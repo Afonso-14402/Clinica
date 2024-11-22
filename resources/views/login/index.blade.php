@@ -26,7 +26,7 @@
                     <input type="password" class="form-control" id="password" placeholder="Password">
                     <label for="password">Senha</label>
                 </div>
-                <button class="btn btn-primary w-100 py-2" type="submit">Entra</button>
+                <button class="btn btn-primary w-100 py-2" type="submit">Entrar</button>
                 
                 <div class="text-center mt-3">
                     <a href="#" class="text-decoration-none text-primary small">Registar-se</a>
