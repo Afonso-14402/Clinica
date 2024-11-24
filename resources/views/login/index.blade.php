@@ -12,6 +12,12 @@
     <div class="card shadow-lg border-0" style="width: 22rem; border-radius: 15px;">
         <main class="form-signin w-100 m-auto p-4">
 
+            @if (session('erro'))
+                <div class="alert alert-danger" role="alert">
+                    {{session('erro')}}
+                </div>     
+            @endif
+
             @if ($errors ->any())
                 <div class="alert alert-danger" role="alert">
                     @foreach ($errors->all() as $errors )
@@ -19,24 +25,37 @@
                     @endforeach
                 </div>     
             @endif
+
+            
+
             <form action="{{ route('login.process') }}" method="POST">
                 <!-- O token CSRF nao recebe de servidor diferente  -->
                 @csrf
-
+                @method('POST')
+                
                 <div class="text-center mb-4">
                     <img class="mb-3" src="{{ asset('imagens/clinica_logo.png') }}" alt="Logo da Clínica" width="100" height="100">
                     <h1 class="h4 mb-2 fw-bold text-primary">Bem-vindo</h1>
                     <p class="text-muted">Iniciar sessão para aceder à sua conta</p>
+                </div> 
+                 <!-- --> 
+        
+                 <div class="form-floating mb-3">
+                    <input type="email"  name="email" class="form-control"  id="email" placeholder="email" value="{{ old('email')}}">
+                    <label for="email">E-mail</label>
+                    
                 </div>
+                <!-- -->
+
+                <!-- --> 
                 
                 <div class="form-floating mb-3">
-                    <input type="email" class="form-control" id="email" placeholder="name@example.com">
-                    <label for="email">E-mail</label>
-                </div>
-                <div class="form-floating mb-3">
-                    <input type="password" class="form-control" id="password" placeholder="Password">
+                    <input type="password"  name="password" class="form-control"  id="password"  placeholder="Password" >
                     <label for="password">Senha</label>
+                    
                 </div>
+                <!-- -->
+
                 <button class="btn btn-primary w-100 py-2" type="submit">Entrar</button>
                 
                 <div class="text-center mt-3">

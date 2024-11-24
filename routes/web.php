@@ -1,12 +1,18 @@
 <?php
 
-use App\Http\Controllers\LogginController;
+use App\Http\Controllers\logginController;
 use App\Http\Controllers\UserController;
 use Illuminate\Support\Facades\Route;
 
 // routes para o login
-Route::get('/', [LogginController::class, 'index'] ) -> name( 'login');
-Route::post('/login', [LogginController::class, 'loginProcess'])-> name ('login.process');
+Route::get('/', [logginController::class, 'index'] ) -> name( 'login');
+Route::post('/login', [logginController::class, 'loginProcess'])-> name ('login.process');
+Route::get('/logout', [logginController::class, 'destroy'])-> name ('login.destroy');
+//route privadas so com login 
 
-// routes para o usuarios
-Route::get('/home', [UserController::class, 'index'] ) -> name( 'user.index');
+Route::group(['middleware'=> 'auth' ] , function(){
+
+    Route::get('/home', [UserController::class, 'index'] ) -> name( 'user.index');
+
+});
+  

@@ -3,8 +3,9 @@
 namespace App\Http\Controllers;
 use App\Http\Requests\LoginRequest;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 
-class LogginController extends Controller
+class logginController extends Controller
 {
     public function index(){
         return view('login.index');
@@ -12,8 +13,20 @@ class LogginController extends Controller
 
     public function loginProcess(LoginRequest $request){
 
-        dd($request);
-        
+        $request ->validated();
+
+        $Authenticate = Auth::attempt(['email'=>$request -> email, 'password'=>$request -> password]);
+
+        if(!$Authenticate){
+
+            return back()->withInput() ->with('erro','Email ou Senha inválida');
+        }
+
+        return redirect()->route('user.index');
     }
 
+    public function destroy(){
+        Auth::logout();
+        return redirect()->route('login');
+    }
 }

@@ -21,9 +21,26 @@ class LoginRequest extends FormRequest
      */
     public function rules(): array
     {
+        
         return [
+            
             'email' => 'required|email',
-            'password' => 'required|min:8',
+            'password' => 'required',
+            
+        ];
+         // Exibe os dados enviados
+   
+
+    }
+
+    public function messages(): array
+    {
+        return [
+            
+            'email.required' => 'Necessário respoder',
+            'email.email' => 'Necessário ser um email valido',
+            'password.required' => 'Necessário por password',
+            
         ];
 
     }
