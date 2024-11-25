@@ -13,10 +13,15 @@ class Usertest extends Seeder
     public function run(): void
     {
         User::firstOrCreate(
-            
-            ['email' => 'afonso@gmail.com'],
-            ['name'=> 'afonso' ,'email' => 'afonso@gmail.com' , 'password'=>'12345678@' , 'active'=> '1' , 'function'=> 'medico']
-        
+            ['email' => 'afonso@gmail.com'], // Condição para encontrar o usuário
+            [
+                'name' => 'afonso',
+                'last_name' => 'afonso',
+                'email' => 'afonso@gmail.com',
+                'password' => bcrypt('12345678@'), // Criptografa a senha antes de salvar
+                'active' => 1, // Pode ser usado como boolean
+                'function' => 'medico',
+            ]
         );
     }
 }

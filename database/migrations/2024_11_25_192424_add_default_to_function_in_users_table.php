@@ -9,14 +9,13 @@ return new class extends Migration
     /**
      * Run the migrations.
      */
-    public function up(): void
-    {
-        Schema::table('users', function (Blueprint $table) {
-            // Adicione as modificações aqui
-            // Exemplo: $table->string('nova_coluna');
-            $table->string('function');
-        });
-    }
+    public function up()
+{
+    Schema::table('users', function (Blueprint $table) {
+        $table->string('function')->default('user')->change();
+    });
+}
+
 
     /**
      * Reverse the migrations.
@@ -24,8 +23,7 @@ return new class extends Migration
     public function down(): void
     {
         Schema::table('users', function (Blueprint $table) {
-            // Rever as modificações, se necessário
-            // Exemplo: $table->dropColumn('nova_coluna');
+            //
         });
     }
 };
