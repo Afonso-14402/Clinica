@@ -20,7 +20,7 @@ class Usertest extends Seeder
                 'email' => 'afonso@gmail.com',
                 'password' => bcrypt('12345678@'), // Criptografa a senha antes de salvar
                 'active' => 1, // Pode ser usado como boolean
-                'function' => 'medico',
+                
             ]
         );
     }

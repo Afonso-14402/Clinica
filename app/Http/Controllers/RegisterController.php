@@ -10,7 +10,7 @@ class RegisterController extends Controller
 {
     public function show()
     {
-        return view('register/index');
+        return view('admin/sign_up_patient');
     }
 
     public function store(Request $request)
@@ -32,10 +32,10 @@ class RegisterController extends Controller
             'password' => Hash::make($validated['password']),
             'birth_date' => $validated['birth_date'],
             'active' => 1, // Usuário ativo por padrão
-            'function' => 'user', // Função padrão do usuário
+            
         ]);
     
-        // Autenticar o usuário automaticamente (se necessário)
+        // Autenticar o usuário automaticamente
         auth()->login($user);
     
         // Redirecionar para a rota user.index

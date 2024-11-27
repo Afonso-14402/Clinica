@@ -11,8 +11,10 @@ return new class extends Migration
      */
     public function up()
 {
-    Schema::table('users', function (Blueprint $table) {
-        $table->string('function')->default('user')->change();
+    Schema::create('specialties', function (Blueprint $table) {
+        $table->id();
+        $table->string('name')->unique(); // Nome da especialidade
+        $table->timestamps();
     });
 }
 
@@ -22,8 +24,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::table('users', function (Blueprint $table) {
-            //
-        });
+        Schema::dropIfExists('specialties');
     }
 };
