@@ -10,7 +10,7 @@ class RegisterController extends Controller
 {
     public function show()
     {
-        return view('admin/sign_up_patient');
+        return view('doctor/sign_up_patient');
     }
 
     public function store(Request $request)
@@ -23,7 +23,7 @@ class RegisterController extends Controller
             'password' => 'required|string|confirmed|min:8',
             'birth_date' => 'required|date|before:today',
         ]);
-    
+
         // Criar o usuário no banco de dados
         $user = User::create([
             'name' => $validated['name'],
@@ -32,15 +32,11 @@ class RegisterController extends Controller
             'password' => Hash::make($validated['password']),
             'birth_date' => $validated['birth_date'],
             'active' => 1, // Usuário ativo por padrão
-            
         ]);
-    
-        // Autenticar o usuário automaticamente
-        auth()->login($user);
-    
-        // Redirecionar para a rota user.index
-        return redirect()->route('user.index')->with('success', 'Registro realizado com sucesso!');
+
+        return redirect()->route('register.show')->with('success', 'Registro realizado com sucesso!');
     }
+
 
 }
 

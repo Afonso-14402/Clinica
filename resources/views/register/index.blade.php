@@ -78,7 +78,7 @@
       
           <!-- Confirmação de Senha -->
           <div class="form-floating mb-4">
-              <input type="password" name="password_confirmation" id="password_confirmation" class="form-control" placeholder="Confirme a Senha" required>
+              <input type=  "password" name="password_confirmation" id="password_confirmation" class="form-control" placeholder="Confirme a Senha" required>
               <label for="password_confirmation">Confirme a Senha</label>
           </div>
       

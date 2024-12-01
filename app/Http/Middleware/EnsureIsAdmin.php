@@ -11,7 +11,7 @@ class EnsureIsAdmin
     public function handle(Request $request, Closure $next): Response
     {
         // Verifica o papel do usuário
-        if (auth()->check() && auth()->user()->role !== 'admin') {
+        if (auth()->check() && auth()->user()->role_id !== '2') {
             return redirect('/home')->with('error', 'Você não tem permissão para acessar esta página.');
         }
 

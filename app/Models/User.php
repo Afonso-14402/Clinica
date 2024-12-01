@@ -22,10 +22,40 @@ class User extends Authenticatable
         'last_name',
         'email',
         'password',
+        'active',
+        'role_id',
         'birth_date',
-        'role',
-        'active'
     ];
+     // Relacionamento com Role
+     public function role()
+     {
+         return $this->belongsTo(Role::class);
+     }
+     public function specialties()
+    {
+        return $this->belongsToMany(Specialty::class, 'user_specialties');
+    }
+
+    public function doctorAgenda()
+    {
+        return $this->hasMany(UserDoctorAgenda::class, 'doctor_id');
+    }
+
+    public function patientAppointments()
+    {
+        return $this->hasMany(Appointment::class, 'patient_user_id');
+    }
+
+    public function doctorAppointments()
+    {
+        return $this->hasMany(Appointment::class, 'doctor_user_id');
+    }
+
+    public function reports()
+    {
+        return $this->hasMany(Report::class, 'doctor_report_user_id');
+    }
+
 
     /**
      * The attributes that should be hidden for serialization.

@@ -19,10 +19,13 @@ return new class extends Migration
             $table->timestamp('email_verified_at')->nullable();
             $table->string('password');
             $table->integer('active');
-            $table->enum('role', ['external', 'admin', 'doctor', 'nurse'])->default('external');
+            $table->unsignedBigInteger('role_id'); // Chave estrangeira para a tabela 'roles'
             $table->date('birth_date')->nullable();
             $table->rememberToken();
             $table->timestamps();
+        
+            // Define a chave estrangeira
+            $table->foreign('role_id')->references('id')->on('roles')->onDelete('cascade');
         });
 
         Schema::create('password_reset_tokens', function (Blueprint $table) {

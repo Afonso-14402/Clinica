@@ -21,9 +21,7 @@
 
             <!-- Header -->
             <div class="text-center mb-4">
-                <img class="mb-3 rounded-circle shadow" src="{{ asset('imagens/clinica_logo.png') }}" alt="Logo da Clínica" width="100" height="100">
-                <h1 class="h4 mb-2 fw-bold text-primary">Bem-vindo</h1>
-                <p class="text-muted">Registre-se para acessar sua conta</p>
+                <p class="text-muted">Registre-se o pacinte</p>
             </div>
 
             <!-- Inputs -->
@@ -53,12 +51,7 @@
             </div>
 
             <!-- Botão -->
-            <button class="btn btn-primary w-100 py-2" type="submit">Registrar-se</button>
-
-            <!-- Link para Login -->
-            <div class="text-center mt-3">
-                <a href="{{ route('login') }}" class="text-decoration-none text-primary small">Já possui uma conta? Faça login</a>
-            </div>
+            <button class="btn btn-primary w-100 py-2" type="submit">Registrar</button>
         </form>
     </main>
 </div>

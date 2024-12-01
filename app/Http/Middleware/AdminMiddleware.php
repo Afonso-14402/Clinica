@@ -14,11 +14,11 @@ class AdminMiddleware
      *
      * @param  \Closure(\Illuminate\Http\Request): (\Symfony\Component\HttpFoundation\Response)  $next
      */
-    public function handle(Request $request, Closure $next , string $role): Response
+    public function handle(Request $request, Closure $next , string $role_id): Response
     {
         if(Auth::check()){
 
-            if(Auth::user()-> role == $role){
+            if(Auth::user()-> role_id == $role_id){
 
                 return $next($request);
             }
