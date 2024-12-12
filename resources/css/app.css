@@ -1,0 +1,17 @@
+/* Importando do css */
+@import 'resources/css/demo.css';
+@import 'resources/css/core.css';
+
+/* Importando do vendor */
+@import 'resources/vendor/css/core.css';
+@import 'resources/vendor/css/theme-default.css';
+@import 'resources/vendor/css/pages/page-account-settings.css';
+@import 'resources/vendor/css/pages/page-auth.css';
+@import 'resources/vendor/css/pages/page-icons.css';
+@import 'resources/vendor/css/pages/page-misc.css';
+@import 'resources/vendor/libs/apex-charts/apex-charts.css';
+@import 'resources/vendor/libs/highlight/highlight.css';
+@import 'resources/vendor/libs/highlight/highlight-github.css';
+@import 'resources/vendor/libs/perfect-scrollbar/perfect-scrollbar.css';
+@import 'resources/vendor/fonts/boxicons.css';
+
