@@ -11,6 +11,7 @@ class SettingsController extends Controller
 {
     public function index()
     {
+        $user = Auth::user()->load('role');
         $user = Auth::user();
         return view('settings.index', compact('user'));
     }

@@ -12,4 +12,3 @@ import './ui-toasts';
 
 
 
-/* Importando do vendor/js */

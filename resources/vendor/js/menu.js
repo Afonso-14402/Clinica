@@ -12,14 +12,23 @@ const togglePasswordIcon = document.querySelector('.input-group-text i');
 const passwordField = document.querySelector('#password');
 
 
-togglePasswordIcon.addEventListener('click', function () {
-  // Alterna o tipo do campo entre "password" e "text"
-  const isPassword = passwordField.type === 'password';
-  passwordField.type = isPassword ? 'text' : 'password';
+ // Selecionar todos os spans com a classe "toggle-password"
+ document.querySelectorAll('.toggle-password').forEach(function(toggle) {
+  toggle.addEventListener('click', function() {
+      const input = this.previousElementSibling; // Seleciona o input anterior ao span
+      const icon = this.querySelector('i'); // Seleciona o ícone dentro do span
 
-  // Alterna os ícones entre "nao ver" e "ver"
-  this.classList.toggle('bx-hide', !isPassword);
-  this.classList.toggle('bx-show', isPassword);
+      // Alternar entre os tipos "password" e "text"
+      if (input.type === "password") {
+          input.type = "text";
+          icon.classList.remove('bx-hide');
+          icon.classList.add('bx-show');
+      } else {
+          input.type = "password";
+          icon.classList.remove('bx-show');
+          icon.classList.add('bx-hide');
+      }
+  });
 });
 
 

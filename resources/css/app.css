@@ -1,6 +1,8 @@
 /* Importando do css */
 @import 'resources/css/demo.css';
 @import 'resources/css/core.css';
+@import 'resources/css/menu-toggle.css';
+
 
 /* Importando do vendor */
 @import 'resources/vendor/css/core.css';

@@ -13,7 +13,7 @@ class CreateAppointmentsTable extends Migration
             $table->foreignId('patient_user_id')->constrained('users')->onDelete('cascade');
             $table->foreignId('doctor_user_id')->constrained('users')->onDelete('cascade');
             $table->foreignId('specialties_id')->constrained('specialties')->onDelete('cascade');
-            $table->foreignId('status_id')->constrained('statuses')->onDelete('cascade');
+            $table->foreignId('status_id')->constrained('status')->onDelete('cascade');
             $table->timestamp('appointment_date_time');
             $table->timestamps();
         });

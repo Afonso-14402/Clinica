@@ -15,4 +15,5 @@ class UserSpecialty extends Model
         'user_id',
         'specialty_id',
     ];
+    public $timestamps = true; //
 }

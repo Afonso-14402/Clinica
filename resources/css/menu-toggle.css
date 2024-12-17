@@ -1,0 +1,16 @@
+.menu-sub {
+    display: none;  /* Submenu oculto por padrão */
+}
+
+.menu-item.active .menu-sub {
+    display: block;  /* Submenu visível quando o item pai estiver ativo */
+}
+
+.menu-item .menu-sub {
+    display: none; /* Esconde os submenus por padrão */
+}
+
+.menu-item.active .menu-sub {
+    display: block; /* Mostra o submenu quando ativo */
+}
+

@@ -42,12 +42,12 @@ class User extends Authenticatable
 
     public function role()
     {
-        return $this->belongsTo(Role::class, 'role_id');
+        return $this->belongsTo(Role::class, 'role_id', 'id');
     }
 
     public function specialties()
     {
-        return $this->belongsToMany(Specialty::class, 'user_specialties');
+        return $this->belongsToMany(Specialty::class, 'user_specialties')->withTimestamps();
     }
 
     public function doctorAgenda()

@@ -1,7 +1,7 @@
 <?php
 
 namespace App\Http\Controllers;
-
+use Illuminate\Support\Facades\Auth;
 use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
@@ -10,10 +10,12 @@ class RegisterController extends Controller
 {
     public function create()
     {
-        return view('patients.create');
+        $user = Auth::user();
+        return view('registar.create', compact('user'));
+      
     }
 
-    public function store(Request $request)
+    public function paciente(Request $request)
     {
         // Validação dos dados enviados pelo formulário
         $validated = $request->validate([
@@ -34,9 +36,9 @@ class RegisterController extends Controller
             'active' => 1, // Usuário ativo por padrão
         ]);
 
-        return redirect()->route('patients.create')->with('success', 'Registro realizado com sucesso!');
+        return redirect()->route('registar.create')->with('success', 'Registro realizado com sucesso!');
     }
-
+    
 
 }
 
