@@ -23,15 +23,19 @@ class RegisterdoctorController extends Controller
     // Validar os dados do formulário
     $validatedData = $request->validate([
         'name' => 'required|string|max:255',
+        'last_name' => 'required|string|max:255',
         'email' => 'required|email|unique:users,email',
         'password' => 'required|confirmed|min:6',
         'specialties' => 'required|array', // Deve conter IDs das especialidades
         'specialties.*' => 'exists:specialties,id',
     ]);
 
+    // Juntar o nome e o sobrenome em um campo único 'full_name'
+    $fullName = $validatedData['name'] . ' ' . $validatedData['last_name'];
+
     // Criar o novo usuário (médico)
     $user = User::create([
-        'name' => $validatedData['name'],
+        'name' => $fullName,
         'email' => $validatedData['email'],
         'password' => bcrypt($validatedData['password']),
         'role_id' => 2, // Definindo o 'role_id' para Médico
@@ -40,11 +44,11 @@ class RegisterdoctorController extends Controller
     // Associar as especialidades ao usuário recém-criado
     $user->specialties()->attach($validatedData['specialties']);
 
-    
-
     // Redirecionar com mensagem de sucesso
     return redirect()->route('registar.create-m')->with('success', 'Médico registrado com sucesso!');
 }
+
+
     
 
 }

@@ -1,0 +1,29 @@
+.icon-box {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    height: 80px;
+    width: 80px;
+    border-radius: 50%;
+    background-color: rgba(0, 0, 0, 0.05);
+    margin: 0 auto;
+}
+
+.card:hover {
+    transform: translateY(-8px);
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.15);
+}
+
+.list-group-item {
+    border-radius: 6px;
+}
+
+.list-group-item:hover {
+    background-color: #f8f9fa;
+}    
+
+/* Classe para ocultar itens */
+.hidden {
+    display: none !important;
+}

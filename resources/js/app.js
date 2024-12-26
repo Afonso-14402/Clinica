@@ -9,6 +9,9 @@ import './main';
 import './ui-modals';
 import './ui-popover';
 import './ui-toasts';
+import './appointments';
+import './dashboard';
+
 
 
 

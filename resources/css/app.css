@@ -1,4 +1,5 @@
 /* Importando do css */
+@import 'resources/css/dashboard.css';
 @import 'resources/css/demo.css';
 @import 'resources/css/core.css';
 @import 'resources/css/menu-toggle.css';

@@ -40,6 +40,15 @@ class User extends Authenticatable
         ];
     }
 
+    public function showForm()
+{
+    $medicos = User::whereHas('role', function ($query) {
+        $query->where('role', 'medico'); // Filtra apenas médicos
+    })->get();
+
+    return view('sua-view', compact('medicos'));
+}
+
     public function role()
     {
         return $this->belongsTo(Role::class, 'role_id', 'id');
@@ -47,9 +56,10 @@ class User extends Authenticatable
 
     public function specialties()
     {
-        return $this->belongsToMany(Specialty::class, 'user_specialties')->withTimestamps();
+        return $this->belongsToMany(Specialty::class, 'user_specialties', 'user_id', 'specialty_id')->withTimestamps();
     }
 
+    
     public function doctorAgenda()
     {
         return $this->hasMany(UserDoctorAgenda::class, 'doctor_id');

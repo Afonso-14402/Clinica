@@ -5,6 +5,7 @@ use Illuminate\Support\Facades\Auth;
 use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
+use App\Models\ActivityLog; 
 
 class RegisterController extends Controller
 {
@@ -25,16 +26,24 @@ class RegisterController extends Controller
             'password' => 'required|string|confirmed|min:8',
             'birth_date' => 'required|date|before:today',
         ]);
+        
+        // Juntar o nome e o sobrenome em um campo único 'full_name'
+        $fullName = $validated['name'] . ' ' . $validated['last_name'];
 
         // Criar o usuário no banco de dados
         $user = User::create([
-            'name' => $validated['name'],
-            'last_name' => $validated['last_name'],
+            'name' => $fullName,  
             'email' => $validated['email'],
             'password' => Hash::make($validated['password']),
             'birth_date' => $validated['birth_date'],
             'active' => 1, // Usuário ativo por padrão
         ]);
+        ActivityLog::create([
+            'type' => 'added', // Tipo da ação
+            'description' => "Paciente {$user->name} foi registrado no sistema", // Use $user->name para acessar o nome do usuário
+            'user_id' => auth()->id(), // Usuário autenticado que realizou a ação
+        ]);
+        
 
         return redirect()->route('registar.create')->with('success', 'Registro realizado com sucesso!');
     }

@@ -110,14 +110,17 @@
               <div class="card">
                 <h5 class="card-header">Registrar Paciente</h5>
                 <div class="card-body">
-                  <div class="mb-4">
-                    <label for="name" class="form-label">Nome</label>
-                    <input type="text" class="form-control" id="name" name="name" value="{{ old('name') }}" required>
+                  <div class="mb-4 row">
+                    <div class="col-md-6">
+                      <label for="name" class="form-label">Nome</label>
+                      <input type="text" class="form-control" id="name" name="name" value="{{ old('name') }}" required>
+                    </div>
+                    <div class="col-md-6">
+                      <label for="last_name" class="form-label">Sobrenome</label>
+                      <input type="text" class="form-control" id="last_name" name="last_name" value="{{ old('last_name') }}" required>
+                    </div>
                   </div>
-                  <div class="mb-4">
-                    <label for="last_name" class="form-label">Sobrenome</label>
-                    <input type="text" class="form-control" id="last_name" name="last_name" value="{{ old('last_name') }}" required>
-                  </div>
+                  
                   <div class="mb-4">
                     <label for="email" class="form-label">E-mail</label>
                     <input type="email" class="form-control" id="email" name="email" value="{{ old('email') }}" required>

@@ -16,8 +16,13 @@
         "vite": "^5.4.11"
     },
     "dependencies": {
+        "@fullcalendar/core": "^6.1.15",
+        "@fullcalendar/daygrid": "^6.1.15",
+        "@fullcalendar/interaction": "^6.1.15",
+        "@fullcalendar/timegrid": "^6.1.15",
         "@popperjs/core": "^2.11.8",
         "bootstrap": "^5.3.3",
+        "flatpickr": "^4.6.13",
         "highlight.js": "^11.10.0"
     }
 }

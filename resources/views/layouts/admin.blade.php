@@ -10,13 +10,23 @@
         @vite(['resources/css/app.css'])
         
         <!-- Fonts -->
+        
         <link rel="preconnect" href="https://fonts.googleapis.com" />
         <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
         <link
         href="https://fonts.googleapis.com/css2?family=Public+Sans:ital,wght@0,300;0,400;0,500;0,600;0,700;1,300;1,400;1,500;1,600;1,700&display=swap"
         rel="stylesheet" />
+
+
+    <link rel="stylesheet" href="https://cdn.dhtmlx.com/scheduler/edge/dhtmlxscheduler.css">
+
+
+
        
 <style>
+
+
+
 
     
 </style>
@@ -27,7 +37,7 @@
         <main class="d-flex">
 
             <aside id="layout-menu" class="layout-menu menu-vertical menu bg-menu-theme">
-                <div id="container" style="max-height: 500px; overflow-y: auto; background-color: #ffffff;">
+                <div id="container" style="max-height: 1000px; overflow-y: auto; background-color: #ffffff;">
   
                 <div class="app-brand demo">
                 <a href="" class="app-brand-link">
@@ -90,48 +100,16 @@
                 <li class="menu-item">
                     <a href="javascript:void(0);" class="menu-link menu-toggle">
                     <i class="menu-icon tf-icons bx bx-home-smile"></i>
-                    <div class="text-truncate" data-i18n="Dashboards">Dashboards</div>
+                    <div class="text-truncate" data-i18n="Dashboards">Painéis de controlo</div>
                     
                     </a>
                     <ul class="menu-sub">
                     <li class="menu-item">
-                        <a href="index.html" class="menu-link">
+                        <a href="{{ route('dashboard.index') }}" class="menu-link">
                         <div class="text-truncate" data-i18n="Analytics">Analytics</div>
                         </a>
                     </li>
-                    <li class="menu-item">
-                        <a
-                        href="https://demos.themeselection.com/sneat-bootstrap-html-admin-template/html/vertical-menu-template/dashboards-crm.html"
-                        target="_blank"
-                        class="menu-link">
-                        <div class="text-truncate" data-i18n="CRM">CRM</div>
-                        <div class="badge rounded-pill bg-label-primary text-uppercase fs-tiny ms-auto">Pro</div>
-                        </a>
-                    </li>
-                    <li class="menu-item">
-                        <a
-                        href="https://demos.themeselection.com/sneat-bootstrap-html-admin-template/html/vertical-menu-template/app-ecommerce-dashboard.html"
-                        target="_blank"
-                        class="menu-link">
-                        <div class="text-truncate" data-i18n="eCommerce">eCommerce</div>
-                        <div class="badge rounded-pill bg-label-primary text-uppercase fs-tiny ms-auto">Pro</div>
-                        </a>
-                    </li>
-                    <li class="menu-item">
-                        <a
-                        href="https://demos.themeselection.com/sneat-bootstrap-html-admin-template/html/vertical-menu-template/app-logistics-dashboard.html"
-                        target="_blank"
-                        class="menu-link">
-                        <div class="text-truncate" data-i18n="Logistics">Logistics</div>
-                        <div class="badge rounded-pill bg-label-primary text-uppercase fs-tiny ms-auto">Pro</div>
-                        </a>
-                    </li>
-                    <li class="menu-item">
-                        <a href="app-academy-dashboard.html" target="_blank" class="menu-link">
-                        <div class="text-truncate" data-i18n="Academy">Academy</div>
-                        <div class="badge rounded-pill bg-label-primary text-uppercase fs-tiny ms-auto">Pro</div>
-                        </a>
-                    </li>
+                    
                     </ul>
                 </li>
             
@@ -159,18 +137,20 @@
                 </li>
                 @endif
 
-                <!-- Extended components -->
+                @if (isset($user) && $user->role->role != 'Patient')
                 <li class="menu-item">
                     <a href="javascript:void(0)" class="menu-link menu-toggle">
                     <i class="menu-icon tf-icons bx bx-copy"></i>
-                    <div class="text-truncate" data-i18n="Extended UI">Extended UI</div>
+                    <div class="text-truncate" data-i18n="Marcações">Marcações</div>
                     </a>
                     <ul class="menu-sub">
+                    @if (isset($user) && $user->role->role != 'Patient' && $user->role->role != 'Doctor')
                     <li class="menu-item">
-                        <a href="extended-ui-perfect-scrollbar.html" class="menu-link">
-                        <div class="text-truncate" data-i18n="Perfect Scrollbar">Perfect Scrollbar</div>
+                        <a href="{{ route('appointments.create') }}" class="menu-link">
+                        <div class="text-truncate" data-i18n="Agenda/Calendário">Agenda/Calendário</div>
                         </a>
                     </li>
+                    @endif
                     <li class="menu-item">
                         <a href="extended-ui-text-divider.html" class="menu-link">
                         <div class="text-truncate" data-i18n="Text Divider">Text Divider</div>
@@ -178,6 +158,7 @@
                     </li>
                     </ul>
                 </li>
+                @endif
             
                 <li class="menu-item">
                     <a href="icons-boxicons.html" class="menu-link">
@@ -234,13 +215,15 @@
                     <div class="col-md-12">
                         <div class="main-content">
                             @yield('content')
+                            
                         </div>
                     </div>
                 </div>
             </div>
     </main>
 
-    
+    <!-- JS -->
+<script src="https://cdn.dhtmlx.com/scheduler/edge/dhtmlxscheduler.js"></script>
     @vite(['resources/vendor/js/app.js', 'resources/js/app.js','resources/vendor/libs/app.js'])
 
 </body>
