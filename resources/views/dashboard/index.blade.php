@@ -3,8 +3,6 @@
 @section('title', 'Dashboard')
 
 @section('content')
-@vite(['resources/css/app.css'])
-
 <div class="container py-5">
     <!-- Navbar -->
     <nav class="layout-navbar container-xxl navbar navbar-expand-xl navbar-detached align-items-center bg-navbar-theme shadow-sm" id="layout-navbar">
@@ -108,5 +106,4 @@
 </div>
 
 @vite(['resources/vendor/js/app.js', 'resources/js/app.js','resources/vendor/libs/app.js'])
-@endsection  
-
+@endsection

@@ -15,7 +15,7 @@ class DatabaseSeeder extends Seeder
     {
         $this->call([
             
-            StatusSeeder::class,
+            SpecialtySeeder::class,
         ]);
     }
 }

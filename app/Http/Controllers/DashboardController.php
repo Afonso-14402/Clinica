@@ -27,13 +27,9 @@ class DashboardController extends Controller
 
         // Atividades mais recentes
         $activities = ActivityLog::with('user') // Inclui informações do usuário
-            ->orderBy('created_at', 'desc')
-            ->limit(20)
-            ->get();
-        
-            $activities = ActivityLog::paginate(5); // Pagina com 5 itens por página
-           
-
+        ->orderBy('created_at', 'desc')
+        ->paginate(5); 
+    
         // Retornar para a view com todos os dados
         $user = Auth::user();
         return view('dashboard.index', compact(

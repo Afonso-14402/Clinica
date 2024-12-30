@@ -16,6 +16,7 @@ class User extends Authenticatable
         'password',
         'role_id',
         'status',
+        
     ];
     /**
      * The attributes that should be hidden for serialization.
@@ -79,4 +80,17 @@ class User extends Authenticatable
     {
         return $this->hasMany(Report::class, 'doctor_report_user_id');
     }
+
+
+    public function specialty()
+{
+    return $this->belongsTo(Specialty::class, 'users_specialties', 'user_id', 'specialty_id');
+}
+
+
+public function UserDoctorAgenda()
+    {
+        return $this->hasMany(UserDoctorAgenda::class);
+    }
+    
 }

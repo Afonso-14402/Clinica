@@ -122,13 +122,13 @@
                     </a>
                     <ul class="menu-sub">
                         <li class="menu-item">
-                            <a href="{{ route('registar.create') }}" class="menu-link">
+                            <a href="{{ route('list.listpatient') }}" class="menu-link">
                                 Resgitar pacientes
                             </a>
                         </li>
                         @if (isset($user) && $user->role->role != 'Patient' && $user->role->role != 'Doctor')
                         <li class="menu-item">
-                            <a href="{{ route('registar.create-m') }}" class="menu-link">
+                            <a href="{{ route('list.index') }}" class="menu-link">
                                 Registar medico
                             </a>
                         </li>

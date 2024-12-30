@@ -1,38 +1,54 @@
 document.addEventListener("DOMContentLoaded", () => {
+    // Captura os elementos do DOM
     const activityList = document.getElementById("activity-list");
     const paginationControls = document.getElementById("pagination-controls");
 
-    
+    // Verifica se esta página contém os elementos necessários
+    if (!activityList || !paginationControls) {
+        // Se não encontrar, interrompe a execução deste script
+        return;
+    }
+
+    // Função para buscar atividades
     const fetchActivities = (page = 1) => {
-        fetch(`/activities?page=${page}`) 
-            .then(response => response.json())
+        fetch(`/activities?page=${page}`) // Substitua pela rota correta no backend
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error(`Erro na resposta do servidor: ${response.status}`);
+                }
+                return response.json();
+            })
             .then(data => {
-                renderActivities(data.data); 
-                renderPagination(data); 
+                renderActivities(data.data); // Renderizar a lista de atividades
+                renderPagination(data); // Renderizar a paginação
             })
             .catch(error => console.error("Erro ao carregar atividades:", error));
     };
 
+   // Função para renderizar as atividades
+const renderActivities = (activities) => {
+    // Limpa a lista antes de renderizar novos itens
+    activityList.innerHTML = "";
 
-    const renderActivities = (activities) => {
-        activityList.innerHTML = ""; 
-        activities.forEach(activity => {
-            const listItem = document.createElement("li");
-            listItem.className = "list-group-item";
-            listItem.innerHTML = `
-                <strong>${new Date(activity.created_at).toLocaleDateString()} ${new Date(activity.created_at).toLocaleTimeString()}</strong> - 
-                ${activity.description} 
-                ${activity.user ? `<span class="text-muted">por ${activity.user.name}</span>` : ""}
-            `;
-            activityList.appendChild(listItem);
-        });
-    };
+    activities.forEach(activity => {
+        const listItem = document.createElement("li");
+        listItem.className = "list-group-item";
+        listItem.dataset.id = activity.id; // Adiciona o ID da atividade para controle
+        listItem.innerHTML = `
+            <strong>${new Date(activity.created_at).toLocaleDateString()} ${new Date(activity.created_at).toLocaleTimeString()}</strong> - 
+            ${activity.description} 
+            ${activity.user ? `<span class="text-muted">por ${activity.user.name}</span>` : ""}
+        `;
+        activityList.appendChild(listItem);
+    });
+};
 
-  
+    // Função para renderizar os botões de paginação
     const renderPagination = (data) => {
-        paginationControls.innerHTML = ""; 
-
         const { current_page, last_page } = data;
+
+        // Atualiza ou cria botões de paginação
+        paginationControls.innerHTML = "";
 
         // Botão "Anterior"
         if (current_page > 1) {
@@ -63,6 +79,6 @@ document.addEventListener("DOMContentLoaded", () => {
         }
     };
 
-    
+    // Carrega as atividades iniciais na primeira página
     fetchActivities();
 });

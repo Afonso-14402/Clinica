@@ -86,13 +86,7 @@
         </div>
     </div>
 
-    <!-- Gráfico -->
-    <div class="row my-5">
-        <div class="col-12 chart-container">
-            <h4 class="text-center mb-4">Tendência de Consultas</h4>
-            <canvas id="chart-consultas"></canvas>
-        </div>
-    </div>
+
 
     <!-- Tabela -->
     <div class="row">

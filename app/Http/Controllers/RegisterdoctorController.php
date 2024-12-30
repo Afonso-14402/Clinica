@@ -5,6 +5,7 @@ use App\Models\Specialty;
 use Illuminate\Support\Facades\Auth;
 use App\Models\User;
 use Illuminate\Http\Request;
+use App\Models\ActivityLog; 
 
 class RegisterdoctorController extends Controller
 {
@@ -40,12 +41,17 @@ class RegisterdoctorController extends Controller
         'password' => bcrypt($validatedData['password']),
         'role_id' => 2, // Definindo o 'role_id' para Médico
     ]);
+    ActivityLog::create([
+        'type' => 'criaçao do medico', // Tipo da ação
+        'description' => "Novo medico {$user->name} foi registrado no sistema", // Use $user->name para acessar o nome do usuário
+        'user_id' => auth()->id(), // Usuário autenticado que realizou a ação
+    ]);
 
     // Associar as especialidades ao usuário recém-criado
     $user->specialties()->attach($validatedData['specialties']);
 
     // Redirecionar com mensagem de sucesso
-    return redirect()->route('registar.create-m')->with('success', 'Médico registrado com sucesso!');
+    return redirect()->route('list.index')->with('success', 'Médico registrado com sucesso!');
 }
 
 

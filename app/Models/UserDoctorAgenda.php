@@ -20,5 +20,10 @@ class UserDoctorAgenda extends Model
     {
         return $this->belongsTo(User::class, 'doctor_id');
     }
+
+    public function user()
+    {
+        return $this->belongsTo(User::class);
+    }
 }
 

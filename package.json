@@ -21,8 +21,9 @@
         "@fullcalendar/interaction": "^6.1.15",
         "@fullcalendar/timegrid": "^6.1.15",
         "@popperjs/core": "^2.11.8",
+        "apexcharts": "^4.3.0",
         "bootstrap": "^5.3.3",
         "flatpickr": "^4.6.13",
-        "highlight.js": "^11.10.0"
+        "highlight.js": "^11.11.1"
     }
 }

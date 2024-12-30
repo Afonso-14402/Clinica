@@ -96,80 +96,117 @@
     
 </nav>     
 
-
-<div class="content-wrapper">
-    <div class="container">
-        <!-- Título -->
-        <h1 class="mt-4 text-center">Painel Administrativo da Clínica</h1>
-
-        <!-- Cartões Resumo -->
-        <div class="row mt-5">
-            <!-- Total de Usuários -->
-            <div class="col-md-3 mb-3">
-                <div class="card bg-primary text-white">
-                    <div class="card-body">
-                        <h5 class="card-title">Total de Usuários</h5>
-                        <h4 id="totalUsers">500</h4>
-                    </div>
-                </div>
-            </div>
-            <!-- Total de Consultas -->
-            <div class="col-md-3 mb-3">
-                <div class="card bg-success text-white">
-                    <div class="card-body">
-                        <h5 class="card-title">Total de Consultas</h5>
-                        <h4 id="totalAppointments">150</h4>
-                    </div>
-                </div>
-            </div>
-            <!-- Total de Especialidades -->
-            <div class="col-md-3 mb-3">
-                <div class="card bg-warning text-white">
-                    <div class="card-body">
-                        <h5 class="card-title">Especialidades</h5>
-                        <h4 id="totalSpecialties">10</h4>
-                    </div>
-                </div>
-            </div>
-            <!-- Relatórios Gerados -->
-            <div class="col-md-3 mb-3">
-                <div class="card bg-secondary text-white">
-                    <div class="card-body">
-                        <h5 class="card-title">Relatórios Gerados</h5>
-                        <h4 id="totalReports">30</h4>
-                    </div>
-                </div>
-            </div>
+<div class="container">
+    <h2 class="mb-4">Adicionar Usuário</h2>
+    
+    <!-- Breadcrumb -->
+    <nav aria-label="breadcrumb">
+        <ol class="breadcrumb">
+            <li class="breadcrumb-item"><a >Usuários</a></li>
+            <li class="breadcrumb-item"><a href="#">Perfil de Usuário</a></li>
+            <li class="breadcrumb-item active" aria-current="page">Adicionar Paciente</li>
+        </ol>
+    </nav>
+    <!-- Card com Abas -->
+    <div class="card shadow-sm">
+        <div class="card-header">
+            <ul class="nav nav-tabs card-header-tabs" id="pacienteTab" role="tablist">
+                @foreach (['Dados de Acesso', 'Dados Pessoais', 'Dados Complementares', 'Convênios', 'Prontuário Médico'] as $index => $tab)
+                <li class="nav-item" role="presentation">
+                    <button 
+                        class="nav-link {{ $index === 0 ? 'active' : '' }}" 
+                        id="{{ Str::slug($tab) }}-tab" 
+                        data-bs-toggle="tab" 
+                        data-bs-target="#{{ Str::slug($tab) }}" 
+                        type="button" 
+                        role="tab">
+                        {{ $tab }}
+                    </button>
+                </li>
+                @endforeach
+            </ul>
         </div>
 
-        <!-- Gráficos -->
-        <div class="row mt-5">
-            <!-- Gráfico de Consultas por Especialidade -->
-            <div class="col-md-6">
-                <div class="card">
-                    <div class="card-body">
-                        <canvas id="appointmentsBySpecialtyChart"></canvas>
-                    </div>
+        <div class="card-body">
+            <div class="tab-content" id="pacienteTabContent">
+                <!-- Aba: Dados de Acesso -->
+                <div class="tab-pane fade show active" id="dados-de-acesso" role="tabpanel" aria-labelledby="dados-de-acesso-tab">
+                    <form>
+                        <div class="mb-3">
+                            <label for="email" class="form-label">E-mail</label>
+                            <input type="email" class="form-control" id="email" name="email" placeholder="Digite o e-mail do paciente" required>
+                        </div>
+                        <div class="mb-3">
+                            <label for="senha" class="form-label">Senha</label>
+                            <input type="password" class="form-control" id="senha" name="senha" placeholder="Defina uma senha" required>
+                        </div>
+                    </form>
                 </div>
-            </div>
-            <!-- Gráfico de Status de Consultas -->
-            <div class="col-md-6">
-                <div class="card">
-                    <div class="card-body">
-                        <canvas id="appointmentsStatusChart"></canvas>
-                    </div>
+                
+                <!-- Aba: Dados Pessoais -->
+                <div class="tab-pane fade" id="dados-pessoais" role="tabpanel" aria-labelledby="dados-pessoais-tab">
+                    <form>
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label for="nome" class="form-label">Nome Completo</label>
+                                <input type="text" class="form-control" id="nome" name="nome" placeholder="Digite o nome completo" required>
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label for="data-nascimento" class="form-label">Data de Nascimento</label>
+                                <input type="date" class="form-control" id="data-nascimento" name="data_nascimento" required>
+                            </div>
+                        </div>
+                        <div class="mb-3">
+                            <label for="telefone" class="form-label">Telefone</label>
+                            <input type="tel" class="form-control" id="telefone" name="telefone" placeholder="(XX) XXXXX-XXXX">
+                        </div>
+                    </form>
+                </div>
+
+                <!-- Aba: Dados Complementares -->
+                <div class="tab-pane fade" id="dados-complementares" role="tabpanel" aria-labelledby="dados-complementares-tab">
+                    <form>
+                        <div class="mb-3">
+                            <label for="endereco" class="form-label">Endereço</label>
+                            <input type="text" class="form-control" id="endereco" name="endereco" placeholder="Digite o endereço completo">
+                        </div>
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label for="cidade" class="form-label">Cidade</label>
+                                <input type="text" class="form-control" id="cidade" name="cidade">
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label for="estado" class="form-label">Estado</label>
+                                <input type="text" class="form-control" id="estado" name="estado">
+                            </div>
+                        </div>
+                    </form>
+                </div>
+
+                <!-- Aba: Convênios -->
+                <div class="tab-pane fade" id="convenios" role="tabpanel" aria-labelledby="convenios-tab">
+                    <form>
+                        <div class="mb-3">
+                            <label for="convenio" class="form-label">Convênio</label>
+                            <input type="text" class="form-control" id="convenio" name="convenio" placeholder="Informe o convênio do paciente">
+                        </div>
+                        <div class="mb-3">
+                            <label for="numero-carteira" class="form-label">Número da Carteira</label>
+                            <input type="text" class="form-control" id="numero-carteira" name="numero_carteira">
+                        </div>
+                    </form>
+                </div>
+
+                <!-- Aba: Prontuário Médico -->
+                <div class="tab-pane fade" id="prontuario-medico" role="tabpanel" aria-labelledby="prontuario-medico-tab">
+                    <p>Cadastro de Prontuário</p>
+                    <p>O cadastro da Anamnese, exame físico e/ou Hipótese diagnóstica será armazenado como ficha inicial do paciente.</p>
+                    <button class="btn btn-success">Iniciar Consulta</button>
                 </div>
             </div>
         </div>
     </div>
 </div>
-
-<script>
-
-
-
-</script>
-
 @endsection
 
 

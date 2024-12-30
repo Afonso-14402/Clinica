@@ -1,20 +1,18 @@
 /* Importando do css */
-@import 'resources/css/dashboard.css';
-@import 'resources/css/demo.css';
-@import 'resources/css/core.css';
-@import 'resources/css/menu-toggle.css';
-
+@import './dashboard.css';
+@import './demo.css';
+@import './core.css';
+@import './menu-toggle.css';
 
 /* Importando do vendor */
-@import 'resources/vendor/css/core.css';
-@import 'resources/vendor/css/theme-default.css';
-@import 'resources/vendor/css/pages/page-account-settings.css';
-@import 'resources/vendor/css/pages/page-auth.css';
-@import 'resources/vendor/css/pages/page-icons.css';
-@import 'resources/vendor/css/pages/page-misc.css';
-@import 'resources/vendor/libs/apex-charts/apex-charts.css';
-@import 'resources/vendor/libs/highlight/highlight.css';
-@import 'resources/vendor/libs/highlight/highlight-github.css';
-@import 'resources/vendor/libs/perfect-scrollbar/perfect-scrollbar.css';
-@import 'resources/vendor/fonts/boxicons.css';
-
+@import '../vendor/css/core.css';
+@import '../vendor/css/theme-default.css';
+@import '../vendor/css/pages/page-account-settings.css';
+@import '../vendor/css/pages/page-auth.css';
+@import '../vendor/css/pages/page-icons.css';
+@import '../vendor/css/pages/page-misc.css';
+@import '../vendor/libs/apex-charts/apex-charts.css';
+@import '../vendor/libs/highlight/highlight.css';
+@import '../vendor/libs/highlight/highlight-github.css';
+@import '../vendor/libs/perfect-scrollbar/perfect-scrollbar.css';
+@import '../vendor/fonts/boxicons.css';

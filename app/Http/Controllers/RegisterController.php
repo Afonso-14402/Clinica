@@ -45,7 +45,7 @@ class RegisterController extends Controller
         ]);
         
 
-        return redirect()->route('registar.create')->with('success', 'Registro realizado com sucesso!');
+        return redirect()->route('list.listpatient')->with('success', 'Registro realizado com sucesso!');
     }
     
 
