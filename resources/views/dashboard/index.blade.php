@@ -70,7 +70,7 @@
             <div class="row g-4">
                 @php
                 $cards = [
-                    ['title' => 'Total de Usuários', 'value' => $totalUsers, 'icon' => 'bx bx-user', 'color' => 'primary'],
+                    ['title' => 'Total de Utilizadores', 'value' => $totalUsers, 'icon' => 'bx bx-user', 'color' => 'primary'],
                     ['title' => 'Total de Pacientes', 'value' => $totalPatients, 'icon' => 'bx bx-user-circle', 'color' => 'info'],
                     ['title' => 'Total de Médicos', 'value' => $totalDoctors, 'icon' => 'bx bx-health', 'color' => 'success'],
                     ['title' => 'Consultas Pendentes', 'value' => $pendingAppointments, 'icon' => 'bx bx-time', 'color' => 'warning'],

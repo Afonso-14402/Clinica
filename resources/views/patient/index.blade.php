@@ -12,7 +12,6 @@
     }
 </style>
 
-
 @section('content')
 
 <nav class="layout-navbar container-xxl navbar navbar-expand-xl navbar-detached align-items-center bg-navbar-theme" id="layout-navbar">
@@ -95,7 +94,7 @@
     
 </nav>  
 <div class="container">
-    <h1>Bem-vindo, {{ $user->name }}</h1>
+   
 
     <div class="row mt-4">
         <!-- Próxima consulta -->
@@ -113,7 +112,100 @@
                 </div>
             </div>
         </div>
+        <div class="col-md-6">
+            <div class="card">
+                <div class="card-body">
+                    <h4>Marcação de consulta </h4>
+                    <p>Você podes pedir uma consulta com o seu medico de família.</p>
+                <br>
+                    <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#appointmentModal">
+                        Agendar Consulta
+                    </button>
+            </div>
+        </div>
     </div>
+
+<!-- Modal -->
+<div class="modal fade" id="appointmentModal" tabindex="-1" aria-labelledby="appointmentModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="appointmentModalLabel">Agendar Consulta</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Fechar"></button>
+            </div>
+            <div class="modal-body">
+                <form method="POST" action="{{ route('requestAppointment') }}">
+                    @csrf
+
+                    <!-- Campo de Paciente -->
+                    <div class="mb-3">
+                        <label for="patient_user_id" class="form-label">Paciente</label>
+                        <input 
+                            type="text" 
+                            id="patient-name" 
+                            class="form-control" 
+                            value="{{ Auth::user()->name }}" 
+                            readonly
+                        />
+                        <input 
+                            type="hidden" 
+                            name="patient_user_id" 
+                            id="patient_user_id" 
+                            value="{{ Auth::id() }}" 
+                        />
+                    </div>
+
+                    <!-- Campo de Médico de Família -->
+                    <div class="mb-3">
+                        <label for="doctor_user_id" class="form-label">Médico de Família</label>
+                        <input 
+                            type="text" 
+                            id="doctor-name" 
+                            class="form-control" 
+                            value="{{ Auth::user()->familyDoctor?->doctor?->name ?? 'Nenhum médico associado' }}" 
+                            readonly
+                        />
+                        <input 
+                            type="hidden" 
+                            name="doctor_user_id" 
+                            id="doctor_user_id" 
+                            value="{{ Auth::user()->familyDoctor?->id ?? '' }}" 
+                        />
+                    </div>
+
+                    <!-- Campo de Data e Hora -->
+                    <div class="mb-3">
+                        <label for="appointment_date_time" class="form-label">Data e Hora</label>
+                        <input 
+                            type="datetime-local" 
+                            class="form-control" 
+                            name="appointment_date_time" 
+                            required 
+                        />
+                    </div>
+
+                    <!-- Mensagem de Erro -->
+                    @if ($errors->any())
+                        <div class="alert alert-danger">
+                            <ul class="mb-0">
+                                @foreach ($errors->all() as $error)
+                                    <li>{{ $error }}</li>
+                                @endforeach
+                            </ul>
+                        </div>
+                    @endif
+
+                    <!-- Botões -->
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                        <button type="submit" class="btn btn-primary">Agendar Consulta</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
 
     <!-- Lista de consultas -->
     <div class="row mt-5">

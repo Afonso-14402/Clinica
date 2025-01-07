@@ -528,7 +528,7 @@ form button {
     });
 
     function renderScheduleForm(schedules) {
-    const days = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'];
+    const days = ['Domingo', 'Segunda-feira', 'Terça-feira', 'Quarta-feira', 'Quinta-feira', 'Sexta-feira', 'Sábado'];
 
     let formHtml = `
         <div class="list-group shadow-sm rounded-3">

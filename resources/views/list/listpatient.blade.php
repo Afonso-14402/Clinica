@@ -313,9 +313,16 @@ form button {
                                     
                                     <!-- Gerenciar Agendamentos -->
                                     <li>
-                                        <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#addPacienteModal">
-                                            Adicionar Paciente
-                                          </button>
+                                        
+                                            <button 
+                                                type="button" 
+                                                class="btn btn-sm btn-outline-primary" 
+                                                data-patient-id="{{ $patient->id }}" 
+                                                data-bs-toggle="modal" 
+                                                data-bs-target="#addPacienteModal">
+                                                Ver Prontuário
+                                            </button>
+                                        
                                           
                                     </li>
                                     
@@ -465,7 +472,7 @@ form button {
           <div class="card shadow-sm">
             <div class="card-header">
               <ul class="nav nav-tabs card-header-tabs" id="pacienteModalTab" role="tablist">
-                @foreach (['Dados de Acesso', 'Dados Pessoais', 'Dados Complementares', 'Convênios', 'Prontuário Médico'] as $index => $tab)
+                @foreach (['Dados Pessoais', 'Prontuário Médico'] as $index => $tab)
                 <li class="nav-item" role="presentation">
                   <button 
                     class="nav-link {{ $index === 0 ? 'active' : '' }}" 
@@ -482,20 +489,6 @@ form button {
             </div>
             <div class="card-body">
               <div class="tab-content" id="pacienteModalTabContent">
-                <!-- Aba: Dados de Acesso -->
-                <div class="tab-pane fade show active" id="modal-dados-de-acesso" role="tabpanel">
-                  <form id="formDadosAcesso">
-                    <div class="mb-3">
-                      <label for="modal-email" class="form-label">E-mail</label>
-                      <input type="email" class="form-control" id="modal-email" name="email" placeholder="Digite o e-mail do paciente" required>
-                    </div>
-                    <div class="mb-3">
-                      <label for="modal-senha" class="form-label">Senha</label>
-                      <input type="password" class="form-control" id="modal-senha" name="senha" placeholder="Defina uma senha" required>
-                    </div>
-                  </form>
-                </div>
-  
                 <!-- Aba: Dados Pessoais -->
                 <div class="tab-pane fade" id="modal-dados-pessoais" role="tabpanel">
                   <form id="formDadosPessoais">
@@ -515,47 +508,29 @@ form button {
                     </div>
                   </form>
                 </div>
-  
-                <!-- Aba: Dados Complementares -->
-                <div class="tab-pane fade" id="modal-dados-complementares" role="tabpanel">
-                  <form id="formDadosComplementares">
-                    <div class="mb-3">
-                      <label for="modal-endereco" class="form-label">Endereço</label>
-                      <input type="text" class="form-control" id="modal-endereco" name="endereco" placeholder="Digite o endereço completo">
-                    </div>
-                    <div class="row">
-                      <div class="col-md-6 mb-3">
-                        <label for="modal-cidade" class="form-label">Cidade</label>
-                        <input type="text" class="form-control" id="modal-cidade" name="cidade">
-                      </div>
-                      <div class="col-md-6 mb-3">
-                        <label for="modal-estado" class="form-label">Estado</label>
-                        <input type="text" class="form-control" id="modal-estado" name="estado">
-                      </div>
-                    </div>
-                  </form>
-                </div>
-  
-                <!-- Aba: Convênios -->
-                <div class="tab-pane fade" id="modal-convenios" role="tabpanel">
-                  <form id="formConvenios">
-                    <div class="mb-3">
-                      <label for="modal-convenio" class="form-label">Convênio</label>
-                      <input type="text" class="form-control" id="modal-convenio" name="convenio" placeholder="Informe o convênio do paciente">
-                    </div>
-                    <div class="mb-3">
-                      <label for="modal-numero-carteira" class="form-label">Número da Carteira</label>
-                      <input type="text" class="form-control" id="modal-numero-carteira" name="numero_carteira">
-                    </div>
-                  </form>
-                </div>
-  
                 <!-- Aba: Prontuário Médico -->
                 <div class="tab-pane fade" id="modal-prontuario-medico" role="tabpanel">
-                  <p>Cadastro de Prontuário</p>
-                  <p>O cadastro da Anamnese, exame físico e/ou Hipótese diagnóstica será armazenado como ficha inicial do paciente.</p>
-                  <button type="button" class="btn btn-success">Iniciar Consulta</button>
+                    <p>Cadastro de Prontuário</p>
+                    <p>O cadastro da Anamnese, exame físico e/ou hipótese diagnóstica será armazenado como ficha inicial do paciente.</p>
+                    <div class="report-list">
+                        <table class="table">
+                            <thead>
+                                <tr>
+                                    <th>Data e Hora</th>
+                                    <th>Ação</th>
+                                </tr>
+                            </thead>
+                            <tbody></tbody>
+                        </table>
+                    </div>
+                    <div class="report-details mt-4" style="display: none;">
+                        <h5>Relatório Completo</h5>
+                        <p id="reportContent"></p>
+                        <button class="btn btn-secondary btn-sm" id="backToList">Voltar à Lista</button>
+                    </div>
                 </div>
+                
+                              
               </div>
             </div>
           </div>
@@ -569,6 +544,70 @@ form button {
   </div>
   
 <script>
+
+$(document).ready(function () {
+    $('#addPacienteModal').on('show.bs.modal', function (event) {
+        const button = $(event.relatedTarget);
+        const patientId = button.data('patient-id');
+
+        const prontuarioTab = $('#modal-prontuario-medico');
+        const reportListContainer = prontuarioTab.find('.report-list tbody');
+        const reportDetails = prontuarioTab.find('.report-details');
+        const reportContent = $('#reportContent');
+        const backToListButton = $('#backToList');
+
+        if (prontuarioTab.length && patientId) {
+            // Limpa a lista de relatórios e oculta detalhes do relatório
+            reportListContainer.empty();
+            reportDetails.hide();
+
+            $.ajax({
+                url: `/patient-reports/${patientId}`,
+                method: 'GET',
+                success: function (data) {
+                    if (data.length) {
+                        data.forEach(report => {
+                            const reportRow = `
+                                <tr>
+                                    <td>${new Date(report.report_date_time).toLocaleString()}</td>
+                                    <td>
+                                        <button class="btn btn-primary btn-sm view-report" data-content="${report.content}">
+                                            Ver Relatório
+                                        </button>
+                                    </td>
+                                </tr>`;
+                            reportListContainer.append(reportRow);
+                        });
+
+                        // Configura os botões de "Ver Relatório"
+                        $('.view-report').on('click', function () {
+                            const content = $(this).data('content');
+                            reportContent.text(content);
+                            prontuarioTab.find('.report-list').hide();
+                            reportDetails.show();
+                        });
+
+                        // Configura o botão "Voltar à Lista"
+                        backToListButton.on('click', function () {
+                            reportDetails.hide();
+                            prontuarioTab.find('.report-list').show();
+                        });
+                    } else {
+                        reportListContainer.append('<tr><td colspan="2">Nenhum relatório encontrado.</td></tr>');
+                    }
+                },
+                error: function () {
+                    reportListContainer.append('<tr><td colspan="2">Erro ao carregar os relatórios.</td></tr>');
+                }
+            });
+        }
+    });
+});
+
+
+
+
+
     
     document.addEventListener('DOMContentLoaded', function () {
     const patientSearch = document.getElementById('patientSearch');
@@ -735,3 +774,4 @@ document.addEventListener('DOMContentLoaded', function () {
 
 @endsection
 <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+<script src="https://code.jquery.com/jquery-3.6.4.min.js"></script>

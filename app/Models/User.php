@@ -93,4 +93,11 @@ public function UserDoctorAgenda()
         return $this->hasMany(UserDoctorAgenda::class);
     }
     
+    public function familyDoctor()
+    {
+        return $this->hasOne(FamilyDoctor::class, 'patient_user_id', 'id')
+                    ->with('doctor'); // Carrega o relacionamento com o médico
+    }
+    
+
 }

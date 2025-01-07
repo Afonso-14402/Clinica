@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Report;
 use App\Models\Specialty;
 use App\Models\User;
 use App\Models\Role;
@@ -28,40 +29,45 @@ class ListController extends Controller
 }
 public function search(Request $request)
 {
-    $query = $request->get('query', ''); // Using query instead of q
-    $specialty = $request->get('specialty', ''); // Specialty filter
+    // Obter os parâmetros da pesquisa enviados 
+    $query = $request->get('query', ''); 
+    $specialty = $request->get('specialty', ''); 
 
-    // Start querying the doctors with role_id = 2 (Médicos)
+    // Iniciar uma consulta para os utilizadores com role_id = 2 (Médicos)
     $doctorsQuery = User::where('role_id', 2);
 
-    // If a name query is provided, filter by doctor's name
+    // Filtrar pelo nome do médico se o parâmetro 'query' for fornecido
     if (!empty($query)) {
-        $doctorsQuery->where('name', 'LIKE', "%$query%");
+        $doctorsQuery->where('name', 'LIKE', "%$query%"); // Pesquisa parcial pelo nome
     }
 
-    // If a specialty filter is provided, filter by specialty
+    // Filtrar pela especialidade se o parâmetro 'specialty' for fornecido
     if (!empty($specialty)) {
+        // Verificar a relação entre o médico e as especialidades
         $doctorsQuery->whereHas('specialties', function ($q) use ($specialty) {
-            $q->where('name', 'LIKE', "%$specialty%");
+            $q->where('name', 'LIKE', "%$specialty%"); // Pesquisa parcial pelo nome da especialidade
         });
     }
 
-    // Paginate the results with a limit of 3 doctors per page
+    
     $doctors = $doctorsQuery->with('specialties')->paginate(3);
 
+    // Preparar a resposta em formato JSON
     return response()->json([
-        'success' => true,
+        'success' => true, 
         'data' => $doctors->map(function ($doctor) {
+            // Transformar os dados do médico para incluir apenas as informações necessárias
             return [
                 'id' => $doctor->id,
                 'name' => $doctor->name,
                 'email' => $doctor->email,
                 'role_id' => $doctor->role_id,
-                'status' => $doctor->status,
-                'created_at' => $doctor->created_at,
-                'updated_at' => $doctor->updated_at,
-                'avatar' => $doctor->avatar,
+                'status' => $doctor->status, 
+                'created_at' => $doctor->created_at, 
+                'updated_at' => $doctor->updated_at, 
+                'avatar' => $doctor->avatar, 
                 'specialties' => $doctor->specialties->map(function ($specialty) {
+                    // Transformar os dados das especialidades associadas ao médico
                     return [
                         'id' => $specialty->id,
                         'name' => $specialty->name,
@@ -69,10 +75,11 @@ public function search(Request $request)
                 }),
             ];
         }),
+        // Informações sobre a paginação
         'pagination' => [
-            'current_page' => $doctors->currentPage(),
-            'last_page' => $doctors->lastPage(),
-            'total' => $doctors->total(),
+            'current_page' => $doctors->currentPage(), // Página atual
+            'last_page' => $doctors->lastPage(), // Última página disponível
+            'total' => $doctors->total(), // Total de resultados
         ],
     ]);
 }
@@ -102,7 +109,7 @@ public function toggleStatus(User $doctor)
     public function getPatients(Request $request)
 {
     $search = $request->input('search');
-    
+   
     $query = User::where('role_id', 3); // Substitua "User" por "Patient" se houver um modelo específico para pacientes.
 
     if ($search) {
@@ -144,6 +151,19 @@ public function destroyPatients(User $patient)
     return redirect()->route('list.listpatient')->with('success', 'Paciente excluído com sucesso!');
 }
 
+public function getPatientReports($patientId)
+{
+    $reports = Report::whereHas('appointment', function($query) use ($patientId) {
+        $query->where('patient_user_id', $patientId);
+    })->get();
+
+    return response()->json($reports->map(function($report) {
+        return [
+            'report_date_time' => $report->created_at->format('Y-m-d H:i:s'),
+            'content' => $report->content,
+        ];
+    }));
+}
 
 
 }

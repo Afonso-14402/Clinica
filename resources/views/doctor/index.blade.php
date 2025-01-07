@@ -142,8 +142,7 @@
 
     <div class="dashboard-card">
         <h1>{{ now()->format('H:i:s') }}</h1>
-        <h2>{{ $totalConsultasHoje }} Consultas realizadas hoje</h2>
-        <p><strong>{{ $consultasAgendadas }}</strong> Consultas previstas agendadas</p>
+
         @if ($nextAppointment)
             <p>
                 Próximo Atendimento inicia-se em 
@@ -153,7 +152,13 @@
         @else
             <p>Nenhuma consulta agendada no momento.</p>
         @endif
-        <a href="#" class="details-button">Detalhes</a>
+        @if(isset($nextAppointment) && $nextAppointment->id)
+            <a href="{{ route('consulta.iniciar', ['id' => $nextAppointment->id]) }}" class="details-button">Iniciar Consulta</a>
+        @else
+            <span class="details-button disabled">Sem consultas disponíveis</span>
+        @endif
+
+        </a>
     </div>
 
     <!-- Lista de consultas -->
@@ -170,7 +175,7 @@
                     </tr>
                 </thead>
                 <tbody>
-                    @forelse ($appointments as $appointment)
+                    @forelse ($custasdortor as $appointment)
                         <tr>
                             <td>{{ $appointment->appointment_date_time }}</td>
                             <td>{{ $appointment->patient->name }}</td>
@@ -184,6 +189,39 @@
                     @endforelse
                 </tbody>
             </table>
+            <nav>
+                <ul class="pagination justify-content-center">
+                    {{-- Link para a página anterior --}}
+                    @if ($custasdortor->onFirstPage())
+                        <li class="page-item disabled">
+                            <span class="page-link">Anterior</span>
+                        </li>
+                    @else
+                        <li class="page-item">
+                            <a class="page-link" href="{{ $custasdortor->previousPageUrl() }}">Anterior</a>
+                        </li>
+                    @endif
+                
+                    {{-- Links para as páginas --}}
+                    @for ($i = 1; $i <= $custasdortor->lastPage(); $i++)
+                        <li class="page-item {{ $custasdortor->currentPage() == $i ? 'active' : '' }}">
+                            <a class="page-link" href="{{ $custasdortor->url($i) }}">{{ $i }}</a>
+                        </li>
+                    @endfor
+                
+                    {{-- Link para a próxima página --}}
+                    @if ($custasdortor->hasMorePages())
+                        <li class="page-item">
+                            <a class="page-link" href="{{ $custasdortor->nextPageUrl() }}">Próxima</a>
+                        </li>
+                    @else
+                        <li class="page-item disabled">
+                            <span class="page-link">Próxima</span>
+                        </li>
+                    @endif
+                </ul>
+            </nav>
+            
         </div>
     </div>
 </div>

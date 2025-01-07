@@ -16,7 +16,7 @@ class Appointment extends Model
         'appointment_date_time',
         'status_id',
     ];
-
+        
     public function patient()
     {
         return $this->belongsTo(User::class, 'patient_user_id');

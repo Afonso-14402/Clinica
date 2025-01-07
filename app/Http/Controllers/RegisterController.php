@@ -39,7 +39,7 @@ class RegisterController extends Controller
             'active' => 1, // Usuário ativo por padrão
         ]);
         ActivityLog::create([
-            'type' => 'added', // Tipo da ação
+            'type' => 'Criaçao do paciente', // Tipo da ação
             'description' => "Paciente {$user->name} foi registrado no sistema", // Use $user->name para acessar o nome do usuário
             'user_id' => auth()->id(), // Usuário autenticado que realizou a ação
         ]);

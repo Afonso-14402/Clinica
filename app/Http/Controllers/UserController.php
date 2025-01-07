@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Appointment;
+use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Carbon\Carbon;
@@ -31,7 +32,7 @@ class UserController extends Controller
                 return $this->handleDoctorDashboard($user);
     
             default:
-                // Se o papel não for reconhecido, redireciona para uma página genérica ou erro
+                // Se o papel não for reconhecido, redireciona para uma página 
                 return redirect()->route('index')->with('error', 'Acesso não autorizado.');
         }
     }
@@ -65,53 +66,53 @@ class UserController extends Controller
     }
     
     private function handleDoctorDashboard($user)
-{
-    // Data atual
-    $today = Carbon::today();
+    {
+        // Data atual
+        $today = Carbon::today();
+    
+        // Próxima consulta
+        $nextAppointment = Appointment::where('doctor_user_id', $user->id)
+            ->where('appointment_date_time', '>', Carbon::now())
+            ->orderBy('appointment_date_time', 'asc')
+            ->first();
+    
 
-    // Próxima consulta
-    $nextAppointment = Appointment::where('doctor_user_id', $user->id)
-        ->where('appointment_date_time', '>', Carbon::now())
-        ->orderBy('appointment_date_time', 'asc')
-        ->first();
-
-    // Consultas realizadas hoje
-    $totalConsultasHoje = Appointment::where('doctor_user_id', $user->id)
-        ->whereDate('appointment_date_time', $today)
-        ->whereHas('status', function ($query) {
-            $query->where('status', 'Realizada');
-        })
-        ->count();
-
-    // Consultas previstas (agendadas)
-    $consultasAgendadas = Appointment::where('doctor_user_id', $user->id)
-        ->whereDate('appointment_date_time', $today)
-        ->whereHas('status', function ($query) {
-            $query->where('status', 'Agendada');
-        })
-        ->count();
-
-    // Tempo restante para a próxima consulta em horas e minutos
-    $tempoRestante = $nextAppointment
-        ? Carbon::now()->diff(Carbon::parse($nextAppointment->appointment_date_time))
-        : null;
-
-    // Todas as consultas do médico
-    $appointments = Appointment::where('doctor_user_id', $user->id)
-        ->with(['patient', 'specialty', 'status'])
-        ->orderBy('appointment_date_time', 'desc')
-        ->get();
-
-    // Retorna a view com os dados necessários
-    return view('doctor.index', compact(
-        'user',
-        'nextAppointment',
-        'totalConsultasHoje',
-        'consultasAgendadas',
-        'tempoRestante',
-        'appointments'
-    ));
-}
+        // Consultas previstas (agendadas)
+        $consultasAgendadas = Appointment::where('doctor_user_id', $user->id)
+            ->whereDate('appointment_date_time', $today)
+            ->whereHas('status', function ($query) {
+                $query->where('status', 'Agendada');
+            })
+            ->count();
+    
+        // Tempo restante para a próxima consulta em horas e minutos
+        $tempoRestante = $nextAppointment
+            ? Carbon::now()->diff(Carbon::parse($nextAppointment->appointment_date_time))
+            : null;
+    
+        // Todas as consultas do médico
+        $appointments = Appointment::where('doctor_user_id', $user->id)
+            ->with(['patient', 'specialty', 'status'])
+            ->orderBy('appointment_date_time', 'desc')
+            ->get();
+    
+        // Consultas paginadas (exibidas na tabela)
+        $custasdortor = Appointment::where('doctor_user_id', $user->id)
+            ->with(['patient', 'specialty', 'status'])
+            ->orderBy('appointment_date_time', 'desc')
+            ->paginate(10);
+    
+        // Retorna a view com os dados necessários
+        return view('doctor.index', compact(
+            'user',
+            'nextAppointment',
+            'consultasAgendadas',
+            'tempoRestante',
+            'appointments',
+            'custasdortor'
+        ));
+    }
+    
 
     
     
@@ -158,6 +159,8 @@ class UserController extends Controller
         return redirect()->back()->with('success', 'Avatar atualizado com sucesso!');
     }
     
+    
+
     
 
     

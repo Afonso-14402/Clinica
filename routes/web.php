@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\ConsultaController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\DoctorScheduleController;
 use App\Http\Controllers\ListController;
@@ -28,6 +29,24 @@ Route::group(['middleware'=> 'auth' ] , function(){
     Route::get('/home/medico', [UserController::class, 'index'] ) -> name( 'doctor.index');
 
 
+
+    Route::post('/appointments/{id}/status', [AppointmentController::class, 'updateStatus']);
+    Route::get('/doctors/{id}/schedule', [AppointmentController::class, 'getSchedule']);
+    Route::get('/doctors/{doctorId}/appointments', [AppointmentController::class, 'getDoctorAppointments']);
+
+    Route::post('/appointments/request', [AppointmentController::class, 'requestAppointment'])->name('requestAppointment');
+    Route::get('/appointments/pending', [AppointmentController::class, 'showPendingAppointments'])->name('appointments.pending');
+    Route::put('/appointments/{id}/update-status', [AppointmentController::class, 'updateStatus'])->name('appointments.updateStatus');
+    Route::get('/doctor/appointments', [AppointmentController::class, 'getDoctorAppointments']);
+
+
+
+
+
+
+    Route::get('/consulta/iniciar/{id}', [ConsultaController::class, 'iniciarConsulta'])->name('consulta.iniciar');
+    Route::post('/consulta/salvar/{id}', [ConsultaController::class, 'salvarRelatorio'])->name('consulta.salvarRelatorio');
+
     
     Route::get('/list', [ListController::class, 'index'])->name('list.index');
     Route::resource('doctors', ListController::class);
@@ -52,6 +71,7 @@ Route::group(['middleware'=> 'auth' ] , function(){
     Route::get('/list/patients', [ListController::class, 'getPatients'])->name('list.listpatient');
     Route::post('/list/patients/toggle-status/{id}', [ListController::class, 'toggleStatusPatients'])->name('patients.toggle-status');
     Route::delete('/patients/{patient}', [ListController::class, 'destroyPatients'])->name('patients.destroy');
+    Route::get('/patient-reports/{patientId}', [ListController::class, 'getPatientReports']);
 
 
 
@@ -72,10 +92,8 @@ Route::group(['middleware'=> 'auth' ] , function(){
     Route::post('/user/change-password', [SettingsController::class, 'changePassword'])->name('user.change-password');
     Route::post('/user/update-avatar', [UserController::class, 'updateAvatar'])->name('user.update.avatar');
     
-    Route::get('/registar/create/paciente', [RegisterController::class, 'create'])->name('registar.create') ->middleware(['auth', 'admin:1,2']);
+    
     Route::post('/registar/paciente', [RegisterController::class, 'paciente'])->name('registar.paciente');
-
-    Route::get('/registar/create/medico', [RegisterdoctorController::class, 'create'])->name('registar.create-m') ->middleware(['auth', 'admin:1']);
     Route::post('/registar/medico', [RegisterdoctorController::class, 'medico'])->name('registar.medico');
     
 
@@ -96,7 +114,7 @@ Route::get('/autocomplete/doctors', function () {
 
     $doctors = User::where('name', 'like', '%' . $search . '%')
         ->whereHas('role', function ($query) {
-            $query->where('role', 'Doctor'); // Ajuste conforme necessário
+            $query->where('role', 'Doctor'); 
         })
         ->take(10)
         ->get();
@@ -106,7 +124,7 @@ Route::get('/autocomplete/doctors', function () {
 
 Route::get('/doctor/{id}/specialties', function ($id) {
     $doctor = User::findOrFail($id);
-    return $doctor->specialties; // Supondo que existe um relacionamento entre médicos e especialidades
+    return $doctor->specialties; 
 });
 
 Route::get('/autocomplete/patient', function () {
@@ -114,7 +132,7 @@ Route::get('/autocomplete/patient', function () {
 
     $patient = User::where('name', 'like', '%' . $search . '%')
         ->whereHas('role', function ($query) {
-            $query->where('role', 'Patient'); // Ajuste conforme necessário
+            $query->where('role', 'Patient'); 
         })
         ->take(10)
         ->get();

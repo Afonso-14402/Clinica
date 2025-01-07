@@ -150,12 +150,13 @@
                         <div class="text-truncate" data-i18n="Agenda/Calendário">Agenda/Calendário</div>
                         </a>
                     </li>
-                    @endif
+                    
                     <li class="menu-item">
-                        <a href="extended-ui-text-divider.html" class="menu-link">
-                        <div class="text-truncate" data-i18n="Text Divider">Text Divider</div>
+                        <a href="{{ route('appointments.pending') }}" class="menu-link">
+                        <div class="text-truncate" data-i18n="Pedidos Pendentes ">Pedidos Pendentes </div>
                         </a>
                     </li>
+                    @endif
                     </ul>
                 </li>
                 @endif
