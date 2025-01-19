@@ -12,6 +12,7 @@ use App\Models\User;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\logginController;
 use App\Http\Controllers\AppointmentController;
+use App\Http\Controllers\DoctorAgendaController;
 
 
 
@@ -47,6 +48,7 @@ Route::group(['middleware'=> 'auth' ] , function(){
     Route::get('/consulta/iniciar/{id}', [ConsultaController::class, 'iniciarConsulta'])->name('consulta.iniciar');
     Route::post('/consulta/salvar/{id}', [ConsultaController::class, 'salvarRelatorio'])->name('consulta.salvarRelatorio');
 
+
     
     Route::get('/list', [ListController::class, 'index'])->name('list.index');
     Route::resource('doctors', ListController::class);
@@ -69,7 +71,7 @@ Route::group(['middleware'=> 'auth' ] , function(){
     
 
     Route::get('/list/patients', [ListController::class, 'getPatients'])->name('list.listpatient');
-    Route::post('/list/patients/toggle-status/{id}', [ListController::class, 'toggleStatusPatients'])->name('patients.toggle-status');
+    Route::post('/patients/{patient}/toggle-status', [ListController::class, 'toggleStatus'])->name('patients.toggle-status');
     Route::delete('/patients/{patient}', [ListController::class, 'destroyPatients'])->name('patients.destroy');
     Route::get('/patient-reports/{patientId}', [ListController::class, 'getPatientReports']);
 
@@ -97,11 +99,10 @@ Route::group(['middleware'=> 'auth' ] , function(){
     Route::post('/registar/medico', [RegisterdoctorController::class, 'medico'])->name('registar.medico');
     
 
-
+    
    
 
-    
-
+    Route::get('/available-times', [DoctorAgendaController::class, 'getAvailableTimes']);
     
 
     

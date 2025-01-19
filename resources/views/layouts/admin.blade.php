@@ -37,7 +37,7 @@
         <main class="d-flex">
 
             <aside id="layout-menu" class="layout-menu menu-vertical menu bg-menu-theme">
-                <div id="container" style="max-height: 1000px; overflow-y: auto; background-color: #ffffff;">
+                <div id="container" style="/*max-height: 1000px;*/ height:100vh; position:fixed;  overflow-y: auto; background-color: #ffffff;">
   
                 <div class="app-brand demo">
                 <a href="" class="app-brand-link">

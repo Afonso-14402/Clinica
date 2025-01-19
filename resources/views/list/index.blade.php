@@ -532,7 +532,7 @@ form button {
 
     let formHtml = `
         <div class="list-group shadow-sm rounded-3">
-            <h5 class="mb-4 text-primary text-center fw-bold">Weekly Schedule</h5>
+            <h5 class="mb-4 text-primary text-center fw-bold">Calendário</h5>
     `;
 
     days.forEach((day, index) => {

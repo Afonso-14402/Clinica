@@ -138,9 +138,16 @@
                                         @endif
                                     </li>
                                     <li>
-                                        <button class="dropdown-item text-danger" onclick="updateStatus({{ $appointment->id }}, 3)">
-                                            <i class="bx bx-x-circle me-1"></i> Rejeitar
-                                        </button>
+                                        
+                                        <form action="{{ route('appointments.updateStatus', $appointment->id) }}" method="POST" style="display: inline;">
+                                            @csrf
+                                            @method('PUT')
+                                            <input type="hidden" name="status" value="3">
+                                            <button type="submit" class="dropdown-item text-danger">
+                                                <i class="bx bx-x-circle me-1"></i> Rejeitar
+                                            </button>
+                                        </form>
+                                        
                                     </li>
                                     <li>
                                         <button class="dropdown-item text-info" data-bs-toggle="modal" data-bs-target="#scheduleModal" data-doctor-id="{{ $appointment->doctor_user_id }}">
@@ -333,6 +340,8 @@ document.addEventListener('DOMContentLoaded', function () {
         doctorAppointmentsContent.innerHTML = '<p class="text-center text-danger">Erro ao carregar as marcações.</p>';
     });
 }
+
+
 
 </script>
 @endsection

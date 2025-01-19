@@ -66,59 +66,52 @@ class UserController extends Controller
     }
     
     private function handleDoctorDashboard($user)
-    {
-        // Data atual
-        $today = Carbon::today();
-    
-        // Próxima consulta
-        $nextAppointment = Appointment::where('doctor_user_id', $user->id)
-            ->where('appointment_date_time', '>', Carbon::now())
-            ->orderBy('appointment_date_time', 'asc')
-            ->first();
-    
+{
+    // Data atual
+    $today = Carbon::today();
 
-        // Consultas previstas (agendadas)
-        $consultasAgendadas = Appointment::where('doctor_user_id', $user->id)
-            ->whereDate('appointment_date_time', $today)
-            ->whereHas('status', function ($query) {
-                $query->where('status', 'Agendada');
-            })
-            ->count();
-    
-        // Tempo restante para a próxima consulta em horas e minutos
-        $tempoRestante = $nextAppointment
-            ? Carbon::now()->diff(Carbon::parse($nextAppointment->appointment_date_time))
-            : null;
-    
-        // Todas as consultas do médico
-        $appointments = Appointment::where('doctor_user_id', $user->id)
-            ->with(['patient', 'specialty', 'status'])
-            ->orderBy('appointment_date_time', 'desc')
-            ->get();
-    
-        // Consultas paginadas (exibidas na tabela)
-        $custasdortor = Appointment::where('doctor_user_id', $user->id)
-            ->with(['patient', 'specialty', 'status'])
-            ->orderBy('appointment_date_time', 'desc')
-            ->paginate(10);
-    
-        // Retorna a view com os dados necessários
-        return view('doctor.index', compact(
-            'user',
-            'nextAppointment',
-            'consultasAgendadas',
-            'tempoRestante',
-            'appointments',
-            'custasdortor'
-        ));
-    }
-    
+    // Próxima consulta (somente com status 1)
+    $nextAppointment = Appointment::where('doctor_user_id', $user->id)
+        ->where('appointment_date_time', '>', Carbon::now())
+        ->where('status_id', 1) // Considera apenas status 1
+        ->orderBy('appointment_date_time', 'asc')
+        ->first();
 
-    
-    
-    
+    // Consultas previstas para hoje (somente com status 1)
+    $consultasAgendadas = Appointment::where('doctor_user_id', $user->id)
+        ->whereDate('appointment_date_time', $today)
+        ->where('status_id', 1)
+        ->count();
 
+    // Tempo restante para a próxima consulta em horas e minutos
+    $tempoRestante = $nextAppointment
+        ? Carbon::now()->diff(Carbon::parse($nextAppointment->appointment_date_time))
+        : null;
 
+    // Todas as consultas do médico com status 1
+    $appointments = Appointment::where('doctor_user_id', $user->id)
+        ->where('status_id', 1) // Filtro para status 1
+        ->with(['patient', 'specialty', 'status'])
+        ->orderBy('appointment_date_time', 'desc')
+        ->get();
+
+    // Consultas paginadas (somente com status 1)
+    $custasdortor = Appointment::where('doctor_user_id', $user->id)
+        ->where('status_id', 1) // Filtro para status 1
+        ->with(['patient', 'specialty', 'status'])
+        ->orderBy('appointment_date_time', 'desc')
+        ->paginate(10);
+
+    // Retorna a view com os dados necessários
+    return view('doctor.index', compact(
+        'user',
+        'nextAppointment',
+        'consultasAgendadas',
+        'tempoRestante',
+        'appointments',
+        'custasdortor'
+    ));
+}
     public function getAppointments()
     {
         $user = auth()->user();

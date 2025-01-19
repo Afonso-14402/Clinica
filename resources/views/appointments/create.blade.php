@@ -194,156 +194,143 @@
         <h4>Calendário</h4>
         <div class="card">
             <div class="card-body">
-              <div class="container mt-5">
-                {{-- For Search --}}
-                <div class="row">
-                    <div class="col-md-6">
-                      <div class="input-group">
-                      </div>
-                        <input type="text" id="searchInput" class="form-control" placeholder="{{__('Enter search term')}}">
-                        <div class="input-group-append">
-                            <button id="searchButton" class="btn btn-primary">{{__('Search')}}</button>
+                <div class="container mt-5">
+    
+                    <!-- Campo de busca e botões de ação -->
+                    <div class="row mb-3">
+                        <div class="col-md-6">
+                            <div class="input-group">
+                                <input type="text" id="searchInput" class="form-control" placeholder="{{__('Enter search term')}}">
+                                <button id="searchButton" class="btn btn-primary">{{__('Search')}}</button>
+                            </div>
                         </div>
-                    </div>
-                    <div class="col-md-6">
-                        <div class="btn-group mb-3" role="group" aria-label="Calendar Actions">
+                        <div class="col-md-6 text-end">
                             <button id="exportButton" class="btn btn-success">{{__('Export Calendar')}}</button>
                         </div>
-                        
-        
+                    </div>
+    
+                    <!-- Modal para detalhes de eventos -->
+                    <div class="modal fade" id="eventModal" tabindex="-1" aria-labelledby="eventModalLabel" aria-hidden="true">
+                        <div class="modal-dialog">
+                            <div class="modal-content">
+                                <div class="modal-header">
+                                    <h5 class="modal-title" id="eventModalLabel">Detalhes da consulta</h5>
+                                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                                </div>
+                                <div class="modal-body">
+                                    <p><strong>Paciente:</strong> <span id="eventPatient"></span></p>
+                                    <p><strong>Médico:</strong> <span id="eventDoctor"></span></p>
+                                    <p><strong>Data:</strong> <span id="eventDate"></span></p>
+                                    <p><strong>Hora:</strong> <span id="eventTime"></span></p>
+                                    <p><strong>Tipo de Consulta:</strong> <span id="eventType"></span></p>
+                                </div>
+                                <div class="modal-footer">
+                                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Fechar</button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+    
+                    <!-- Calendário -->
+                    <div class="card">
+                        <div class="card-body">
+                            <div id="calendar" style="width: 100%; height: 100vh;"></div>
+                        </div>
                     </div>
                 </div>
-
-                <!-- Modal -->
-                <div class="modal fade" id="eventModal" tabindex="-1" aria-labelledby="eventModalLabel" aria-hidden="true">
-                  <div class="modal-dialog">
-                    <div class="modal-content">
-                      <div class="modal-header">
-                        <h5 class="modal-title" id="eventModalLabel">Event Details</h5>
-                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                      </div>
-                      <div class="modal-body">
-                        <p><strong>Title:</strong> <span id="eventTitle"></span></p>
-                        <p><strong>Date:</strong> <span id="eventDate"></span></p>
-                        <p><strong>Description:</strong> <span id="eventDescription"></span></p>
-                      </div>
-                      <div class="modal-footer">
-                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-
+    
+                <!-- Scripts -->
                 <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
                 <script src="https://cdn.jsdelivr.net/npm/fullcalendar@6.1.8/index.global.min.js"></script>
                 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.min.js"></script>
-        
-                <div class="card">
-                    <div class="card-body">
-                        <div id="calendar" style="width: 100%;height:100vh"></div>
-        
-                    </div>
-                </div>
-            </div>
-            <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-            <script src="https://cdn.jsdelivr.net/npm/fullcalendar@6.1.8/index.global.min.js"></script>
-            <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.17.0/xlsx.full.min.js"></script>
-        
-            <script type="text/javascript">
-                $.ajaxSetup({
-                    headers: {
-                        'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
-                    }
-                });
-        
-                var calendarEl = document.getElementById('calendar');
-                var calendar = new FullCalendar.Calendar(calendarEl, {
-                    headerToolbar: {
-                        left: 'prev,next today',
-                        center: 'title',
-                        right: 'dayGridMonth,timeGridWeek,timeGridDay'
-                    },
-                    initialView: 'dayGridMonth',
-                    timeZone: 'UTC',
-                    events: '/events',
-                    editable: true,
-                    
-                    // Quando o usuário clica em um evento
-                    eventClick: function(info) {
-                        // Preencher o modal com as informações do evento
-                        var event = info.event;
-                        
-                        // Exemplo de como preencher as informações do evento no modal
-                        document.getElementById('eventTitle').innerText = event.title;
-                        document.getElementById('eventDate').innerText = event.start.toLocaleString();
-                        document.getElementById('eventDescription').innerText = event.extendedProps.description || 'No description available';
-                        
-                        // Mostrar o modal
-                        $('#eventModal').modal('show');
-                    }
-                });
-
-                calendar.render();
-
-        
-                document.getElementById('searchButton').addEventListener('click', function() {
-                    var searchKeywords = document.getElementById('searchInput').value.toLowerCase();
-                    filterAndDisplayEvents(searchKeywords);
-                });
-        
-        
-                function filterAndDisplayEvents(searchKeywords) {
-                    $.ajax({
-                        method: 'GET',
-                        url: `/events/search?title=${searchKeywords}`,
-                        success: function(response) {
-                            calendar.removeAllEvents();
-                            calendar.addEventSource(response);
-                        },
-                        error: function(error) {
-                            console.error('Error searching events:', error);
+                <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.17.0/xlsx.full.min.js"></script>
+    
+                <script type="text/javascript">
+                    $.ajaxSetup({
+                        headers: {
+                            'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
                         }
                     });
-                }
-        
-        
-                // Função de exportação
-                document.getElementById('exportButton').addEventListener('click', function() {
-                    var events = calendar.getEvents().map(function(event) {
-                        return {
-                            title: event.title,
-                            start: event.start ? event.start.toISOString() : null,
-                           
-                            color: event.backgroundColor,
-                        };
+    
+                    // Inicialização do calendário
+                    var calendarEl = document.getElementById('calendar');
+                    var calendar = new FullCalendar.Calendar(calendarEl, {
+                      locale: 'pt', // Definindo o idioma como português
+                        headerToolbar: {
+                            left: 'prev,next today',
+                            center: 'title',
+                            right: 'dayGridMonth,timeGridWeek,timeGridDay'
+                        },
+                        initialView: 'dayGridMonth',
+                        timeZone: 'UTC',
+                        events: '/events',
+                        editable: true,
+                        eventClick: function(info) {
+                            var event = info.event;
+                            document.getElementById('eventPatient').innerText = event.extendedProps.patient || 'N/A';
+                            document.getElementById('eventDoctor').innerText = event.extendedProps.doctor || 'N/A';
+                            document.getElementById('eventDate').innerText = event.start.toLocaleDateString();
+                            document.getElementById('eventTime').innerText = event.start.toLocaleTimeString();
+                            document.getElementById('eventType').innerText = event.extendedProps.type || 'N/A';
+                            $('#eventModal').modal('show');
+                        }
                     });
-        
-                    var wb = XLSX.utils.book_new();
-        
-                    var ws = XLSX.utils.json_to_sheet(events);
-        
-                    XLSX.utils.book_append_sheet(wb, ws, 'Events');
-        
-                    var arrayBuffer = XLSX.write(wb, {
-                        bookType: 'xlsx',
-                        type: 'array'
+                    calendar.render();
+    
+                    // Função de busca de eventos
+                    document.getElementById('searchButton').addEventListener('click', function() {
+                        var searchKeywords = document.getElementById('searchInput').value.toLowerCase();
+                        filterAndDisplayEvents(searchKeywords);
                     });
-        
-                    var blob = new Blob([arrayBuffer], {
-                        type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
-                    });
-        
-                    var downloadLink = document.createElement('a');
-                    downloadLink.href = URL.createObjectURL(blob);
-                    downloadLink.download = 'events.xlsx';
-                    downloadLink.click();
-                })         
-            </script>
+    
+                    function filterAndDisplayEvents(searchKeywords) {
+                        $.ajax({
+                            method: 'GET',
+                            url: `/events/search?title=${searchKeywords}`,
+                            success: function(response) {
+                                calendar.removeAllEvents();
+                                calendar.addEventSource(response);
+                            },
+                            error: function(error) {
+                                console.error('Error searching events:', error);
+                            }
+                        });
+                    }
+    
+                   // Função para exportar eventos com mais informações
+                    document.getElementById('exportButton').addEventListener('click', function() {
+                        var events = calendar.getEvents().map(function(event) {
+                            return {
+                                'Paciente': event.extendedProps.patient,       // Nome do paciente
+                                'Médico': event.extendedProps.doctor,         // Nome do médico
+                                'Hora da Consulta': event.extendedProps.appointment_time, // Hora da consulta
+                                'Tipo da Consulta': event.extendedProps.type,  // Tipo da consulta
+                                'Início': event.start ? event.start.toISOString() : null, // Data e hora do início
+                            };
+                        });
 
-           </div>
+                        // Criação do livro de trabalho e da planilha
+                        var wb = XLSX.utils.book_new();
+                        var ws = XLSX.utils.json_to_sheet(events);
+
+                        // Adicionando a planilha ao livro de trabalho
+                        XLSX.utils.book_append_sheet(wb, ws, 'Eventos');
+
+                        // Gerando o arquivo XLSX
+                        var arrayBuffer = XLSX.write(wb, { bookType: 'xlsx', type: 'array' });
+                        var blob = new Blob([arrayBuffer], { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' });
+
+                        // Criando o link para download
+                        var downloadLink = document.createElement('a');
+                        downloadLink.href = URL.createObjectURL(blob);
+                        downloadLink.download = 'eventos.xlsx';
+                        downloadLink.click();
+                    });
+
+                </script>
+            </div>
         </div>
-      </div>
-    </div>
+    </div>    
 </div>
 
 @endsection

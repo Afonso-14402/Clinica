@@ -35,45 +35,48 @@ class ConsultaController extends Controller
      */
     public function salvarRelatorio(Request $request, $id)
     {
-        // Valida o conteúdo do relatório, garantindo que o campo 'content' seja preenchido com uma string
+        // Valida os campos do formulário
         $request->validate([
-            'content' => 'required|string',
+            'sintomas' => 'required|string',
+            'diagnostico' => 'required|string',
+            'tratamento' => 'required|string',
+            'observacoes' => 'required|string',
         ]);
-
-        // Cria ou atualiza o relatório associado à consulta com os dados fornecidos
+    
+        // Concatena os campos em um único conteúdo no formato desejado
+        $content = "### Sintomas:\n" . $request->input('sintomas') . "\n\n" .
+                   "### Diagnóstico:\n" . $request->input('diagnostico') . "\n\n" .
+                   "### Tratamento:\n" . $request->input('tratamento') . "\n\n" .
+                   "### Observações:\n" . $request->input('observacoes');
+    
+        // Cria ou atualiza o relatório associado à consulta
         Report::updateOrCreate(
             ['appointment_id' => $id],
             [
-                // Armazena o ID do médico que está criando o relatório (utilizador autenticado)
                 'doctor_report_user_id' => auth()->id(),
-                // Armazena o conteúdo do relatório
-                'content' => $request->input('content'),
-                // Registra a data e hora de criação do relatório
+                'content' => $content,
                 'report_date_time' => now(),
             ]
         );
-
+    
         $appointment = Appointment::find($id);
 
-if ($appointment) {
-    // Define o ID do status "Concluída"
-    $completedStatusId = 2;
-
-    // Altera apenas o status_id
-    $appointment->status_id = $completedStatusId;
-
-    // Salva explicitamente a mudança no banco
-    $appointment->save();
-
-    // Exibe os dados atualizados
-    dd($appointment->fresh()->toArray());
-}
-
-
+        if ($appointment) {
+            // Define o ID do status "Concluída"
+            $completedStatusId = 2;
         
-
-
+            // Altera apenas o status_id
+            $appointment->status_id = $completedStatusId;
+        
+            // Salva explicitamente a mudança no banco
+            $appointment->save();
+    
+        }
+    
         // Redireciona para o painel do médico com uma mensagem de sucesso
         return redirect()->route('doctor.index')->with('success', 'Relatório médico salvo e consulta marcada como concluída!');
     }
+
+    // Exemplo no Controller
+
 }

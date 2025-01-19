@@ -27,3 +27,7 @@ class UserDoctorAgenda extends Model
     }
 }
 
+class Appointment extends Model
+{
+    protected $fillable = ['doctor_user_id', 'appointment_date_time'];
+}

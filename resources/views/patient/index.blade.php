@@ -169,20 +169,34 @@
                             type="hidden" 
                             name="doctor_user_id" 
                             id="doctor_user_id" 
-                            value="{{ Auth::user()->familyDoctor?->id ?? '' }}" 
+                            value="{{ Auth::user()->familyDoctor?->doctor?->id ?? '' }}" 
                         />
                     </div>
 
-                    <!-- Campo de Data e Hora -->
                     <div class="mb-3">
-                        <label for="appointment_date_time" class="form-label">Data e Hora</label>
+                        <label for="appointment_day" class="form-label">Dia</label>
                         <input 
-                            type="datetime-local" 
+                            type="date" 
                             class="form-control" 
-                            name="appointment_date_time" 
+                            name="appointment_day" 
+                            id="appointment_day" 
                             required 
+                            onchange="loadAvailableTimes()"
                         />
                     </div>
+                    
+                    <div class="mb-3">
+                        <label for="appointment_time" class="form-label">Horário</label>
+                        <select 
+                            class="form-select" 
+                            name="appointment_time" 
+                            id="appointment_time" 
+                            required
+                        >
+                            <option value="" disabled selected>Selecione um horário</option>
+                        </select>
+                    </div>
+                    
 
                     <!-- Mensagem de Erro -->
                     @if ($errors->any())
@@ -205,6 +219,40 @@
         </div>
     </div>
 </div>
+
+<script>
+function loadAvailableTimes() {
+    const appointmentDay = document.getElementById('appointment_day').value;
+    const doctorId = document.getElementById('doctor_user_id').value;
+
+    if (!appointmentDay || !doctorId) {
+        return;
+    }
+
+    fetch(`/available-times?doctor_id=${doctorId}&day=${appointmentDay}`)
+        .then(response => {
+            if (!response.ok) {
+                throw new Error('Erro ao carregar horários');
+            }
+            return response.json();
+        })
+        .then(data => {
+            const timeSelect = document.getElementById('appointment_time');
+            timeSelect.innerHTML = '<option value="" disabled selected>Selecione um horário</option>';
+            
+            data.forEach(time => {
+                const option = document.createElement('option');
+                option.value = time;
+                option.textContent = time;
+                timeSelect.appendChild(option);
+            });
+        })
+        .catch(error => {
+            console.error('Erro ao carregar horários:', error);
+        });
+}
+
+</script>
 
 
     <!-- Lista de consultas -->

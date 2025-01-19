@@ -139,27 +139,33 @@
 
 <div class="container">
     <h1>Bem-vindo, {{ $user->name }}</h1>
+    <div class="container text-center">
+        <div class="row align-items-start">
+          <div class="col-6">
 
-    <div class="dashboard-card">
-        <h1>{{ now()->format('H:i:s') }}</h1>
+            <div class="dashboard-card" style="border: 1px solid #e0e0e0; border-radius: 8px; padding: 24px; background-color: #fff; box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.1); width: 400px;">
 
-        @if ($nextAppointment)
-            <p>
-                Próximo Atendimento inicia-se em 
-                <strong>{{ $tempoRestante->h }} horas e {{ $tempoRestante->i }} minutos</strong>
-            </p>
-            <p><strong>Paciente:</strong> {{ $nextAppointment->patient->name }}</p>
-        @else
-            <p>Nenhuma consulta agendada no momento.</p>
-        @endif
-        @if(isset($nextAppointment) && $nextAppointment->id)
-            <a href="{{ route('consulta.iniciar', ['id' => $nextAppointment->id]) }}" class="details-button">Iniciar Consulta</a>
-        @else
-            <span class="details-button disabled">Sem consultas disponíveis</span>
-        @endif
-
-        </a>
-    </div>
+                @if ($nextAppointment)
+                    <p style="font-size: 16px; margin: 0; color: #666; text-align: left;">Próximo Atendimento inicia-se em</p>
+                    <p style="font-size: 18px; font-weight: bold; margin: 12px 0; text-align: left;">{{ $tempoRestante->h }} horas e {{ $tempoRestante->i }} minutos</p>
+                    <p style="font-size: 16px; color: #333; margin: 0; text-align: left;"><strong>Paciente:</strong> {{ $nextAppointment->patient->name }}</p>
+                    <a href="{{ route('consulta.iniciar', ['id' => $nextAppointment->id]) }}" style="display: inline-block; margin-top: 16px; padding: 12px 20px; text-decoration: none; color: #fff; background-color: #6c63ff; border-radius: 6px; font-size: 16px; text-align: left;">Iniciar Consulta</a>
+                @else
+                    <p style="font-size: 16px; margin: 0; color: #666; text-align: left;">Nenhuma consulta agendada no momento.</p>
+                    <span style="display: inline-block; margin-top: 16px; padding: 12px 20px; text-decoration: none; color: #aaa; background-color: #f0f0f0; border-radius: 6px; font-size: 16px; text-align: left;">Sem consultas disponíveis</span>
+                @endif
+            
+            </div>
+            
+            
+          </div>
+          <div class="col-6">
+            
+          </div>
+        </div>
+      </div>
+    
+    
 
     <!-- Lista de consultas -->
     <div class="row mt-5">

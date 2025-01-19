@@ -129,16 +129,16 @@ public function toggleStatus(User $doctor)
     return view('list.listpatient', compact('patients', 'user'));
 }
 
-public function toggleStatusPatients(Request $request, $id)
+public function toggleStatusPatients(User $patient)
 {
-    $patient = User::findOrFail($id);
-
-    // Inverte o status atual
-    $patient->status = !$patient->status;
-    // Salva no banco
+    // Alternar o status do paciente
+    $patient->status = $patient->status ? 0 : 1; // 0 = inativo, 1 = ativo
     $patient->save();
+
+    // Retornar com uma mensagem de sucesso
     return redirect()->back()->with('success', 'Status atualizado com sucesso!');
 }
+
 
 public function destroyPatients(User $patient)
 {

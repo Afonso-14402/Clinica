@@ -117,83 +117,120 @@ class AppointmentController extends Controller
     }
 }
 
-    public function getEvents(Request $request)
-    {
-        $appointments = Appointment::with(['doctor', 'patient', 'specialty'])
-            ->get()
-            ->map(function ($appointment) {
-                return [
-                    'id' => $appointment->id,
-                    'title' => $appointment->patient->name . ' - ' . $appointment->specialty->name,
-                    'start' => $appointment->appointment_date_time,
-                    'backgroundColor' => '#00C851', // Customize as needed
-                ];
-            });
+public function getEvents(Request $request)
+{
+    $appointments = Appointment::with(['doctor', 'patient', 'specialty'])
+        ->get()
+        ->map(function ($appointment) {
+            // Ensure the appointment_date_time is a Carbon instance
+            $appointmentDate = \Carbon\Carbon::parse($appointment->appointment_date_time);
 
-        return response()->json($appointments);
-    }
+            return [
+                'id' => $appointment->id,
+                'title' => $appointment->patient->name . ' - ' . $appointment->specialty->name,
+                'start' => $appointment->appointment_date_time,
+                'extendedProps' => [
+                    'patient' => $appointment->patient->name,
+                    'doctor' => $appointment->doctor->name,
+                    'type' => $appointment->specialty->name,
+                    'appointment_time' => $appointmentDate->format('H:i'), // Format the Carbon instance
+                ],
+            ];
+        });
 
-    public function requestAppointment(Request $request)
-    {
-        try {
-            // Validar os dados de entrada
-            $validated = $request->validate([
-                'patient_user_id' => 'required|exists:users,id',
-                'appointment_date_time' => 'required|date|after_or_equal:now',
-            ]);
-    
-            // Buscar o paciente
-            $patientId = $validated['patient_user_id'];
-            $patient = User::find($patientId);
-    
-            if (!$patient) {
-                return redirect()->back()->with('error', 'Paciente não encontrado.');
-            }
-    
-            // Buscar o registro do médico de família associado ao paciente
-            $familyDoctorRecord = $patient->familyDoctor;
-    
-            if (!$familyDoctorRecord || !$familyDoctorRecord->doctor) {
-                return redirect()->back()->with('error', 'Nenhum médico de família está associado a este paciente.');
-            }
-    
-            // Obter o médico associado
-            $doctor = $familyDoctorRecord->doctor;
-            $doctorId = $doctor->id;
-    
-            // Definir os valores adicionais
-            $validated['specialties_id'] = 4; // Exemplo: Medicina Geral e Familiar
-            $validated['doctor_user_id'] = $doctorId;
-            $validated['status_id'] = Status::where('status', 'Pendente')->firstOrFail()->id;
-    
-            // Criar o agendamento
-            $appointment = Appointment::create($validated);
-    
-            // Criar log de atividade
-            ActivityLog::create([
-                'type' => 'appointment',
-                'description' => 'Consulta marcada: Paciente ' . $patient->name .
-                                 ' com o médico ' . $doctor->name .
-                                 ' para ' . Carbon::parse($validated['appointment_date_time'])->format('d/m/Y H:i') .
-                                 ' na especialidade Medicina Geral e Familiar.',
-                'user_id' => Auth::id(),
-            ]);
-    
-            return redirect()->route('patient.index')->with('success', 'Consulta agendada com sucesso!');
-        } catch (\Illuminate\Validation\ValidationException $e) {
-            // Tratamento de erros de validação
-            return redirect()->back()->withErrors($e->errors())->with('error', 'Erro de validação: Verifique os campos obrigatórios.');
-        } catch (\Exception $e) {
-            // Tratamento de outros erros
-            \Log::error('Erro ao agendar consulta', [
-                'error' => $e->getMessage(),
-                'stack' => $e->getTraceAsString(),
-            ]);
-            return redirect()->back()->with('error', 'Ocorreu um erro inesperado: ' . $e->getMessage());
+    return response()->json($appointments);
+}
+
+
+
+public function requestAppointment(Request $request)
+{
+    try {
+        // Validar os dados de entrada
+        $validated = $request->validate([
+            'patient_user_id' => 'required|exists:users,id',
+            'appointment_day' => 'required|date',
+            'appointment_time' => [
+                'required',
+                'date_format:H:i',
+                function ($attribute, $value, $fail) use ($request) {
+                    // Combinar a data e o horário para validar
+                    $dateTime = Carbon::createFromFormat('Y-m-d H:i', $request->appointment_day . ' ' . $value);
+                    if ($dateTime->isPast()) {
+                        $fail('Não é possível selecionar um horário no passado.');
+                    }
+                },
+            ],
+        ]);
+
+        // Buscar o paciente
+        $patientId = $validated['patient_user_id'];
+        $patient = User::find($patientId);
+
+        if (!$patient) {
+            return redirect()->back()->with('error', 'Paciente não encontrado.');
         }
+
+        // Buscar o registro do médico de família associado ao paciente
+        $familyDoctorRecord = $patient->familyDoctor;
+
+        if (!$familyDoctorRecord || !$familyDoctorRecord->doctor) {
+            return redirect()->back()->with('error', 'Nenhum médico de família está associado a este paciente.');
+        }
+
+        // Obter o médico associado
+        $doctor = $familyDoctorRecord->doctor;
+        $doctorId = $doctor->id;
+
+        // Combinar o dia e o horário em um único campo datetime
+        $appointmentDateTime = Carbon::createFromFormat(
+            'Y-m-d H:i',
+            $validated['appointment_day'] . ' ' . $validated['appointment_time']
+        );
+
+        // Verificar conflitos de horário
+        $conflictingAppointment = Appointment::where('doctor_user_id', $doctorId)
+            ->where('appointment_date_time', $appointmentDateTime)
+            ->first();
+
+        if ($conflictingAppointment) {
+            return redirect()->back()->with('error', 'Esse horário já está reservado para outro paciente.');
+        }
+
+        // Definir os valores adicionais
+        $validated['appointment_date_time'] = $appointmentDateTime;
+        $validated['specialties_id'] = 4; // Exemplo: Medicina Geral e Familiar
+        $validated['doctor_user_id'] = $doctorId;
+        $validated['status_id'] = Status::where('status', 'Pendente')->firstOrFail()->id;
+
+        // Criar o agendamento
+        $appointment = Appointment::create($validated);
+
+        // Criar log de atividade
+        ActivityLog::create([
+            'type' => 'appointment',
+            'description' => 'Consulta marcada: Paciente ' . $patient->name .
+                             ' com o médico ' . $doctor->name .
+                             ' para ' . $appointmentDateTime->format('d/m/Y H:i') .
+                             ' na especialidade Medicina Geral e Familiar.',
+            'user_id' => Auth::id(),
+        ]);
+
+        return redirect()->route('patient.index')->with('success', 'Consulta agendada com sucesso!');
+    } catch (\Illuminate\Validation\ValidationException $e) {
+        // Tratamento de erros de validação
+        return redirect()->back()
+            ->withErrors($e->errors())
+            ->with('error', 'Erro de validação: Verifique os campos obrigatórios.');
+    } catch (\Exception $e) {
+        // Tratamento de outros erros
+        \Log::error('Erro ao agendar consulta', [
+            'error' => $e->getMessage(),
+            'stack' => $e->getTraceAsString(),
+        ]);
+        return redirect()->back()->with('error', 'Ocorreu um erro inesperado: ' . $e->getMessage());
     }
-    
-    
+}
 
    
     public function showPendingAppointments()
@@ -204,14 +241,22 @@ class AppointmentController extends Controller
         return view('appointments.pending', compact('appointments','user'   ));
     }
 
-    public function updateStatus($id)
+    public function updateStatus(Request $request, $id)
     {
         $appointment = Appointment::findOrFail($id);
     
-        // Atualizar status para "1" (Aprovado)
-        $appointment->update(['status_id' => 1]);
+        // Validar o status recebido
+        $status = $request->input('status');
     
-        return redirect()->back()->with('success', 'Status atualizado para Aprovado!');
+        if (!in_array($status, [1, 3])) {
+            return back()->withErrors(['error' => 'Status inválido!']);
+        }
+    
+        // Atualizar o status
+        $appointment->update(['status_id' => $status]);
+    
+        $message = $status == 1 ? 'Consulta aprovada com sucesso!' : 'Consulta rejeitada com sucesso!';
+        return back()->with('success', $message);
     }
     
 

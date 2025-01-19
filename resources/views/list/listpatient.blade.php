@@ -289,13 +289,14 @@ form button {
                         
                         <!-- Status do paciente   -->
                         <td>
-                            <form action="{{ route('patients.destroy', $patient->id) }}" method="POST" style="display: inline;">
+                            <form action="{{ route('patients.toggle-status', $patient->id) }}" method="POST" style="display: inline;">
                                 @csrf
                                 <button type="submit" style="border: none; background: none; padding: 0;">
                                     <i class="status-icon {{ $patient->status ? 'status-active bx bx-check-circle' : 'status-inactive bx bx-x-circle' }}" data-toggle="tooltip" title="{{ $patient->status ? 'Ativo - Clique para desativar' : 'Inativo - Clique para ativar' }}"></i>
                                 </button>
                             </form>
                         </td>
+                        
                         
                         <!-- Ações -->
                         <td>
@@ -645,7 +646,7 @@ $(document).ready(function () {
 
 
 
-document.querySelectorAll('.toggle-status-form').forEach(form => {
+document.querySelectorAll('.doctors.toggleStatus').forEach(form => {
     form.addEventListener('submit', function (e) {
         e.preventDefault();
 
@@ -681,9 +682,6 @@ document.querySelectorAll('.toggle-status-form').forEach(form => {
         .catch(error => console.error('Erro na requisição:', error));
     });
 });
-
-
-
 
 document.getElementById('exportButton').addEventListener('click', function () {
     // Localiza a tabela de pacientes no DOM

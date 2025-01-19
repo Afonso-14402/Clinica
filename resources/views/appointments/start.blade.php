@@ -77,91 +77,91 @@
         </div>
     </nav>
 
-    <!-- Título -->
-    <h2 class="mb-4">Ficha de Anamnese</h2>
-
-    <!-- Card Principal -->
-    <div class="card">
-        <div class="card-body d-flex align-items-center">
-            <!-- Imagem do Paciente -->
-            <div class="me-4">
-                <img src="https://via.placeholder.com/120" alt="Foto do Paciente" class="rounded-circle" style="width: 120px; height: 120px;">
-            </div>
-
-            <!-- Informações do Paciente -->
-            <div class="flex-grow-1">
-                <h4 class="mb-1">{{ $appointment->patient->name }}</h4>
-                <p><strong>Data e Hora:</strong> {{ \Carbon\Carbon::parse($appointment->appointment_date_time)->format('d/m/Y H:i') }}</p>
-                <p><strong>Médico:</strong> {{ $appointment->doctor->name }}</p>
-                @if($appointment->specialties_id)
-                    <p><strong>Especialidade:</strong> {{ $appointment->specialty->name }}</p>
-                @endif
+    <div class="container py-5">
+        <!-- Título -->
+        <h2 class="mb-4 text-center text-primary">Ficha de Anamnese</h2>
     
+        <!-- Card Principal -->
+        <div class="card shadow-lg">
+            <div class="card-body d-flex flex-column flex-md-row align-items-center">
+                <!-- Imagem do Paciente -->
+                <div class="text-center me-md-4 mb-4 mb-md-0">
+                    <img src="https://via.placeholder.com/120" alt="Foto do Paciente" class="rounded-circle border border-primary" style="width: 120px; height: 120px;">
+                </div>
+    
+                <!-- Informações do Paciente -->
+                <div class="flex-grow-1">
+                    <h4 class="text-dark mb-2">{{ $appointment->patient->name }}</h4>
+                    <p><strong>Data e Hora:</strong> {{ \Carbon\Carbon::parse($appointment->appointment_date_time)->format('d/m/Y H:i') }}</p>
+                    <p><strong>Médico:</strong> {{ $appointment->doctor->name }}</p>
+                    @if($appointment->specialties_id)
+                        <p><strong>Especialidade:</strong> {{ $appointment->specialty->name }}</p>
+                    @endif
+                </div>
+            </div>
+        </div>
+    
+        <!-- Formulário de Relatório Médico -->
+        <div class="card mt-4 shadow-lg">
+            <div class="card-body">
+                <h4 class="text-primary mb-4">Preencher Relatório Médico</h4>
+    
+                <!-- Formulário -->
+                <form action="{{ route('consulta.salvarRelatorio', $appointment->id) }}" method="POST">
+                    @csrf
+    
+                    <!-- Seção 1: O que o paciente sente -->
+                    <div class="mb-4">
+                        <label for="sintomas" class="form-label">O que o paciente sente?</label>
+                        <textarea 
+                            class="form-control" 
+                            id="sintomas" 
+                            name="sintomas" 
+                            rows="3" 
+                            placeholder="Descreva aqui os sintomas relatados pelo paciente..." 
+                            required></textarea>
+                    </div>
+    
+                    <!-- Seção 2: Diagnóstico -->
+                    <div class="mb-4">
+                        <label for="diagnostico" class="form-label">Diagnóstico</label>
+                        <textarea 
+                            class="form-control" 
+                            id="diagnostico" 
+                            name="diagnostico" 
+                            rows="3" 
+                            placeholder="Informe o diagnóstico do paciente..." 
+                            required></textarea>
+                    </div>
+    
+                    <!-- Seção 3: Tratamento -->
+                    <div class="mb-4">
+                        <label for="tratamento" class="form-label">Tratamento</label>
+                        <textarea 
+                            class="form-control" 
+                            id="tratamento" 
+                            name="tratamento" 
+                            rows="3" 
+                            placeholder="Detalhe o tratamento recomendado..." 
+                            required></textarea>
+                    </div>
+    
+                    <!-- Seção 4: Observações -->
+                    <div class="mb-4">
+                        <label for="observacoes" class="form-label">Observações</label>
+                        <textarea 
+                            class="form-control" 
+                            id="observacoes" 
+                            name="observacoes" 
+                            rows="3" 
+                            placeholder="Insira aqui quaisquer observações adicionais..." 
+                            required></textarea>
+                    </div>
+    
+                    <!-- Botão de Envio -->
+                    <button type="submit" class="btn btn-success w-100">Finalizar consulta</button>
+                </form>
             </div>
         </div>
     </div>
-
-    <!-- Botões e Temporizador -->
-    <div class="d-flex justify-content-between align-items-center mt-4">
-        <a href= "{{ route('doctor.index') }}" class="btn btn-warning btn-sm">
-       
-            
-            <i class="fas fa-arrow-left"></i> Retroceder
-        </a>
-
-        <div class="text-center">
-            <div class="bg-light p-3 rounded" style="display: inline-block;">
-                <i class="fas fa-clock text-primary"></i>
-                <span class="fs-4">00:00:00</span>
-            </div>
-        </div>
-
-        <a href="#" class="btn btn-success btn-sm">
-            <i class="fas fa-prescription-bottle"></i> Prescrever Medicamento
-        </a>
-    </div>
-
-    <!-- Formulário de Relatório Médico -->
-    <div class="card mt-4">
-        <div class="card-body">
-            <h4>Preencher Relatório Médico</h4>
-            @if (session('success'))
-                <div class="alert alert-success" role="alert">
-                    {{ session('success') }}
-                </div>
-            @endif
-            @if ($errors->any())
-                <div class="alert alert-danger" role="alert">
-                    <ul>
-                        @foreach ($errors->all() as $error)
-                            <li>{{ $error }}</li>
-                        @endforeach
-                    </ul>
-                </div>
-            @endif
-
-            <form action="{{ route('consulta.salvarRelatorio', $appointment->id) }}" method="POST">
-                @csrf
-                <div class="form-group">
-                    <label for="content" class="form-label">Relatório</label>
-                    <textarea 
-                        class="form-control @error('content') is-invalid @enderror" 
-                        id="content" 
-                        name="content" 
-                        rows="6" 
-                        placeholder="Descreva aqui o diagnóstico, tratamento ou observações relevantes..." 
-                        aria-label="Campo para preenchimento do relatório médico" 
-                        required>{{ old('content', $appointment->report->content ?? '') }}</textarea>
-                    @error('content')
-                        <div class="invalid-feedback">
-                            {{ $message }}
-                        </div>
-                    @enderror
-                </div>
-
-                <button type="submit" class="btn btn-success mt-3">Finalizar consulta</button>
-            </form>
-        </div>
-    </div>
-</div>
 @endsection
