@@ -192,8 +192,9 @@
       </div>
       <div class="col-md-8">
         <h4>Calendário</h4>
-        <div class="card">
-            <div class="card-body">
+        
+        <div class="card" style="width: 39rem;">
+
                 <div class="container mt-5">
     
                     <!-- Campo de busca e botões de ação -->
@@ -208,36 +209,33 @@
                             <button id="exportButton" class="btn btn-success">{{__('Export Calendar')}}</button>
                         </div>
                     </div>
-    
-                    <!-- Modal para detalhes de eventos -->
-                    <div class="modal fade" id="eventModal" tabindex="-1" aria-labelledby="eventModalLabel" aria-hidden="true">
-                        <div class="modal-dialog">
-                            <div class="modal-content">
-                                <div class="modal-header">
-                                    <h5 class="modal-title" id="eventModalLabel">Detalhes da consulta</h5>
-                                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                                </div>
-                                <div class="modal-body">
-                                    <p><strong>Paciente:</strong> <span id="eventPatient"></span></p>
-                                    <p><strong>Médico:</strong> <span id="eventDoctor"></span></p>
-                                    <p><strong>Data:</strong> <span id="eventDate"></span></p>
-                                    <p><strong>Hora:</strong> <span id="eventTime"></span></p>
-                                    <p><strong>Tipo de Consulta:</strong> <span id="eventType"></span></p>
-                                </div>
-                                <div class="modal-footer">
-                                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Fechar</button>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-    
                     <!-- Calendário -->
-                    <div class="card">
-                        <div class="card-body">
-                            <div id="calendar" style="width: 100%; height: 100vh;"></div>
-                        </div>
-                    </div>
+                    
+                    <div id="calendar" style="width: 100%; height: 100vh;"></div>          
+                    
                 </div>
+          </div>
+                <!-- Modal para detalhes de eventos -->
+                <div class="modal fade" id="eventModal" tabindex="-1" aria-labelledby="eventModalLabel" aria-hidden="true">
+                  <div class="modal-dialog">
+                      <div class="modal-content">
+                          <div class="modal-header">
+                              <h5 class="modal-title" id="eventModalLabel">Detalhes da consulta</h5>
+                              <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                          </div>
+                          <div class="modal-body">
+                              <p><strong>Paciente:</strong> <span id="eventPatient"></span></p>
+                              <p><strong>Médico:</strong> <span id="eventDoctor"></span></p>
+                              <p><strong>Data:</strong> <span id="eventDate"></span></p>
+                              <p><strong>Hora:</strong> <span id="eventTime"></span></p>
+                              <p><strong>Tipo de Consulta:</strong> <span id="eventType"></span></p>
+                          </div>
+                          <div class="modal-footer">
+                              <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Fechar</button>
+                          </div>
+                      </div>
+                  </div>
+              </div>
     
                 <!-- Scripts -->
                 <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
@@ -328,8 +326,8 @@
                     });
 
                 </script>
-            </div>
-        </div>
+            
+        
     </div>    
 </div>
 

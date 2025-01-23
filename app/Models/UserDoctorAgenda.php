@@ -8,12 +8,15 @@ use Illuminate\Database\Eloquent\Model;
 class UserDoctorAgenda extends Model
 {
     use HasFactory;
+
     protected $table = 'user_doctor_agenda'; 
     protected $fillable = [
         'doctor_id',
         'day_of_week',
         'start_time',
         'end_time',
+        'doctor_user_id', 
+        'appointment_date_time'
     ];
 
     public function doctor()
@@ -25,9 +28,7 @@ class UserDoctorAgenda extends Model
     {
         return $this->belongsTo(User::class);
     }
-}
 
-class Appointment extends Model
-{
-    protected $fillable = ['doctor_user_id', 'appointment_date_time'];
+
 }
+    

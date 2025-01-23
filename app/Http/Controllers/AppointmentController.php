@@ -259,26 +259,6 @@ public function requestAppointment(Request $request)
         return back()->with('success', $message);
     }
     
-
- 
-
-    public function getDoctorAppointments(Request $request)
-    {
-        $validated = $request->validate([
-            'doctor_id' => 'required|exists:users,id',
-            'date' => 'required|date',
-        ]);
-    
-        $appointments = Appointment::with(['patient', 'specialty']) // Adicione relacionamentos, se necessário
-            ->where('doctor_user_id', $validated['doctor_id'])
-            ->whereDate('appointment_date_time', $validated['date'])
-            ->get();
-    
-        return response()->json($appointments);
-    }
-    
-    
-
     
     public function getSchedule($id)
     {

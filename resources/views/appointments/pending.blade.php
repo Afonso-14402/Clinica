@@ -138,29 +138,10 @@
                                         @endif
                                     </li>
                                     <li>
-                                        
-                                        <form action="{{ route('appointments.updateStatus', $appointment->id) }}" method="POST" style="display: inline;">
-                                            @csrf
-                                            @method('PUT')
-                                            <input type="hidden" name="status" value="3">
-                                            <button type="submit" class="dropdown-item text-danger">
-                                                <i class="bx bx-x-circle me-1"></i> Rejeitar
-                                            </button>
-                                        </form>
-                                        
-                                    </li>
-                                    <li>
                                         <button class="dropdown-item text-info" data-bs-toggle="modal" data-bs-target="#scheduleModal" data-doctor-id="{{ $appointment->doctor_user_id }}">
                                             <i class="bx bx-calendar me-1"></i> Ver Horário
                                         </button>
-                                    </li>
-
-                                    <li>
-                                        <button class="btn btn-sm btn-outline-info" data-bs-toggle="modal" data-bs-target="#doctorAppointmentsModal" onclick="loadDoctorAppointments({{ $appointment->doctor_user_id }}, '{{ \Carbon\Carbon::parse($appointment->appointment_date_time)->toDateString() }}')">
-                                            Ver Marcações do Dia
-                                        </button>
-                                    </li>
-                                    
+                                    </li> 
                                 </ul>
                             </div>
                         </td>
@@ -209,76 +190,11 @@
 </div>
 
 
-<!-- Modal para Marcações do Médico -->
-<div class="modal fade" id="doctorAppointmentsModal" tabindex="-1" aria-labelledby="doctorAppointmentsModalLabel" aria-hidden="true">
-    <div class="modal-dialog">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h5 class="modal-title" id="doctorAppointmentsModalLabel">Marcações do Médico</h5>
-                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-            </div>
-            <div class="modal-body">
-                <ul id="doctorAppointmentsList" class="list-group">
-                    <li class="list-group-item text-center">Carregando...</li>
-                </ul>                
-            </div>
-        </div>
-    </div>
-</div>
+
 
 
 
 <script>
-
-document.addEventListener('DOMContentLoaded', function () {
-    function loadDoctorAppointments(doctorId, date) {
-        const appointmentsList = document.getElementById('doctorAppointmentsList');
-
-        if (!appointmentsList) {
-            console.error('Elemento doctorAppointmentsList não encontrado.');
-            return;
-        }
-
-        // Limpar lista e exibir mensagem de carregamento
-        appointmentsList.innerHTML = '<li class="list-group-item text-center">Carregando...</li>';
-
-        // Buscar marcações do backend
-        fetch(`/doctor/appointments?doctor_id=${doctorId}&date=${date}`)
-            .then(response => response.json())
-            .then(data => {
-                // Limpar a lista
-                appointmentsList.innerHTML = '';
-
-                if (data.length > 0) {
-                    // Exibir cada marcação
-                    data.forEach(appointment => {
-                        const listItem = document.createElement('li');
-                        listItem.className = 'list-group-item';
-
-                        listItem.innerHTML = `
-                            <strong>Paciente:</strong> ${appointment.patient.name}<br>
-                            <strong>Horário:</strong> ${appointment.appointment_date_time}<br>
-                            <strong>Especialidade:</strong> ${appointment.specialty.name || 'Não informado'}
-                        `;
-                        appointmentsList.appendChild(listItem);
-                    });
-                } else {
-                    // Caso não haja marcações
-                    appointmentsList.innerHTML = '<li class="list-group-item text-center">Nenhuma marcação para este dia.</li>';
-                }
-            })
-            .catch(error => {
-                // Tratar erros
-                console.error('Erro ao carregar marcações:', error);
-                appointmentsList.innerHTML = '<li class="list-group-item text-center text-danger">Erro ao carregar marcações.</li>';
-            });
-    }
-
-    // Disponibiliza a função globalmente (opcional)
-    window.loadDoctorAppointments = loadDoctorAppointments;
-});
-
-
 
 
     // Buscar e exibir horários do médico
@@ -313,33 +229,6 @@ document.addEventListener('DOMContentLoaded', function () {
         });
     });
 
-
-    function loadDoctorAppointments(doctorId, date) {
-    const doctorAppointmentsContent = document.getElementById('doctorAppointmentsContent');
-    doctorAppointmentsContent.innerHTML = '<p class="text-center text-muted">Carregando...</p>';
-
-    axios.get(`/doctors/${doctorId}/appointments`, {
-        params: { date }
-    })
-    .then(response => {
-        if (response.data.length === 0) {
-            doctorAppointmentsContent.innerHTML = '<p class="text-center text-muted">Nenhuma marcação encontrada para esta data.</p>';
-        } else {
-            const list = response.data.map(appointment => `
-                <div class="mb-3">
-                    <p><strong>Paciente:</strong> ${appointment.patient?.name ?? 'N/A'}</p>
-                    <p><strong>Horário:</strong> ${new Date(appointment.appointment_date_time).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}</p>
-                    <hr>
-                </div>
-            `).join('');
-            doctorAppointmentsContent.innerHTML = list;
-        }
-    })
-    .catch(error => {
-        console.error(error);
-        doctorAppointmentsContent.innerHTML = '<p class="text-center text-danger">Erro ao carregar as marcações.</p>';
-    });
-}
 
 
 

@@ -12,30 +12,48 @@ use Illuminate\Support\Facades\Storage;
 class UserController extends Controller
 {
 
-    public function indext()
-    {
-        $user = Auth::user();
-        return view('index', compact('user'));
-    }
+   
     
     public function index()
     {
         $user = Auth::user();
         $role = $user->role->role;
-    
+
+
+
         // Verifica o papel do usuário
         switch ($role) {
             case 'Patient':
                 return $this->handlePatientDashboard($user);
-    
+
             case 'Doctor':
                 return $this->handleDoctorDashboard($user);
-    
+
+            case 'Admin':
+                return $this->handleAdminDashboard($user);
+            
             default:
-                // Se o papel não for reconhecido, redireciona para uma página 
-                return redirect()->route('index')->with('error', 'Acesso não autorizado.');
+                abort(403, 'Role não autorizada ou desconhecida.');
         }
     }
+
+    public function redirectToHome()
+    {
+        $user = Auth::user();
+        $role = $user->role->role;
+
+        switch ($role) {
+            case 'Admin':
+                return redirect()->route('index'); 
+            case 'Doctor':
+                return redirect()->route('doctor.index'); 
+            case 'Patient':
+                return redirect()->route('doctor.patient');
+            default:
+                abort(403, 'Role não autorizada ou desconhecida.');
+        }
+    }
+
     
     private function handlePatientDashboard($user)
     {
@@ -64,54 +82,62 @@ class UserController extends Controller
             'appointments'
         ));
     }
-    
+
+    private function handleAdminDashboard($user)
+    {
+
+        $user = Auth::user();
+        return view('index', compact('user'));
+       
+    }
     private function handleDoctorDashboard($user)
-{
-    // Data atual
-    $today = Carbon::today();
+    {
+        // Data atual
+        $today = Carbon::today();
 
-    // Próxima consulta (somente com status 1)
-    $nextAppointment = Appointment::where('doctor_user_id', $user->id)
-        ->where('appointment_date_time', '>', Carbon::now())
-        ->where('status_id', 1) // Considera apenas status 1
-        ->orderBy('appointment_date_time', 'asc')
-        ->first();
+        // Próxima consulta (somente com status 1)
+        $nextAppointment = Appointment::where('doctor_user_id', $user->id)
+            ->where('appointment_date_time', '>', Carbon::now())
+            ->where('status_id', 1) // Considera apenas status 1
+            ->orderBy('appointment_date_time', 'asc')
+            ->first();
 
-    // Consultas previstas para hoje (somente com status 1)
-    $consultasAgendadas = Appointment::where('doctor_user_id', $user->id)
-        ->whereDate('appointment_date_time', $today)
-        ->where('status_id', 1)
-        ->count();
+        // Consultas previstas para hoje (somente com status 1)
+        $consultasAgendadas = Appointment::where('doctor_user_id', $user->id)
+            ->whereDate('appointment_date_time', $today)
+            ->where('status_id', 1)
+            ->count();
 
-    // Tempo restante para a próxima consulta em horas e minutos
-    $tempoRestante = $nextAppointment
-        ? Carbon::now()->diff(Carbon::parse($nextAppointment->appointment_date_time))
-        : null;
+        // Tempo restante para a próxima consulta em horas e minutos
+        $tempoRestante = $nextAppointment
+            ? Carbon::now()->diff(Carbon::parse($nextAppointment->appointment_date_time))
+            : null;
 
-    // Todas as consultas do médico com status 1
-    $appointments = Appointment::where('doctor_user_id', $user->id)
-        ->where('status_id', 1) // Filtro para status 1
-        ->with(['patient', 'specialty', 'status'])
-        ->orderBy('appointment_date_time', 'desc')
-        ->get();
+        // Todas as consultas do médico com status 1
+        $appointments = Appointment::where('doctor_user_id', $user->id)
+            ->where('status_id', 1) // Filtro para status 1
+            ->with(['patient', 'specialty', 'status'])
+            ->orderBy('appointment_date_time', 'desc')
+            ->get();
 
-    // Consultas paginadas (somente com status 1)
-    $custasdortor = Appointment::where('doctor_user_id', $user->id)
-        ->where('status_id', 1) // Filtro para status 1
-        ->with(['patient', 'specialty', 'status'])
-        ->orderBy('appointment_date_time', 'desc')
-        ->paginate(10);
+        // Consultas paginadas (somente com status 1)
+        $custasdortor = Appointment::where('doctor_user_id', $user->id)
+            ->where('status_id', 1) // Filtro para status 1
+            ->with(['patient', 'specialty', 'status'])
+            ->orderBy('appointment_date_time', 'desc')
+            ->paginate(10);
 
-    // Retorna a view com os dados necessários
-    return view('doctor.index', compact(
-        'user',
-        'nextAppointment',
-        'consultasAgendadas',
-        'tempoRestante',
-        'appointments',
-        'custasdortor'
-    ));
-}
+        // Retorna a view com os dados necessários
+        return view('doctor.index', compact(
+            'user',
+            'nextAppointment',
+            'consultasAgendadas',
+            'tempoRestante',
+            'appointments',
+            'custasdortor'
+        ));
+    }
+
     public function getAppointments()
     {
         $user = auth()->user();

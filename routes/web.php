@@ -25,10 +25,10 @@ Route::get('/lixo', [logginController::class, 'destroy'])-> name ('lixo.destroy'
 
 Route::group(['middleware'=> 'auth' ] , function(){
 
-    Route::get('/home', [UserController::class, 'indext'] ) -> name( 'index');
+    Route::get('/home/admin', [UserController::class, 'index'] ) -> name( 'index');
     Route::get('/home/pacientes', [UserController::class, 'index'] ) -> name( 'patient.index');
     Route::get('/home/medico', [UserController::class, 'index'] ) -> name( 'doctor.index');
-
+    Route::get('/home', [UserController::class, 'redirectToHome'])->name('home');
 
 
     Route::post('/appointments/{id}/status', [AppointmentController::class, 'updateStatus']);

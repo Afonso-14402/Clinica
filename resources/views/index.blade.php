@@ -47,4 +47,5 @@
 
 @section('content')
 
+faaafaf
 @endsection
