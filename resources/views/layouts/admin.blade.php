@@ -229,5 +229,7 @@
 <script src="https://cdn.dhtmlx.com/scheduler/edge/dhtmlxscheduler.js"></script>
     @vite(['resources/vendor/js/app.js', 'resources/js/app.js','resources/vendor/libs/app.js'])
 
+    <meta name="csrf-token" content="{{ csrf_token() }}">
+
 </body>
 </html>

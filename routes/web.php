@@ -40,7 +40,8 @@ Route::group(['middleware'=> 'auth' ] , function(){
     Route::put('/appointments/{id}/update-status', [AppointmentController::class, 'updateStatus'])->name('appointments.updateStatus');
     Route::get('/doctor/appointments', [AppointmentController::class, 'getDoctorAppointments']);
 
-
+    Route::put('/appointments/{appointment}/approve', [AppointmentController::class, 'approve'])->name('appointments.approve');
+    Route::put('/appointments/{appointment}/reschedule', [AppointmentController::class, 'reschedule'])->name('appointments.reschedule');
 
 
 
@@ -71,7 +72,7 @@ Route::group(['middleware'=> 'auth' ] , function(){
     
 
     Route::get('/list/patients', [ListController::class, 'getPatients'])->name('list.listpatient');
-    Route::post('/patients/{patient}/toggle-status', [ListController::class, 'toggleStatus'])->name('patients.toggle-status');
+    Route::post('/patients/{patient}/toggle-status', [ListController::class, 'toggleStatusPatients'])->name('patients.toggle-status');
     Route::delete('/patients/{patient}', [ListController::class, 'destroyPatients'])->name('patients.destroy');
     Route::get('/patient-reports/{patientId}', [ListController::class, 'getPatientReports']);
 
@@ -140,4 +141,19 @@ Route::get('/autocomplete/patient', function () {
 
     return response()->json($patient);
 });
+
+Route::get('/patients/{patient}/info', [ListController::class, 'getPatientInfo']);
+Route::get('/patients/{patient}/appointments', [ListController::class, 'getPatientAppointments']);
+
+Route::get('/appointments/{id}/report', [AppointmentController::class, 'getReport'])->name('appointments.report');
+Route::get('/patient-details/{id}', [ListController::class, 'getPatientDetails'])->name('patient.details');
+
+Route::get('/doctor/{doctorId}/works-saturday', [DoctorAgendaController::class, 'checkWorksSaturday']);
+
+Route::get('/doctor/{doctorId}/check-availability', [DoctorAgendaController::class, 'checkDoctorAvailability']);
+
+// Rota para médico ver pacientes
+Route::get('/doctor/patients', [DoctorAgendaController::class, 'patients'])->name('doctor.patient');
+
+Route::get('/doctor/{id}/check-availability', [DoctorAgendaController::class, 'checkAvailability']);
 

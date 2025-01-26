@@ -14,9 +14,9 @@ class User extends Authenticatable
         'name',
         'email',
         'password',
-        'role_id',
         'status',
-        
+        'role_id',
+        'avatar'
     ];
     /**
      * The attributes that should be hidden for serialization.
@@ -71,7 +71,7 @@ class User extends Authenticatable
         return $this->hasMany(Appointment::class, 'doctor_user_id');
     }
 
-    public function appointmentsAsPatient()
+    public function appointments()
     {
         return $this->hasMany(Appointment::class, 'patient_user_id');
     }
@@ -99,5 +99,9 @@ public function UserDoctorAgenda()
                     ->with('doctor'); // Carrega o relacionamento com o médico
     }
     
+    public function dados_pessoais()
+    {
+        return $this->hasOne(DadosPessoais::class);
+    }
 
 }

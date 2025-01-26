@@ -224,10 +224,42 @@
 function loadAvailableTimes() {
     const appointmentDay = document.getElementById('appointment_day').value;
     const doctorId = document.getElementById('doctor_user_id').value;
+    const timeSelect = document.getElementById('appointment_time');
+
+    // Limpa as opções atuais
+    timeSelect.innerHTML = '<option value="" disabled selected>Selecione um horário</option>';
 
     if (!appointmentDay || !doctorId) {
         return;
     }
+
+    // Verifica se o médico atende no dia selecionado
+    fetch(`/doctor/${doctorId}/check-availability?date=${appointmentDay}`)
+        .then(response => {
+            if (!response.ok) {
+                throw new Error(`HTTP error! status: ${response.status}`);
+            }
+            return response.json();
+        })
+        .then(data => {
+            if (!data.available) {
+                timeSelect.innerHTML = `<option value="" disabled selected>${data.message}</option>`;
+                timeSelect.disabled = true;
+                return;
+            }
+            // Se o médico atende neste dia, carrega os horários disponíveis
+            loadTimes(doctorId, appointmentDay);
+        })
+        .catch(error => {
+            console.error('Erro ao verificar disponibilidade:', error);
+            timeSelect.innerHTML = '<option value="" disabled selected>Erro ao verificar disponibilidade</option>';
+            timeSelect.disabled = true;
+        });
+}
+
+function loadTimes(doctorId, appointmentDay) {
+    const timeSelect = document.getElementById('appointment_time');
+    timeSelect.disabled = false;
 
     fetch(`/available-times?doctor_id=${doctorId}&day=${appointmentDay}`)
         .then(response => {
@@ -237,18 +269,22 @@ function loadAvailableTimes() {
             return response.json();
         })
         .then(data => {
-            const timeSelect = document.getElementById('appointment_time');
-            timeSelect.innerHTML = '<option value="" disabled selected>Selecione um horário</option>';
-            
-            data.forEach(time => {
-                const option = document.createElement('option');
-                option.value = time;
-                option.textContent = time;
-                timeSelect.appendChild(option);
-            });
+            if (data.length === 0) {
+                timeSelect.innerHTML = '<option value="" disabled selected>Sem horários disponíveis</option>';
+                timeSelect.disabled = true;
+            } else {
+                data.forEach(time => {
+                    const option = document.createElement('option');
+                    option.value = time;
+                    option.textContent = time;
+                    timeSelect.appendChild(option);
+                });
+            }
         })
         .catch(error => {
             console.error('Erro ao carregar horários:', error);
+            timeSelect.innerHTML = '<option value="" disabled selected>Erro ao carregar horários</option>';
+            timeSelect.disabled = true;
         });
 }
 

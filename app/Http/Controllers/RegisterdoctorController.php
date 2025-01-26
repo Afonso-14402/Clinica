@@ -6,6 +6,8 @@ use Illuminate\Support\Facades\Auth;
 use App\Models\User;
 use Illuminate\Http\Request;
 use App\Models\ActivityLog; 
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Hash;
 
 class RegisterdoctorController extends Controller
 {
@@ -20,39 +22,39 @@ class RegisterdoctorController extends Controller
 
 
     public function medico(Request $request)
-{
-    // Validar os dados do formulário
-    $validatedData = $request->validate([
-        'name' => 'required|string|max:255',
-        'last_name' => 'required|string|max:255',
-        'email' => 'required|email|unique:users,email',
-        'password' => 'required|confirmed|min:6',
-        'specialties' => 'required|array', // Deve conter IDs das especialidades
-        'specialties.*' => 'exists:specialties,id',
-    ]);
+    {
+        try {
+            $request->validate([
+                'name' => 'required|string|max:255',
+                'email' => 'required|string|email|max:255|unique:users',
+                'password' => 'required|string|min:8',
+                'specialty' => 'required|array',
+                'specialty.*' => 'exists:specialties,id'
+            ]);
 
-    // Juntar o nome e o sobrenome em um campo único 'full_name'
-    $fullName = $validatedData['name'] . ' ' . $validatedData['last_name'];
+            DB::beginTransaction();
 
-    // Criar o novo usuário (médico)
-    $user = User::create([
-        'name' => $fullName,
-        'email' => $validatedData['email'],
-        'password' => bcrypt($validatedData['password']),
-        'role_id' => 2, // Definindo o 'role_id' para Médico
-    ]);
-    ActivityLog::create([
-        'type' => 'criaçao do medico', // Tipo da ação
-        'description' => "Novo medico {$user->name} foi registrado no sistema", // Use $user->name para acessar o nome do usuário
-        'user_id' => auth()->id(), // Usuário autenticado que realizou a ação
-    ]);
+            // Criar o usuário
+            $user = User::create([
+                'name' => $request->name,
+                'email' => $request->email,
+                'password' => Hash::make($request->password),
+                'status' => 1,
+                'role_id' => 2 // ID do papel 'Doctor'
+            ]);
 
-    // Associar as especialidades ao usuário recém-criado
-    $user->specialties()->attach($validatedData['specialties']);
+            // Associar especialidades ao médico
+            $user->specialties()->attach($request->specialty);
 
-    // Redirecionar com mensagem de sucesso
-    return redirect()->route('list.index')->with('success', 'Médico registrado com sucesso!');
-}
+            DB::commit();
+
+            return response()->json(['message' => 'Médico registrado com sucesso!']);
+
+        } catch (\Exception $e) {
+            DB::rollBack();
+            return response()->json(['error' => $e->getMessage()], 500);
+        }
+    }
 
 
     

@@ -48,7 +48,7 @@ class UserController extends Controller
             case 'Doctor':
                 return redirect()->route('doctor.index'); 
             case 'Patient':
-                return redirect()->route('doctor.patient');
+                return redirect()->route('patient.index');
             default:
                 abort(403, 'Role não autorizada ou desconhecida.');
         }

@@ -642,7 +642,7 @@ document.addEventListener('change', (e) => {
                     document.querySelector('.pagination').innerHTML = newPagination.innerHTML;
                 })
                 .catch(error => {
-                    console.error('Erro ao buscar os pacientes:', error);
+                    console.error('Erro ao buscar os médicos:', error);
                 });
         });
     } else {

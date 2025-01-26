@@ -1,9 +1,4 @@
-
-
-
 @extends('layouts.admin')
-
-
 
 @section('content')
 <meta name="csrf-token" content="{{ csrf_token() }}">
@@ -129,16 +124,24 @@
                                 </button>
                                 <ul class="dropdown-menu">
                                     <li>
-                                        @if ($appointment->status_id == 4) <!-- Se o status for Pendente -->
-                                        <form action="{{ route('appointments.updateStatus', $appointment->id) }}" method="POST">
-                                            @csrf
-                                            @method('PUT')
-                                            <button type="submit" class="btn btn-success">Aprovar</button>
-                                        </form>
-                                        @endif
+                                        <button class="dropdown-item text-success" data-bs-toggle="modal" 
+                                            data-bs-target="#approveModal" 
+                                            data-appointment-id="{{ $appointment->id }}">
+                                            <i class="bx bx-check me-1"></i> Aprovar
+                                        </button>
                                     </li>
                                     <li>
-                                        <button class="dropdown-item text-info" data-bs-toggle="modal" data-bs-target="#scheduleModal" data-doctor-id="{{ $appointment->doctor_user_id }}">
+                                        <button class="dropdown-item text-warning" data-bs-toggle="modal" 
+                                            data-bs-target="#rescheduleModal"
+                                            data-appointment-id="{{ $appointment->id }}"
+                                            data-doctor-id="{{ $appointment->doctor_user_id }}">
+                                            <i class="bx bx-calendar-edit me-1"></i> Reagendar
+                                        </button>
+                                    </li>
+                                    <li>
+                                        <button class="dropdown-item text-info" data-bs-toggle="modal" 
+                                            data-bs-target="#scheduleModal" 
+                                            data-doctor-id="{{ $appointment->doctor_user_id }}">
                                             <i class="bx bx-calendar me-1"></i> Ver Horário
                                         </button>
                                     </li> 
@@ -189,14 +192,70 @@
     </div>
 </div>
 
+<!-- Modal de Aprovação -->
+<div class="modal fade" id="approveModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Confirmar Aprovação</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <p>Tem certeza que deseja aprovar esta consulta?</p>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                <form id="approveForm" method="POST">
+                    @csrf
+                    @method('PUT')
+                    <button type="submit" class="btn btn-success">Confirmar Aprovação</button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
 
-
-
-
+<!-- Modal de Reagendamento -->
+<div class="modal fade" id="rescheduleModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Reagendar Consulta</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <form id="rescheduleForm" method="POST">
+                    @csrf
+                    @method('PUT')
+                    <div class="mb-3">
+                        <label for="new_doctor" class="form-label">Médico</label>
+                        <select class="form-select" id="new_doctor" name="new_doctor_id" required>
+                            <option value="">Selecione um médico</option>
+                        </select>
+                    </div>
+                    <div class="mb-3">
+                        <label for="new_date" class="form-label">Nova Data</label>
+                        <input type="date" class="form-control" id="new_date" name="new_date" required>
+                    </div>
+                    <div class="mb-3">
+                        <label for="new_time" class="form-label">Novo Horário</label>
+                        <input type="time" class="form-control" id="new_time" name="new_time" required>
+                    </div>
+                    <div class="mb-3">
+                        <label for="reschedule_reason" class="form-label">Motivo do Reagendamento</label>
+                        <textarea class="form-control" id="reschedule_reason" name="reschedule_reason" rows="3" required></textarea>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                <button type="submit" form="rescheduleForm" class="btn btn-primary">Confirmar Reagendamento</button>
+            </div>
+        </div>
+    </div>
+</div>
 
 <script>
-
-
     // Buscar e exibir horários do médico
     document.querySelectorAll('[data-bs-target="#scheduleModal"]').forEach(button => {
         button.addEventListener('click', function () {
@@ -229,8 +288,73 @@
         });
     });
 
+    // Manipulador do modal de aprovação
+    document.querySelectorAll('[data-bs-target="#approveModal"]').forEach(button => {
+        button.addEventListener('click', function() {
+            const appointmentId = this.getAttribute('data-appointment-id');
+            const form = document.getElementById('approveForm');
+            form.action = `/appointments/${appointmentId}/approve`;
+        });
+    });
 
+    // Manipulador do modal de reagendamento
+    document.querySelectorAll('[data-bs-target="#rescheduleModal"]').forEach(button => {
+        button.addEventListener('click', function() {
+            const appointmentId = this.getAttribute('data-appointment-id');
+            const currentDoctorId = this.getAttribute('data-doctor-id');
+            const appointmentDate = this.closest('tr').querySelector('.appointment-date-time').textContent.trim();
+            
+            // Converter a data do formato brasileiro (dd/mm/yyyy HH:mm) para o formato do input
+            const [datePart, timePart] = appointmentDate.split(' ');
+            const [day, month, year] = datePart.split('/');
+            
+            // Preencher a data atual
+            const formattedDate = `${year}-${month}-${day}`;
+            document.getElementById('new_date').value = formattedDate;
+            
+            // Preencher o horário atual
+            document.getElementById('new_time').value = timePart;
 
+            const form = document.getElementById('rescheduleForm');
+            form.action = `/appointments/${appointmentId}/reschedule`;
 
+            // Carregar e selecionar o médico atual
+            axios.get('/autocomplete/doctors')
+                .then(response => {
+                    const doctorSelect = document.getElementById('new_doctor');
+                    doctorSelect.innerHTML = '<option value="">Selecione um médico</option>';
+                    
+                    response.data.forEach(doctor => {
+                        const option = document.createElement('option');
+                        option.value = doctor.id;
+                        option.textContent = doctor.name;
+                        if (doctor.id == currentDoctorId) {
+                            option.selected = true;
+                        }
+                        doctorSelect.appendChild(option);
+                    });
+                })
+                .catch(error => {
+                    console.error('Erro ao carregar médicos:', error);
+                    alert('Erro ao carregar lista de médicos');
+                });
+        });
+    });
+
+    // Validação de data e hora no reagendamento
+    document.getElementById('rescheduleForm').addEventListener('submit', function(e) {
+        e.preventDefault();
+        
+        const newDate = document.getElementById('new_date').value;
+        const newTime = document.getElementById('new_time').value;
+        const reason = document.getElementById('reschedule_reason').value;
+
+        if (!newDate || !newTime || !reason) {
+            alert('Por favor, preencha todos os campos');
+            return;
+        }
+
+        this.submit();
+    });
 </script>
 @endsection
