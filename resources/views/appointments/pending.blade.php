@@ -241,10 +241,6 @@
                         <label for="new_time" class="form-label">Novo Horário</label>
                         <input type="time" class="form-control" id="new_time" name="new_time" required>
                     </div>
-                    <div class="mb-3">
-                        <label for="reschedule_reason" class="form-label">Motivo do Reagendamento</label>
-                        <textarea class="form-control" id="reschedule_reason" name="reschedule_reason" rows="3" required></textarea>
-                    </div>
                 </form>
             </div>
             <div class="modal-footer">
@@ -341,16 +337,24 @@
         });
     });
 
-    // Validação de data e hora no reagendamento
+    // Atualizar a validação do formulário de reagendamento
     document.getElementById('rescheduleForm').addEventListener('submit', function(e) {
         e.preventDefault();
         
         const newDate = document.getElementById('new_date').value;
         const newTime = document.getElementById('new_time').value;
-        const reason = document.getElementById('reschedule_reason').value;
-
-        if (!newDate || !newTime || !reason) {
+        
+        if (!newDate || !newTime) {
             alert('Por favor, preencha todos os campos');
+            return;
+        }
+
+        // Verificar se a data não é no passado
+        const selectedDateTime = new Date(newDate + ' ' + newTime);
+        const now = new Date();
+        
+        if (selectedDateTime < now) {
+            alert('Não é possível reagendar para uma data/hora no passado');
             return;
         }
 

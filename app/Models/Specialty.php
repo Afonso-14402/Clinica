@@ -18,7 +18,7 @@ class Specialty extends Model
     }
     public function appointments()
     {
-        return $this->hasMany(Appointment::class);
+        return $this->hasMany(Appointment::class, 'specialties_id');
     }
 
  

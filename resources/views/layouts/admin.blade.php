@@ -162,53 +162,18 @@
                     </ul>
                 </li>
                 @endif
-            
+
+                @if (isset($user) && $user->role->role != 'Doctor')
                 <li class="menu-item">
-                    <a href="icons-boxicons.html" class="menu-link">
+                    <a href="{{ route('appointments.history') }}" class="menu-link">
                     <i class="menu-icon tf-icons bx bx-crown"></i>
-                    <div class="text-truncate" data-i18n="Boxicons">Boxicons</div>
+                    <div class="text-truncate" data-i18n="Boxicons">Histórico de Consultas</div>
                     </a>
                 </li>
+                @endif
             
                 <!-- Forms & Tables -->
                 <li class="menu-header small text-uppercase"><span class="menu-header-text">Forms &amp; Tables</span></li>
-                <!-- Forms -->
-                <li class="menu-item">
-                    <a href="javascript:void(0);" class="menu-link menu-toggle">
-                    <i class="menu-icon tf-icons bx bx-detail"></i>
-                    <div class="text-truncate" data-i18n="Form Elements">Form Elements</div>
-                    </a>
-                    <ul class="menu-sub">
-                    <li class="menu-item">
-                        <a href="forms-basic-inputs.html" class="menu-link">
-                        <div class="text-truncate" data-i18n="Basic Inputs">Basic Inputs</div>
-                        </a>
-                    </li>
-                    <li class="menu-item">
-                        <a href="forms-input-groups.html" class="menu-link">
-                        <div class="text-truncate" data-i18n="Input groups">Input groups</div>
-                        </a>
-                    </li>
-                    </ul>
-                </li>
-                <li class="menu-item">
-                    <a href="javascript:void(0);" class="menu-link menu-toggle">
-                    <i class="menu-icon tf-icons bx bx-detail"></i>
-                    <div class="text-truncate" data-i18n="Form Layouts">Form Layouts</div>
-                    </a>
-                    <ul class="menu-sub">
-                    <li class="menu-item">
-                        <a href="form-layouts-vertical.html" class="menu-link">
-                        <div class="text-truncate" data-i18n="Vertical Form">Vertical Form</div>
-                        </a>
-                    </li>
-                    <li class="menu-item">
-                        <a href="form-layouts-horizontal.html" class="menu-link">
-                        <div class="text-truncate" data-i18n="Horizontal Form">Horizontal Form</div>
-                        </a>
-                    </li>
-                    </ul>
-                </li>                          
                 </ul>
             </div>
             </aside>

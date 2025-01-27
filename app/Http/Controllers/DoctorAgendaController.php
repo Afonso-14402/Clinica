@@ -52,15 +52,49 @@ class DoctorAgendaController extends Controller
             // Remover horários já ocupados
             $availableTimes = array_values(array_diff($availableTimes, $bookedAppointments));
 
-            return response()->json([
-                'times' => $availableTimes
-            ]);
+            return response()->json($availableTimes);
 
         } catch (\Exception $e) {
             \Log::error('Erro ao buscar horários disponíveis: ' . $e->getMessage());
+            return response()->json([], 500);
+        }
+    }
+
+    public function checkAvailability($doctorId, Request $request)
+    {
+        try {
+            $date = $request->query('date');
+            if (!$date) {
+                return response()->json([
+                    'available' => false,
+                    'message' => 'Data não fornecida'
+                ], 400);
+            }
+
+            $dayOfWeek = Carbon::parse($date)->dayOfWeek;
+
+            // Verificar se o médico tem agenda para este dia da semana
+            $agenda = UserDoctorAgenda::where('doctor_id', $doctorId)
+                ->where('day_of_week', $dayOfWeek)
+                ->first();
+
+            if (!$agenda) {
+                return response()->json([
+                    'available' => false,
+                    'message' => 'Médico não atende neste dia da semana'
+                ]);
+            }
+
             return response()->json([
-                'error' => 'Erro ao buscar horários disponíveis',
-                'message' => $e->getMessage()
+                'available' => true,
+                'message' => 'Médico disponível neste dia'
+            ]);
+
+        } catch (\Exception $e) {
+            \Log::error('Erro ao verificar disponibilidade: ' . $e->getMessage());
+            return response()->json([
+                'available' => false,
+                'message' => 'Erro ao verificar disponibilidade: ' . $e->getMessage()
             ], 500);
         }
     }

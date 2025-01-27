@@ -104,4 +104,9 @@ public function UserDoctorAgenda()
         return $this->hasOne(DadosPessoais::class);
     }
 
+    public function doctorAppointments()
+    {
+        return $this->hasMany(Appointment::class, 'doctor_user_id');
+    }
+
 }

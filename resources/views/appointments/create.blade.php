@@ -232,13 +232,12 @@
     
                     <!-- Campo de busca e botões de ação -->
                     <div class="row mb-3">
-                        <div class="col-md-6">
-                            <div class="input-group">
-                                <input type="text" id="searchInput" class="form-control" placeholder="Introduza o termo de pesquisa">
-                                <button id="searchButton" class="btn btn-primary">Pesquisar</button>
+                        <div class="col-md-7">
+                            <div class="col-md-4">
+                                <input type="text" id="doctorSearch" class="form-control" placeholder="Pesquisar por nome...">
                             </div>
                         </div>
-                        <div class="col-md-6 text-end">
+                        <div class="col-md- text-end">
                             <button id="exportButton" class="btn btn-success">Exportar Calendário</button>
                         </div>
                     </div>

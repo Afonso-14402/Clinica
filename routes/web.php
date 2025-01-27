@@ -13,6 +13,7 @@ use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\logginController;
 use App\Http\Controllers\AppointmentController;
 use App\Http\Controllers\DoctorAgendaController;
+use App\Http\Controllers\AppointmentHistoryController;
 
 
 
@@ -87,6 +88,7 @@ Route::group(['middleware'=> 'auth' ] , function(){
     Route::get('/appointments/events', [AppointmentController::class, 'getEvents'])->name('appointments.events');
     Route::get('/appointments/create', [AppointmentController::class, 'create'])->name('appointments.create');
     Route::post('/appointments', [AppointmentController::class, 'store'])->name('appointments.store');
+    Route::get('/appointments/history', [AppointmentHistoryController::class, 'index'])->name('appointments.history');
 
 
     
@@ -150,10 +152,8 @@ Route::get('/patient-details/{id}', [ListController::class, 'getPatientDetails']
 
 Route::get('/doctor/{doctorId}/works-saturday', [DoctorAgendaController::class, 'checkWorksSaturday']);
 
-Route::get('/doctor/{doctorId}/check-availability', [DoctorAgendaController::class, 'checkDoctorAvailability']);
+Route::get('/doctor/{doctorId}/check-availability', [DoctorAgendaController::class, 'checkAvailability']);
 
 // Rota para médico ver pacientes
 Route::get('/doctor/patients', [DoctorAgendaController::class, 'patients'])->name('doctor.patient');
-
-Route::get('/doctor/{id}/check-availability', [DoctorAgendaController::class, 'checkAvailability']);
 

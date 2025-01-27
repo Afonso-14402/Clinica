@@ -255,8 +255,7 @@ class AppointmentController extends Controller
         $request->validate([
             'new_date' => 'required|date',
             'new_time' => 'required',
-            'new_doctor_id' => 'required|exists:users,id',
-            'reschedule_reason' => 'required|string'
+            'new_doctor_id' => 'required|exists:users,id'
         ]);
 
         $newDateTime = $request->new_date . ' ' . $request->new_time;
@@ -294,16 +293,17 @@ class AppointmentController extends Controller
 
         $appointment->update([
             'appointment_date_time' => $newDateTime,
-            'doctor_user_id' => $newDoctorId,
-            'reschedule_reason' => $request->reschedule_reason
+            'doctor_user_id' => $newDoctorId
         ]);
 
         // Registrar no log de atividades
         ActivityLog::create([
             'type' => 'appointment_reschedule',
-            'description' => 'Consulta reagendada: ID #' . $appointment->id . 
-                            ' - Novo médico: ' . User::find($newDoctorId)->name .
-                            ' - Nova data/hora: ' . $appointmentDateTime->format('d/m/Y H:i'),
+            'description' => sprintf(
+                'Consulta reagendada: ID #%d - Nova data/hora: %s com Dr(a). %s',$appointment->id,
+                $appointmentDateTime->format('d/m/Y H:i'),
+                User::find($newDoctorId)->name
+            ),
             'user_id' => Auth::id(),
         ]);
 

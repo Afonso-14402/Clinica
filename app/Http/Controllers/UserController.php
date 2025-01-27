@@ -69,17 +69,40 @@ class UserController extends Controller
     
         $plannedAppointments = Appointment::where('patient_user_id', $user->id)->count();
     
-        $appointments = Appointment::where('patient_user_id', $user->id)
-            ->with(['doctor', 'specialty', 'status'])
-            ->orderBy('appointment_date_time', 'desc')
-            ->get();
+        // Query base para consultas
+        $query = Appointment::where('patient_user_id', $user->id)
+            ->with(['doctor', 'specialty', 'status']);
+
+        // Aplicar filtro de data se solicitado
+        $filterDate = request('filter_date');
+        if ($filterDate === 'today') {
+            $query->whereDate('appointment_date_time', Carbon::today());
+        } else {
+            // Se não houver filtro de data, mostrar apenas consultas futuras
+            $query->where('appointment_date_time', '>', Carbon::now());
+        }
+
+        // Aplicar filtro de médico se solicitado
+        $filterDoctor = request('filter_doctor');
+        if ($filterDoctor) {
+            $query->where('doctor_user_id', $filterDoctor);
+        }
+
+        // Obter apenas os médicos que têm consultas com este paciente
+        $doctors = User::whereHas('doctorAppointments', function($q) use ($user) {
+            $q->where('patient_user_id', $user->id);
+        })->get();
+
+        // Executar a query com os filtros aplicados
+        $appointments = $query->orderBy('appointment_date_time', 'asc')->paginate(10);
     
         return view('patient.index', compact(
             'user',
             'nextAppointment',
             'todayAppointmentsCount',
             'plannedAppointments',
-            'appointments'
+            'appointments',
+            'doctors'
         ));
     }
 

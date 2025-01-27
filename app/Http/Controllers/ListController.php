@@ -107,7 +107,8 @@ class ListController extends Controller
     {
         $search = $request->input('search');
        
-        $query = User::where('role_id', 3); // Substitua "User" por "Patient" se houver um modelo específico para pacientes.
+        $query = User::where('role_id', 3)
+            ->with(['dados_pessoais']); // Carrega os dados pessoais junto
 
         if ($search) {
             $query->where(function ($q) use ($search) {
@@ -116,7 +117,7 @@ class ListController extends Controller
             });
         }
 
-        $patients = $query->paginate(2); // Substitua 10 pelo número desejado de itens por página.
+        $patients = $query->orderBy('name', 'asc')->paginate(10);
         $user = Auth::user();
 
         if ($request->ajax()) {

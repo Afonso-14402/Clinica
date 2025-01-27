@@ -295,11 +295,38 @@ function loadTimes(doctorId, appointmentDay) {
     <div class="row mt-5">
         <div class="col-12">
             <h2>Minhas Consultas</h2>
+            
+            <!-- Filtros -->
+            <div class="row mb-3">
+                <div class="col-md-6">
+                    <form action="{{ route('patient.index') }}" method="GET" class="d-flex gap-2">
+                        <select name="filter_doctor" class="form-select">
+                            <option value="">Todos os Médicos</option>
+                            @foreach($doctors as $doctor)
+                                <option value="{{ $doctor->id }}" {{ request('filter_doctor') == $doctor->id ? 'selected' : '' }}>
+                                    {{ $doctor->name }}
+                                </option>
+                            @endforeach
+                        </select>
+                        
+                        <select name="filter_date" class="form-select">
+                            <option value="">Todas as Datas</option>
+                            <option value="today" {{ request('filter_date') == 'today' ? 'selected' : '' }}>Hoje</option>
+                        </select>
+                        
+                        <button type="submit" class="btn btn-primary">Filtrar</button>
+                        @if(request('filter_doctor') || request('filter_date'))
+                            <a href="{{ route('patient.index') }}" class="btn btn-secondary">Limpar Filtros</a>
+                        @endif
+                    </form>
+                </div>
+            </div>
+
             <table class="table table-striped">
                 <thead>
                     <tr>
                         <th>Data e Hora</th>
-                        <th>Paciente</th>
+                        <th>Médico</th>
                         <th>Especialidade</th>
                         <th>Status</th>
                     </tr>
@@ -308,7 +335,7 @@ function loadTimes(doctorId, appointmentDay) {
                     @forelse ($appointments as $appointment)
                         <tr>
                             <td>{{ $appointment->appointment_date_time }}</td>
-                            <td>{{ $appointment->patient->name }}</td>
+                            <td>{{ $appointment->doctor->name }}</td>
                             <td>{{ $appointment->specialty->name }}</td>
                             <td>{{ $appointment->status->status }}</td>
                         </tr>
@@ -319,6 +346,35 @@ function loadTimes(doctorId, appointmentDay) {
                     @endforelse
                 </tbody>
             </table>
+            <nav>
+                <ul class="pagination justify-content-center">
+                    @if ($appointments->onFirstPage())
+                        <li class="page-item disabled">
+                            <span class="page-link">Anterior</span>
+                        </li>
+                    @else
+                        <li class="page-item">
+                            <a class="page-link" href="{{ $appointments->previousPageUrl() }}">Anterior</a>
+                        </li>
+                    @endif
+
+                    @for ($i = 1; $i <= $appointments->lastPage(); $i++)
+                        <li class="page-item {{ $appointments->currentPage() == $i ? 'active' : '' }}">
+                            <a class="page-link" href="{{ $appointments->url($i) }}">{{ $i }}</a>
+                        </li>
+                    @endfor
+
+                    @if ($appointments->hasMorePages())
+                        <li class="page-item">
+                            <a class="page-link" href="{{ $appointments->nextPageUrl() }}">Próxima</a>
+                        </li>
+                    @else
+                        <li class="page-item disabled">
+                            <span class="page-link">Próxima</span>
+                        </li>
+                    @endif
+                </ul>
+            </nav>
         </div>
     </div>
 </div>
