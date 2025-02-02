@@ -614,7 +614,7 @@ h6.fw-bold {
                         <div class="col-md-6">
                             <label for="password" class="form-label">Palavra-passe</label>
                             <div class="input-group">
-                                <input type="text" 
+                                <input type="password" 
                                     class="form-control"
                                        id="password" 
                                     name="password"
@@ -624,7 +624,7 @@ h6.fw-bold {
                         <div class="col-md-6">
                             <label for="password_confirmation" class="form-label">Confirmar Palavra-passe</label>
                             <div class="input-group">
-                                <input type="text" 
+                                <input type="password" 
                                     class="form-control"
                                        id="password_confirmation" 
                                     name="password_confirmation"
@@ -1198,6 +1198,41 @@ document.addEventListener('DOMContentLoaded', function () {
     } else {
         console.error('Elemento com ID "patientSearch" não encontrado!');
     }
+});
+
+// Adicione este código JavaScript após o script existente
+document.addEventListener('DOMContentLoaded', function() {
+    const form = document.querySelector('#novopacienteModal form');
+    
+    form.addEventListener('submit', function(e) {
+        e.preventDefault();
+        
+        const formData = new FormData(this);
+        
+        fetch(this.action, {
+            method: 'POST',
+            body: formData,
+            headers: {
+                'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content,
+                'Accept': 'application/json'
+            }
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                alert(data.message);
+                document.getElementById('novopacienteModal').style.display = 'none';
+                // Recarrega a página para mostrar o novo paciente
+                window.location.reload();
+            } else {
+                alert('Erro ao registar paciente: ' + data.message);
+            }
+        })
+        .catch(error => {
+            console.error('Erro:', error);
+            alert('Erro ao registar paciente');
+        });
+    });
 });
 </script>
  

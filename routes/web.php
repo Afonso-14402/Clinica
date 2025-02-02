@@ -99,8 +99,8 @@ Route::group(['middleware'=> 'auth' ] , function(){
     Route::post('/user/update-avatar', [UserController::class, 'updateAvatar'])->name('user.update.avatar');
     
     
-    Route::post('/registar/paciente', [RegisterController::class, 'paciente'])->name('registar.paciente');
-    Route::post('/registar/medico', [RegisterdoctorController::class, 'medico'])->name('registar.medico');
+    Route::post('/registar-paciente', [RegisterController::class, 'registarPaciente'])->name('registar.paciente');
+    Route::post('/registar-medico', [RegisterController::class, 'store'])->name('registar.medico');
     
 
     
