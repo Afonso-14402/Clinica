@@ -13,7 +13,9 @@
 ```
 composer create-project laravel/laravel .
 ```
-
+```
+composer install
+```
 2. Instale as dependências do Node.js:
 ```
 npm install
@@ -36,7 +38,7 @@ npm install highlight.js
 
 6. Copie o arquivo de ambiente:
 ```
-cp .env.example .env
+cp .env.example  e mode o nome para  .env
 ```
 
 7. Configure o arquivo .env com suas credenciais de banco de dados:
@@ -45,8 +47,8 @@ DB_CONNECTION=mysql
 DB_HOST=127.0.0.1
 DB_PORT=3306
 DB_DATABASE=apclinica
-DB_USERNAME=seu_usuario
-DB_PASSWORD=sua_senha
+DB_USERNAME=root
+DB_PASSWORD=
 ```
 
 8. Gere a chave da aplicação:
@@ -57,9 +59,47 @@ php artisan key:generate
 9. Crie o banco de dados:
 ```
 CREATE DATABASE apclinica;
-php artisan migrate --path=/database/migrations/2025_01_03_202316_create_family_doctor_table.php 
+
+php artisan migrate --path=/database/migrations/--------------------
+
 ```
 
+## Ordem de Execução das Migrações
+
+As migrações devem ser executadas na seguinte ordem devido às dependências:
+
+1. 2024_12_04_150113_create_roles_table.php
+  - php artisan migrate --path=/database/migrations/2024_12_04_150113_create_roles_table.php 
+
+2. 2024_12_04_150227_create_specialties_table.php
+  - php artisan migrate --path=/database/migrations/2024_12_04_150227_create_specialties_table.php
+
+3. 0001_01_01_000000_create_users_table.php
+  - php artisan migrate --path=/database/migrations/0001_01_01_000000_create_users_table.php
+
+4. 2024_12_04_150234_create_user_specialties_table.php
+  - php artisan migrate --path=/database/migrations/2024_12_04_150234_create_user_specialties_table.php
+   
+5. 2024_12_04_150237_create_user_doctor_agenda_table.php
+  - php artisan migrate --path=/database/migrations/2024_12_04_150237_create_user_doctor_agenda_table.php
+
+6. 2024_12_04_150251_create_status_table.php
+  - php artisan migrate --path=/database/migrations/2024_12_04_150251_create_status_table.php
+
+7. 2024_12_04_150240_create_appointments_table.php
+  - php artisan migrate --path=/database/migrations/2024_12_04_150240_create_appointments_table.php
+
+8. 2024_12_04_150244_create_reports_table.php
+  - php artisan migrate --path=/database/migrations/2024_12_04_150244_create_reports_table.php
+
+9. 2024_12_25_155943_create_activity_log_table.php
+  - php artisan migrate --path=/database/migrations/2024_12_25_155943_create_activity_log_table.php
+
+10. 2025_01_03_202316_create_family_doctor_table.php
+ - php artisan migrate --path=/database/migrations/2025_01_03_202316_create_family_doctor_table.php
+
+11. 2025_01_25_000000_create_dados_pessoais_table.php
+ - php artisan migrate --path=/database/migrations/2025_01_25_000000_create_dados_pessoais_table.php
 
 
 10. Execute as migrações e seeders:
@@ -122,21 +162,7 @@ O sistema utiliza as seguintes tabelas principais:
 - `user_specialties`: Especialidades de cada médico
 - `status`: Status possíveis para as consultas
 
-## Ordem de Execução das Migrações
 
-As migrações devem ser executadas na seguinte ordem devido às dependências:
-
-1. 2024_12_04_150113_create_roles_table.php
-2. 2024_12_04_150227_create_specialties_table.php
-3. 0001_01_01_000000_create_users_table.php
-4. 2024_12_04_150234_create_user_specialties_table.php
-5. 2024_12_04_150237_create_user_doctor_agenda_table.php
-6. 2024_12_04_150251_create_status_table.php
-7. 2024_12_04_150240_create_appointments_table.php
-8. 2024_12_04_150244_create_reports_table.php
-9. 2024_12_25_155943_create_activity_log_table.php
-10. 2025_01_03_202316_create_family_doctor_table.php
-11. 2025_01_25_000000_create_dados_pessoais_table.php
 
 ## Funcionalidades Principais
 
