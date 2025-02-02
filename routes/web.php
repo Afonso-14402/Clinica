@@ -14,6 +14,8 @@ use App\Http\Controllers\logginController;
 use App\Http\Controllers\AppointmentController;
 use App\Http\Controllers\DoctorAgendaController;
 use App\Http\Controllers\AppointmentHistoryController;
+use App\Http\Controllers\PatientController;
+use App\Http\Controllers\FamilyDoctorController;
 
 
 
@@ -56,8 +58,7 @@ Route::group(['middleware'=> 'auth' ] , function(){
     Route::resource('doctors', ListController::class);
 
     
-    Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard.index');
-    Route::get('/activities', [DashboardController::class, 'fetchActivities']);
+ 
 
     
     
@@ -156,4 +157,8 @@ Route::get('/doctor/{doctorId}/check-availability', [DoctorAgendaController::cla
 
 // Rota para médico ver pacientes
 Route::get('/doctor/patients', [DoctorAgendaController::class, 'patients'])->name('doctor.patient');
+
+
+Route::post('/patient/{id}/update', [PatientController::class, 'update'])->name('patient.update');
+
 

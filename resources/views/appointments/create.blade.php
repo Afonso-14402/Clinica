@@ -1,6 +1,6 @@
 @extends('layouts.admin')
 
-@section('title', 'Agendar Consulta')
+@section('title', 'Marcar Consulta')
 
 @section('content')
     
@@ -27,7 +27,7 @@
             <li class="nav-item navbar-dropdown dropdown-user dropdown">
               <a class="nav-link dropdown-toggle hide-arrow p-0" href="javascript:void(0);" data-bs-toggle="dropdown">
                 <div class="avatar avatar-online">
-                  <img src="{{ $user->avatar ? asset('storage/' . $user->avatar) : asset('default-avatar.png') }}" alt="Avatar do usuário" class="avatar">
+                  <img src="{{ $user->avatar ? asset('storage/' . $user->avatar) : asset('default-avatar.png') }}" alt="Fotografia do utilizador" class="avatar">
                 </div>
               </a>
               <ul class="dropdown-menu dropdown-menu-end">
@@ -116,7 +116,7 @@
             <div class="card">
                 <div class="card-header">
                     <button class="btn btn-primary w-100" data-bs-toggle="modal" data-bs-target="#addEventModal">
-                        + Agendar consulta 
+                        + Marcar consulta 
                     </button>
                 </div>
                 
@@ -131,21 +131,21 @@
           <div class="modal-dialog modal-lg">
               <div class="modal-content">
                   <div class="modal-header">
-                      <h5 class="modal-title" id="addEventModalLabel">Agendar Consulta</h5>
-                      <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                      <h5 class="modal-title" id="addEventModalLabel">Marcar Consulta</h5>
+                      <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Fechar"></button>
                   </div>
                   <div class="modal-body">
                       <form method="POST" action="{{ route('appointments.store') }}">
                           @csrf
       
-                          <!-- Campo de paciente - mantém o original -->
+                          <!-- Campo de paciente -->
                           <div class="mb-3">
-                              <label for="patient_user_id" class="form-label">Paciente</label>
+                              <label for="patient_user_id" class="form-label">Utente</label>
                               <div>
                                   <input 
                                       type="text" 
                                       id="patient-search" 
-                                      placeholder="Digite o nome do paciente..." 
+                                      placeholder="Digite o nome do utente..." 
                                       class="form-control"
                                       autocomplete="off"
                                   />
@@ -154,7 +154,7 @@
                               </div>
                           </div>
       
-                          <!-- Campo de médico - mantém o original -->
+                          <!-- Campo de médico -->
                           <div class="mb-3">
                               <label for="doctor_user_id" class="form-label">Médico</label>
                               <div>
@@ -170,7 +170,7 @@
                               </div>
                           </div>
       
-                          <!-- Campo de especialidade - mantém o original -->
+                          <!-- Campo de especialidade -->
                           <div class="mb-3">
                               <label for="specialties_id" class="form-label">Especialidade</label>
                               <select class="form-select" name="specialties_id" required>
@@ -178,7 +178,7 @@
                               </select>
                           </div>
       
-                          <!-- NOVOS campos de data e hora separados -->
+                          <!-- Campos de data e hora -->
                           <div class="mb-3">
                               <label for="appointment_day" class="form-label">Dia</label>
                               <input 
@@ -192,14 +192,14 @@
                           </div>
                           
                           <div class="mb-3">
-                              <label for="appointment_time" class="form-label">Horário</label>
+                              <label for="appointment_time" class="form-label">Hora</label>
                               <select 
                                   class="form-select" 
                                   name="appointment_time" 
                                   id="appointment_time" 
                                   required
                               >
-                                  <option value="" disabled selected>Selecione um horário</option>
+                                  <option value="" disabled selected>Selecione uma hora</option>
                               </select>
                           </div>
       
@@ -216,7 +216,7 @@
       
                           <div class="modal-footer">
                               <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
-                              <button type="submit" class="btn btn-primary">Agendar Consulta</button>
+                              <button type="submit" class="btn btn-primary">Marcar Consulta</button>
                           </div>
                       </form>
                   </div>
@@ -253,10 +253,10 @@
                       <div class="modal-content">
                           <div class="modal-header">
                               <h5 class="modal-title" id="eventModalLabel">Detalhes da consulta</h5>
-                              <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                              <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Fechar"></button>
                           </div>
                           <div class="modal-body">
-                              <p><strong>Paciente:</strong> <span id="eventPatient"></span></p>
+                              <p><strong>Utente:</strong> <span id="eventPatient"></span></p>
                               <p><strong>Médico:</strong> <span id="eventDoctor"></span></p>
                               <p><strong>Data:</strong> <span id="eventDate"></span></p>
                               <p><strong>Hora:</strong> <span id="eventTime"></span></p>
@@ -285,7 +285,7 @@
                     // Inicialização do calendário
                     var calendarEl = document.getElementById('calendar');
                     var calendar = new FullCalendar.Calendar(calendarEl, {
-                      locale: 'pt-br', // Isso já inclui as traduções necessárias
+                      locale: 'pt-pt', // Configuração para português de Portugal
                       buttonText: {
                           today: 'Hoje',
                           month: 'Mês',
@@ -313,12 +313,12 @@
                     });
                     calendar.render();
     
-                    // Função de busca de eventos
-                    document.getElementById('searchButton').addEventListener('click', function() {
-                        var searchKeywords = document.getElementById('searchInput').value.toLowerCase();
+                    // Função de busca de eventos usando o campo doctorSearch
+                    document.getElementById('doctorSearch').addEventListener('input', function() {
+                        var searchKeywords = this.value.toLowerCase();
                         filterAndDisplayEvents(searchKeywords);
                     });
-    
+
                     function filterAndDisplayEvents(searchKeywords) {
                         $.ajax({
                             method: 'GET',
@@ -403,12 +403,17 @@ function loadAvailableTimes() {
     const doctorId = document.getElementById('doctor_user_id').value;
     const timeSelect = document.getElementById('appointment_time');
 
-    if (!appointmentDay || !doctorId) {
-        timeSelect.innerHTML = '<option value="" disabled selected>Selecione um médico e uma data primeiro</option>';
+    if (!doctorId) {
+        timeSelect.innerHTML = '<option value="" disabled selected>Por favor, selecione um médico primeiro</option>';
         return;
     }
 
-    timeSelect.innerHTML = '<option value="" disabled selected>Carregando horários...</option>';
+    if (!appointmentDay) {
+        timeSelect.innerHTML = '<option value="" disabled selected>Por favor, selecione uma data</option>';
+        return;
+    }
+
+    timeSelect.innerHTML = '<option value="" disabled selected>A carregar horários...</option>';
     timeSelect.disabled = true;
 
     fetch(`/available-times?doctor_id=${doctorId}&day=${appointmentDay}`)
@@ -422,21 +427,21 @@ function loadAvailableTimes() {
             timeSelect.disabled = false;
             timeSelect.innerHTML = '';
 
-            if (!data.times || data.times.length === 0) {
-                timeSelect.innerHTML = '<option value="" disabled selected>Sem horários disponíveis</option>';
+            if (!data || data.length === 0) {
+                timeSelect.innerHTML = '<option value="" disabled selected>Sem horários disponíveis para esta data</option>';
                 return;
             }
 
-            // Adiciona a opção padrão
+            // Adiciona a opção predefinida
             const defaultOption = document.createElement('option');
             defaultOption.value = '';
-            defaultOption.textContent = 'Selecione um horário';
+            defaultOption.textContent = 'Selecione uma hora';
             defaultOption.selected = true;
             defaultOption.disabled = true;
             timeSelect.appendChild(defaultOption);
 
             // Adiciona os horários disponíveis
-            data.times.forEach(time => {
+            data.forEach(time => {
                 const option = document.createElement('option');
                 option.value = time;
                 option.textContent = time;
@@ -445,10 +450,17 @@ function loadAvailableTimes() {
         })
         .catch(error => {
             console.error('Erro:', error);
-            timeSelect.innerHTML = '<option value="" disabled selected>Erro ao carregar horários</option>';
+            timeSelect.innerHTML = '<option value="" disabled selected>Erro ao carregar horários. Por favor, tente novamente.</option>';
             timeSelect.disabled = true;
         });
 }
+
+// Adicionar evento para carregar horários quando o médico for selecionado
+document.getElementById('doctor-search').addEventListener('change', function() {
+    if (document.getElementById('appointment_day').value) {
+        loadAvailableTimes();
+    }
+});
 </script>
 
 @endsection

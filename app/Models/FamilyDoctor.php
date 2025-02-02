@@ -34,7 +34,7 @@ class FamilyDoctor extends Model
      * Um médico pode estar associado como médico de família de um paciente.
      */
     public function doctor()
-{
-    return $this->belongsTo(User::class, 'doctor_user_id');
-}
+    {
+        return $this->belongsTo(User::class, 'doctor_user_id');
+    }
 }

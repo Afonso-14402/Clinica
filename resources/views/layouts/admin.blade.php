@@ -98,22 +98,7 @@
                 <div class="menu-inner-shadow"></div>
             
                 <ul class="menu-inner py-1">
-                <!-- Dashboards -->
-                <li class="menu-item">
-                    <a href="javascript:void(0);" class="menu-link menu-toggle">
-                    <i class="menu-icon tf-icons bx bx-home-smile"></i>
-                    <div class="text-truncate" data-i18n="Dashboards">Painéis de controlo</div>
-                    
-                    </a>
-                    <ul class="menu-sub">
-                    <li class="menu-item">
-                        <a href="{{ route('dashboard.index') }}" class="menu-link">
-                        <div class="text-truncate" data-i18n="Analytics">Analytics</div>
-                        </a>
-                    </li>
-                    
-                    </ul>
-                </li>
+                
             
                 <!-- Registar -->
                 @if (isset($user) && $user->role->role != 'Patient')
@@ -125,7 +110,7 @@
                     <ul class="menu-sub">
                         <li class="menu-item">
                             <a href="{{ route('list.listpatient') }}" class="menu-link">
-                                Resgitar pacientes
+                                Resgitar utentes
                             </a>
                         </li>
                         @if (isset($user) && $user->role->role != 'Patient' && $user->role->role != 'Doctor')

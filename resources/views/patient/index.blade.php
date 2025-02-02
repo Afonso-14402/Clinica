@@ -36,7 +36,7 @@
         <li class="nav-item navbar-dropdown dropdown-user dropdown">
         <a class="nav-link dropdown-toggle hide-arrow p-0" href="javascript:void(0);" data-bs-toggle="dropdown">
             <div class="avatar avatar-online">
-            <img src="{{ $user->avatar ? asset('storage/' . $user->avatar) : asset('default-avatar.png') }}" alt="Avatar do usuário" class="avatar">
+            <img src="{{ $user->avatar ? asset('storage/' . $user->avatar) : asset('default-avatar.png') }}" alt="Fotografia do utilizador" class="avatar">
             </div>
         </a>
         <ul class="dropdown-menu dropdown-menu-end">
@@ -45,7 +45,7 @@
                 <div class="d-flex">
                 <div class="flex-shrink-0 me-3">
                     <div class="avatar avatar-online">
-                    <img src="{{ $user->avatar ? asset('storage/' . $user->avatar) : asset('default-avatar.png') }}" alt="Avatar do usuário" class="avatar">
+                    <img src="{{ $user->avatar ? asset('storage/' . $user->avatar) : asset('default-avatar.png') }}" alt="Fotografia do utilizador" class="avatar">
                     </div>
                 </div>
                 <div class="flex-grow-1">
@@ -104,7 +104,7 @@
                     <h4>Próxima Consulta</h4>
                     @if ($nextAppointment)
                         <p><strong>Data e Hora:</strong> {{ $nextAppointment->appointment_date_time }}</p>
-                        <p><strong>Paciente:</strong> {{ $nextAppointment->patient->name }}</p>
+                        <p><strong>Utente:</strong> {{ $nextAppointment->patient->name }}</p>
                         <p><strong>Especialidade:</strong> {{ $nextAppointment->specialty->name }}</p>
                     @else
                         <p>Nenhuma consulta agendada.</p>
@@ -119,7 +119,7 @@
                     <p>Você podes pedir uma consulta com o seu medico de família.</p>
                 <br>
                     <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#appointmentModal">
-                        Agendar Consulta
+                        Marcar Consulta
                     </button>
             </div>
         </div>
@@ -130,16 +130,16 @@
     <div class="modal-dialog">
         <div class="modal-content">
             <div class="modal-header">
-                <h5 class="modal-title" id="appointmentModalLabel">Agendar Consulta</h5>
+                <h5 class="modal-title" id="appointmentModalLabel">Marcar Consulta</h5>
                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Fechar"></button>
             </div>
             <div class="modal-body">
                 <form method="POST" action="{{ route('requestAppointment') }}">
                     @csrf
 
-                    <!-- Campo de Paciente -->
+                    <!-- Campo de Utente -->
                     <div class="mb-3">
-                        <label for="patient_user_id" class="form-label">Paciente</label>
+                        <label for="patient_user_id" class="form-label">Utente</label>
                         <input 
                             type="text" 
                             id="patient-name" 
@@ -186,14 +186,14 @@
                     </div>
                     
                     <div class="mb-3">
-                        <label for="appointment_time" class="form-label">Horário</label>
+                        <label for="appointment_time" class="form-label">Hora</label>
                         <select 
                             class="form-select" 
                             name="appointment_time" 
                             id="appointment_time" 
                             required
                         >
-                            <option value="" disabled selected>Selecione um horário</option>
+                            <option value="" disabled selected>Selecione uma hora</option>
                         </select>
                     </div>
                     
@@ -212,7 +212,7 @@
                     <!-- Botões -->
                     <div class="modal-footer">
                         <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
-                        <button type="submit" class="btn btn-primary">Agendar Consulta</button>
+                        <button type="submit" class="btn btn-primary">Marcar Consulta</button>
                     </div>
                 </form>
             </div>
@@ -227,7 +227,7 @@ function loadAvailableTimes() {
     const timeSelect = document.getElementById('appointment_time');
 
     // Limpa as opções atuais
-    timeSelect.innerHTML = '<option value="" disabled selected>Selecione um horário</option>';
+    timeSelect.innerHTML = '<option value="" disabled selected>Selecione uma hora</option>';
 
     if (!appointmentDay || !doctorId) {
         return;
@@ -247,7 +247,7 @@ function loadAvailableTimes() {
                 timeSelect.disabled = true;
                 return;
             }
-            // Se o médico atende neste dia, carrega os horários disponíveis
+            // Se o médico atende neste dia, carrega as horas disponíveis
             loadTimes(doctorId, appointmentDay);
         })
         .catch(error => {
@@ -264,13 +264,13 @@ function loadTimes(doctorId, appointmentDay) {
     fetch(`/available-times?doctor_id=${doctorId}&day=${appointmentDay}`)
         .then(response => {
             if (!response.ok) {
-                throw new Error('Erro ao carregar horários');
+                throw new Error('Erro ao carregar horas');
             }
             return response.json();
         })
         .then(data => {
             if (data.length === 0) {
-                timeSelect.innerHTML = '<option value="" disabled selected>Sem horários disponíveis</option>';
+                timeSelect.innerHTML = '<option value="" disabled selected>Sem horas disponíveis</option>';
                 timeSelect.disabled = true;
             } else {
                 data.forEach(time => {
@@ -282,8 +282,8 @@ function loadTimes(doctorId, appointmentDay) {
             }
         })
         .catch(error => {
-            console.error('Erro ao carregar horários:', error);
-            timeSelect.innerHTML = '<option value="" disabled selected>Erro ao carregar horários</option>';
+            console.error('Erro ao carregar horas:', error);
+            timeSelect.innerHTML = '<option value="" disabled selected>Erro ao carregar horas</option>';
             timeSelect.disabled = true;
         });
 }

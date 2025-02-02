@@ -4,7 +4,7 @@ use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
 
-class CreateAppointmentsTable extends Migration
+return new class extends Migration
 {
     public function up()
     {
@@ -14,7 +14,7 @@ class CreateAppointmentsTable extends Migration
             $table->foreignId('doctor_user_id')->constrained('users')->onDelete('cascade');
             $table->foreignId('specialties_id')->constrained('specialties')->onDelete('cascade');
             $table->foreignId('status_id')->constrained('status')->onDelete('cascade');
-            $table->timestamp('appointment_date_time');
+            $table->dateTime('appointment_date_time')->nullable();
             $table->timestamps();
         });
     }
@@ -23,6 +23,6 @@ class CreateAppointmentsTable extends Migration
     {
         Schema::dropIfExists('appointments');
     }
-}
+};
 
 

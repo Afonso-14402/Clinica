@@ -435,7 +435,7 @@ h6.fw-bold {
     <div class="card">
         <h5 class="card-header d-flex justify-content-between align-items-center">
             
-            Lista de Pacientes
+            Lista de Utentes
             
 
 
@@ -447,7 +447,7 @@ h6.fw-bold {
                 <i class="bx bx-download"></i> Exportar para Excel
             </button>
 
-            <button id="openModal" class="btn btn-primary">Novo paciente </button>
+            <button id="openModal" class="btn btn-primary">Novo utente </button>
             
             
         </h5>
@@ -470,7 +470,7 @@ h6.fw-bold {
                         <td>{{ $patient->email }}</td>
                         
                         
-                        <!-- Status do paciente   -->
+                        <!-- Status do utente   -->
                         <td>
                             <form action="{{ route('patients.toggle-status', $patient->id) }}" method="POST" style="display: inline;">
                                 @csrf
@@ -488,7 +488,7 @@ h6.fw-bold {
                                     Ações
                                 </button>
                                 <ul class="dropdown-menu">
-                                    <!-- Editar Paciente -->
+                                    <!-- Editar Utente -->
                                     <li>
                                         <a class="dropdown-item" href="#">
                                             <i class="bx bx-edit-alt me-1"></i> Editar
@@ -497,12 +497,12 @@ h6.fw-bold {
                                     
                                     <!-- Ver Prontuário -->
                                     <li>
-                                        <a class="dropdown-item" data-bs-toggle="modal" data-bs-target="#addPacienteModal" data-patient-id="{{ $patient->id }}">
+                                        <a class="dropdown-item" data-bs-toggle="modal" data-bs-target="#addUtenteModal" data-patient-id="{{ $patient->id }}">
                                             <i class="bx bx-file me-1"></i> Ver Prontuário
                                         </a>
                                     </li>
                                     
-                                    <!-- Excluir Paciente -->
+                                    <!-- Excluir Utente -->
                                     <li>
                                         <form action="{{ route('patients.destroy', $patient->id) }}" method="POST" onsubmit="return confirm('Tem a certeza que pretende eliminar este utente?');">
                                             @csrf
@@ -554,13 +554,13 @@ h6.fw-bold {
         </div>
     </div>
 </div>
-   <!-- Modal para Novo Paciente -->
-   <div class="modal" id="novopacienteModal" tabindex="-1"> 
+   <!-- Modal para Novo Utente -->
+   <div class="modal" id="novoutenteModal" tabindex="-1"> 
     <div class="modal-dialog modal-lg">
         <div class="modal-content">
             <div class="modal-header">
                 <h5 class="modal-title">
-                    <i class="bx bx-user-plus me-2"></i>Registar Novo Paciente
+                    <i class="bx bx-user-plus me-2"></i>Registar Novo Utente
                 </h5>
                 <button type="button" class="btn-close" id="closeModal" aria-label="Close"></button>
             </div>
@@ -649,18 +649,18 @@ h6.fw-bold {
 
 
 <!-- Modal -->
-<div class="modal fade" id="addPacienteModal" tabindex="-1" aria-labelledby="addPacienteModalLabel" aria-hidden="true">
+<div class="modal fade" id="addUtenteModal" tabindex="-1" aria-labelledby="addUtenteModalLabel" aria-hidden="true">
     <div class="modal-dialog modal-lg">
       <div class="modal-content">
         <div class="modal-header">
-          <h5 class="modal-title" id="addPacienteModalLabel">Adicionar Paciente</h5>
+          <h5 class="modal-title" id="addUtenteModalLabel">Adicionar Utente</h5>
           <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
         </div>
         <div class="modal-body">
           <!-- Formulário com abas -->
           <div class="card shadow-sm">
             <div class="card-header">
-              <ul class="nav nav-tabs card-header-tabs" id="pacienteModalTab" role="tablist">
+              <ul class="nav nav-tabs card-header-tabs" id="utenteModalTab" role="tablist">
                 @foreach (['Dados Pessoais', 'Prontuário Médico'] as $index => $tab)
                 <li class="nav-item" role="presentation">
                   <button 
@@ -677,46 +677,39 @@ h6.fw-bold {
               </ul>
             </div>
             <div class="card-body">
-              <div class="tab-content" id="pacienteModalTabContent">
+              <div class="tab-content" id="utenteModalTabContent">
                 <!-- Aba: Dados Pessoais -->
                 <div class="tab-pane fade show active" id="modal-dados-pessoais" role="tabpanel">
-                    <!-- Adicionar botão de edição no topo -->
-                    <div class="d-flex justify-content-end mb-3">
-                        <button class="btn btn-primary btn-sm edit-personal-data">
-                            <i class="bx bx-edit-alt me-1"></i>Editar Dados Pessoais
-                        </button>
-                    </div>
-                    
                     <div class="row">
                         <!-- Informações Básicas -->
+                        <div class="col-12 mb-3">
+                            <button class="btn btn-primary btn-sm edit-personal-data" data-patient-id="${patient.id}">
+                                <i class="bx bx-edit-alt me-1"></i>Editar Dados Pessoais
+                            </button>
+                        </div>
                         <div class="col-md-6 mb-3">
                             <label class="form-label fw-bold">Nome Completo</label>
-                            <p>{{ $patient->name }}</p>
+                            <p>${patient.name}</p>
                         </div>
                         <div class="col-md-6 mb-3">
                             <label class="form-label fw-bold">Data de Nascimento</label>
-                            <p>{{ $patient->dados_pessoais->data_nascimento ?? 'Não informado' }}</p>
+                            <p>${dados.data_nascimento || 'Não preenchido'}</p>
                         </div>
                         
                         <!-- Documentos -->
                         <div class="col-md-6 mb-3">
                             <label class="form-label fw-bold">NIF</label>
-                            <p>{{ $patient->dados_pessoais->nif ?? 'Não informado' }}</p>
+                            <p>${dados.nif || 'Não preenchido'}</p>
                         </div>
                         
                         <!-- Informações Pessoais -->
                         <div class="col-md-6 mb-3">
                             <label class="form-label fw-bold">Sexo</label>
-                            <p>{{ $patient->dados_pessoais->sexo ?? 'Não informado' }}</p>
+                            <p>${dados.sexo || 'Não preenchido'}</p>
                         </div>
-                        <div class="col-md-4">
-                            <label class="form-label">Estado Civil</label>
-                            <select class="form-control" name="estado_civil" id="estado_civil" required>
-                                <option value="">Selecione</option>
-                                <option value="Solteiro" ${dados && dados.estado_civil === 'Solteiro' ? 'selected' : ''}>Solteiro</option>
-                                <option value="Casado" ${dados && dados.estado_civil === 'Casado' ? 'selected' : ''}>Casado</option>
-                                <option value="Divorciado" ${dados && dados.estado_civil === 'Divorciado' ? 'selected' : ''}>Divorciado</option>
-                            </select>
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label fw-bold">Estado Civil</label>
+                            <p>${dados.estado_civil || 'Não preenchido'}</p>
                         </div>
                         
                         <!-- Endereço -->
@@ -725,27 +718,27 @@ h6.fw-bold {
                             <div class="row">
                                 <div class="col-md-8">
                                     <label class="form-label fw-bold">Morada</label>
-                                    <p>{{ $patient->dados_pessoais->morada ?? 'Não informado' }}</p>
+                                    <p>${dados.morada || 'Não preenchido'}</p>
                                 </div>
                                 <div class="col-md-4">
                                     <label class="form-label fw-bold">Número</label>
-                                    <p>{{ $patient->dados_pessoais->numero ?? 'Não informado' }}</p>
+                                    <p>${dados.numero || 'Não preenchido'}</p>
                                 </div>
                                 <div class="col-md-4">
                                     <label class="form-label fw-bold">Código Postal</label>
-                                    <p>{{ $patient->dados_pessoais->codigo_postal ?? 'Não informado' }}</p>
+                                    <p>${dados.codigo_postal || 'Não preenchido'}</p>
                                 </div>
                                 <div class="col-md-4">
                                     <label class="form-label fw-bold">Freguesia</label>
-                                    <p>{{ $patient->dados_pessoais->freguesia ?? 'Não informado' }}</p>
+                                    <p>${dados.freguesia || 'Não preenchido'}</p>
                                 </div>
                                 <div class="col-md-4">
                                     <label class="form-label fw-bold">Concelho</label>
-                                    <p>{{ $patient->dados_pessoais->concelho ?? 'Não informado' }}</p>
+                                    <p>${dados.concelho || 'Não preenchido'}</p>
                                 </div>
                                 <div class="col-md-4">
                                     <label class="form-label fw-bold">Distrito</label>
-                                    <p>{{ $patient->dados_pessoais->distrito ?? 'Não informado' }}</p>
+                                    <p>${dados.distrito || 'Não preenchido'}</p>
                                 </div>
                             </div>
                         </div>
@@ -754,15 +747,15 @@ h6.fw-bold {
                         <h6 class="fw-bold">Informações médicas</h6> <!-- Informações Médicas -->
                         <div class="col-md-4 mb-3">
                             <label class="form-label fw-bold">Grupo Sanguíneo</label>
-                            <p>{{ $patient->dados_pessoais->grupo_sanguineo ?? 'Não informado' }}</p>
+                            <p>${dados.grupo_sanguineo || 'Não informado'}</p>
                         </div>
                         <div class="col-md-4 mb-3">
                             <label class="form-label fw-bold">Peso (kg)</label>
-                            <p>{{ $patient->dados_pessoais->peso ?? 'Não informado' }}</p>
+                            <p>${dados.peso || 'Não informado'}</p>
                         </div>
                         <div class="col-md-4 mb-3">
                             <label class="form-label fw-bold">Altura (m)</label>
-                            <p>{{ $patient->dados_pessoais->altura ?? 'Não informado' }}</p>
+                            <p>${dados.altura || 'Não informado'}</p>
                         </div>
                     </div>
                 </div>
@@ -776,7 +769,7 @@ h6.fw-bold {
                                 <i class="bx bx-file me-2"></i>Histórico de Prontuários
                             </h5>
                             <p class="text-muted small">
-                                Histórico completo dos prontuários e relatórios médicos do paciente.
+                                Histórico completo dos prontuários e relatórios médicos do utente.
                             </p>
                         </div>
 
@@ -830,25 +823,26 @@ h6.fw-bold {
         </div>
         <div class="modal-footer">
           <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
-          <button type="button" class="btn btn-primary" id="salvarPaciente">Salvar</button>
+          <button type="button" class="btn btn-primary" id="salvarUtente">Guardar</button>
         </div>
       </div>
     </div>
   </div>
   
 <script>
-// Gestão do modal para adicionar novo paciente
+// Gestão do modal para adicionar novo utente
 document.getElementById('openModal')?.addEventListener('click', () => {
-    document.getElementById('novopacienteModal').style.display = 'block';  // Mostra o modal
+    document.getElementById('novoutenteModal').style.display = 'block';  // Mostra o modal
 });
 
 document.getElementById('closeModal')?.addEventListener('click', () => {
-    document.getElementById('novopacienteModal').style.display = 'none';   // Esconde o modal
+    document.getElementById('novoutenteModal').style.display = 'none';   // Esconde o modal
 });
 
 // Função para visualizar o prontuário médico do utente
 $(document).ready(function() {
-    $('#addPacienteModal').on('show.bs.modal', function(event) {
+    $('#addUtenteModal').on('show.bs.modal', function(event) {
+        // Obtém o ID do utente selecionado
         const patientId = $(event.relatedTarget).data('patient-id');
         const prontuarioTab = $('#modal-prontuario-medico');
         const reportList = prontuarioTab.find('.report-list tbody');
@@ -857,20 +851,18 @@ $(document).ready(function() {
         // Carrega os dados pessoais do utente através de uma chamada AJAX
         $.get(`/patient-details/${patientId}`, function(response) {
             if (response.success) {
-                let dados = response.dados_pessoais;
-                let patient = response.patient;
-                let isEditing = false;
+                const dados = response.dados_pessoais;
+                const patient = response.patient;
 
-                function renderViewMode() {
+                // Atualiza o modal com os dados do utente
                 $('#modal-dados-pessoais').html(`
-                    <!-- Botão de Edição -->
-                    <div class="d-flex justify-content-end mb-3">
-                        <button class="btn btn-primary btn-sm edit-personal-data" data-patient-id="${patientId}">
-                            <i class="bx bx-edit-alt me-1"></i>Editar Dados Pessoais
-                        </button>
-                    </div>
                     <div class="row">
                         <!-- Informações Básicas -->
+                        <div class="col-12 mb-3">
+                            <button class="btn btn-primary btn-sm edit-personal-data" data-patient-id="${patient.id}">
+                                <i class="bx bx-edit-alt me-1"></i>Editar Dados Pessoais
+                            </button>
+                        </div>
                         <div class="col-md-6 mb-3">
                             <label class="form-label fw-bold">Nome Completo</label>
                             <p>${patient.name}</p>
@@ -944,163 +936,15 @@ $(document).ready(function() {
                     </div>
                 </div>
                 `);
-                }
-
-                function renderEditMode() {
-                    $('#modal-dados-pessoais').html(`
-                        <div class="d-flex justify-content-end mb-3">
-                            <button class="btn btn-secondary btn-sm me-2 cancel-edit">
-                                <i class="bx bx-x me-1"></i>Cancelar
-                            </button>
-                            <button class="btn btn-success btn-sm save-personal-data" data-patient-id="${patientId}">
-                                <i class="bx bx-check me-1"></i>Salvar Alterações
-                            </button>
-                        </div>
-                        <form id="editPersonalDataForm">
-                            <div class="row">
-                                <!-- Informações Básicas -->
-                                <div class="col-md-6 mb-3">
-                                    <label class="form-label fw-bold">Nome Completo</label>
-                                    <input type="text" class="form-control" name="name" value="${patient.name}">
-                                </div>
-                                <div class="col-md-6 mb-3">
-                                    <label class="form-label fw-bold">Data de Nascimento</label>
-                                    <input type="date" class="form-control" name="data_nascimento" value="${dados.data_nascimento || ''}">
-                                </div>
-                                
-                                <!-- Documentos -->
-                                <div class="col-md-6 mb-3">
-                                    <label class="form-label fw-bold">NIF</label>
-                                    <input type="text" class="form-control" name="nif" value="${dados.nif || ''}">
-                                </div>
-                                
-                                <!-- Informações Pessoais -->
-                                <div class="col-md-6 mb-3">
-                                    <label class="form-label fw-bold">Sexo</label>
-                                    <select class="form-control" name="sexo">
-                                        <option value="Masculino" ${dados.sexo === 'Masculino' ? 'selected' : ''}>Masculino</option>
-                                        <option value="Feminino" ${dados.sexo === 'Feminino' ? 'selected' : ''}>Feminino</option>
-                                    </select>
-                                </div>
-                                <div class="col-md-4">
-                                    <label class="form-label">Estado Civil</label>
-                                    <select class="form-control" name="estado_civil" id="estado_civil" required>
-                                        <option value="">Selecione</option>
-                                        <option value="Solteiro" ${dados && dados.estado_civil === 'Solteiro' ? 'selected' : ''}>Solteiro</option>
-                                        <option value="Casado" ${dados && dados.estado_civil === 'Casado' ? 'selected' : ''}>Casado</option>
-                                        <option value="Divorciado" ${dados && dados.estado_civil === 'Divorciado' ? 'selected' : ''}>Divorciado</option>
-                                    </select>
-                                </div>
-                                
-                                <!-- Endereço -->
-                                <div class="col-12 mb-3">
-                                    <h6 class="fw-bold">Endereço</h6>
-                                    <div class="row">
-                                        <div class="col-md-8">
-                                            <label class="form-label">Morada</label>
-                                            <input type="text" class="form-control" name="morada" value="${dados.morada || ''}">
-                                        </div>
-                                        <div class="col-md-4">
-                                            <label class="form-label">Número</label>
-                                            <input type="text" class="form-control" name="numero" value="${dados.numero || ''}">
-                                        </div>
-                                        <div class="col-md-4">
-                                            <label class="form-label">Código Postal</label>
-                                            <input type="text" class="form-control" name="codigo_postal" value="${dados.codigo_postal || ''}">
-                                        </div>
-                                        <div class="col-md-4">
-                                            <label class="form-label">Freguesia</label>
-                                            <input type="text" class="form-control" name="freguesia" value="${dados.freguesia || ''}">
-                                        </div>
-                                        <div class="col-md-4">
-                                            <label class="form-label">Concelho</label>
-                                            <input type="text" class="form-control" name="concelho" value="${dados.concelho || ''}">
-                                        </div>
-                                        <div class="col-md-4">
-                                            <label class="form-label">Distrito</label>
-                                            <input type="text" class="form-control" name="distrito" value="${dados.distrito || ''}">
-                                        </div>
-                                    </div>
-                                </div>
-
-                                <!-- Informações Médicas -->
-                                <div class="col-12 mb-3">
-                                    <h6 class="fw-bold">Informações Médicas</h6>
-                                    <div class="row">
-                                        <div class="col-md-4">
-                                            <label class="form-label">Grupo Sanguíneo</label>
-                                            <select class="form-control" name="grupo_sanguineo">
-                                                <option value="">Selecione</option>
-                                                <option value="A+" ${dados.grupo_sanguineo === 'A+' ? 'selected' : ''}>A+</option>
-                                                <option value="A-" ${dados.grupo_sanguineo === 'A-' ? 'selected' : ''}>A-</option>
-                                                <option value="B+" ${dados.grupo_sanguineo === 'B+' ? 'selected' : ''}>B+</option>
-                                                <option value="B-" ${dados.grupo_sanguineo === 'B-' ? 'selected' : ''}>B-</option>
-                                                <option value="AB+" ${dados.grupo_sanguineo === 'AB+' ? 'selected' : ''}>AB+</option>
-                                                <option value="AB-" ${dados.grupo_sanguineo === 'AB-' ? 'selected' : ''}>AB-</option>
-                                                <option value="O+" ${dados.grupo_sanguineo === 'O+' ? 'selected' : ''}>O+</option>
-                                                <option value="O-" ${dados.grupo_sanguineo === 'O-' ? 'selected' : ''}>O-</option>
-                                            </select>
-                                        </div>
-                                        <div class="col-md-4">
-                                            <label class="form-label">Peso (kg)</label>
-                                            <input type="number" step="0.1" class="form-control" name="peso" value="${dados.peso || ''}">
-                                        </div>
-                                        <div class="col-md-4">
-                                            <label class="form-label">Altura (m)</label>
-                                            <input type="number" step="0.01" class="form-control" name="altura" value="${dados.altura || ''}">
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                        </form>
-                    `);
-                }
-
-                // Renderiza inicialmente em modo de visualização
-                renderViewMode();
-
-                // Evento para o botão de edição
-                $(document).on('click', '.edit-personal-data', function() {
-                    isEditing = true;
-                    renderEditMode();
-                });
-
-                // Evento para o botão de cancelar
-                $(document).on('click', '.cancel-edit', function() {
-                    isEditing = false;
-                    renderViewMode();
-                });
-
-                // Evento para salvar as alterações
-                $(document).on('click', '.save-personal-data', function() {
-                    const formData = new FormData($('#editPersonalDataForm')[0]);
-                    
-                    $.ajax({
-                        url: `/patient/${patientId}/update`,
-                        method: 'POST',
-                        data: formData,
-                        processData: false,
-                        contentType: false,
-                        headers: {
-                            'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
-                        },
-                        success: function(response) {
-                            if (response.success) {
-                                dados = response.dados_pessoais;
-                                patient = response.patient;
-                                isEditing = false;
-                                renderViewMode();
-                                alert('Dados atualizados com sucesso!');
-                            } else {
-                                alert('Erro ao atualizar os dados');
-                            }
-                        },
-                        error: function() {
-                            alert('Erro ao atualizar os dados');
-                        }
-                    });
-                });
+            } else {
+                // Mostra mensagem de erro se falhar
+                console.error('Erro ao carregar dados:', response.message);
+                alert('Erro ao carregar dados do utente');
             }
+        }).fail(function(error) {
+            // Tratamento de erro na chamada AJAX
+            console.error('Erro na requisição:', error);
+            alert('Erro ao carregar dados do utente');
         });
 
         // Carrega os relatórios médicos do utente
@@ -1199,9 +1043,119 @@ document.addEventListener('DOMContentLoaded', function () {
         console.error('Elemento com ID "patientSearch" não encontrado!');
     }
 });
+
+// Manipulador de evento para o botão de editar dados pessoais
+$(document).on('click', '.edit-personal-data', function() {
+    const patientId = $(this).data('patient-id');
+    const personalDataContainer = $(this).closest('.row');
+    
+    // Transformar os campos em inputs editáveis
+    personalDataContainer.find('p').each(function() {
+        const currentValue = $(this).text();
+        const fieldLabel = $(this).prev('label').text().toLowerCase();
+        const fieldName = fieldLabel.replace(/\s+/g, '_');
+        
+        // Campos específicos com opções restritas
+        if (fieldLabel === 'sexo') {
+            $(this).html(`
+                <select class="form-control form-control-sm" name="${fieldName}">
+                    <option value="Masculino" ${currentValue === 'Masculino' ? 'selected' : ''}>Masculino</option>
+                    <option value="Feminino" ${currentValue === 'Feminino' ? 'selected' : ''}>Feminino</option>
+                </select>
+            `);
+        } else if (fieldLabel === 'estado civil') {
+            $(this).html(`
+                <select class="form-control form-control-sm" name="${fieldName}">
+                    <option value="Solteiro" ${currentValue === 'Solteiro' ? 'selected' : ''}>Solteiro</option>
+                    <option value="Casado" ${currentValue === 'Casado' ? 'selected' : ''}>Casado</option>
+                    <option value="Divorciado" ${currentValue === 'Divorciado' ? 'selected' : ''}>Divorciado</option>
+                    <option value="Viúvo" ${currentValue === 'Viúvo' ? 'selected' : ''}>Viúvo</option>
+                </select>
+            `);
+        } else if (fieldLabel === 'grupo sanguíneo') {
+            $(this).html(`
+                <select class="form-control form-control-sm" name="${fieldName}">
+                    <option value="A+" ${currentValue === 'A+' ? 'selected' : ''}>A+</option>
+                    <option value="A-" ${currentValue === 'A-' ? 'selected' : ''}>A-</option>
+                    <option value="B+" ${currentValue === 'B+' ? 'selected' : ''}>B+</option>
+                    <option value="B-" ${currentValue === 'B-' ? 'selected' : ''}>B-</option>
+                    <option value="AB+" ${currentValue === 'AB+' ? 'selected' : ''}>AB+</option>
+                    <option value="AB-" ${currentValue === 'AB-' ? 'selected' : ''}>AB-</option>
+                    <option value="O+" ${currentValue === 'O+' ? 'selected' : ''}>O+</option>
+                    <option value="O-" ${currentValue === 'O-' ? 'selected' : ''}>O-</option>
+                </select>
+            `);
+        } else if (fieldLabel === 'data de nascimento') {
+            $(this).html(`
+                <input type="date" 
+                       class="form-control form-control-sm" 
+                       name="${fieldName}" 
+                       value="${currentValue === 'Não preenchido' ? '' : currentValue}">
+            `);
+        } else {
+            $(this).html(`
+                <input type="text" 
+                       class="form-control form-control-sm" 
+                       name="${fieldName}" 
+                       value="${currentValue === 'Não preenchido' ? '' : currentValue}">
+            `);
+        }
+    });
+    
+    // Trocar o botão de editar por salvar/cancelar
+    $(this).replaceWith(`
+        <div class="btn-group">
+            <button class="btn btn-success btn-sm save-personal-data" data-patient-id="${patientId}">
+                <i class="bx bx-check me-1"></i>Salvar
+            </button>
+            <button class="btn btn-danger btn-sm cancel-edit">
+                <i class="bx bx-x me-1"></i>Cancelar
+            </button>
+        </div>
+    `);
+});
+
+// Manipulador para o botão de salvar
+$(document).on('click', '.save-personal-data', function() {
+    const patientId = $(this).data('patient-id');
+    const formData = {};
+    
+    // Coletar todos os valores dos inputs e selects
+    $(this).closest('.row').find('input, select').each(function() {
+        const name = $(this).attr('name');
+        const value = $(this).val();
+        
+        if (value && value !== 'Não preenchido') {
+            formData[name] = value;
+        }
+    });
+    
+    // Enviar dados para o servidor
+    $.ajax({
+        url: `/patient/${patientId}/update-personal-data`,
+        method: 'POST',
+        data: {
+            _token: $('meta[name="csrf-token"]').attr('content'),
+            ...formData
+        },
+        success: function(response) {
+            location.reload();
+        },
+        error: function(xhr) {
+            console.error('Erro ao atualizar dados:', xhr);
+            location.reload();
+        }
+    });
+});
+
+// Manipulador para o botão de cancelar
+$(document).on('click', '.cancel-edit', function() {
+    location.reload();
+});
 </script>
  
 
-@endsection<script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+@endsection
+<script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
 <script src="https://code.jquery.com/jquery-3.6.4.min.js"></script>
-<link href='https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css' rel='stylesheet'>
+<link href='https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css' rel='stylesheet'>    

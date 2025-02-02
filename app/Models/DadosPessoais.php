@@ -25,6 +25,8 @@ class DadosPessoais extends Model
         'altura'
     ];
 
+
+
     public function user()
     {
         return $this->belongsTo(User::class);

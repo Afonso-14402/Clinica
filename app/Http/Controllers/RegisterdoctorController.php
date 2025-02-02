@@ -13,10 +13,15 @@ class RegisterdoctorController extends Controller
 {
     public function create()
     {
-        $user = Auth::user()->load('role'); // Carrega a relação 'role' do usuário autenticado
-        $specialties = Specialty::all(); // Carrega todas as especialidades do banco de dados
-    
-        return view('registar.create-m', compact('user', 'specialties'));
+        try {
+            $user = Auth::user()->load('role');
+            $specialties = Specialty::all();
+        
+            return view('registar.create-m', compact('user', 'specialties'));
+        } catch (\Exception $e) {
+            \Log::error('Erro ao acessar formulário de registro de médico: ' . $e->getMessage());
+            return redirect()->back()->with('error', 'Ocorreu um erro ao acessar o formulário. Tente novamente.');
+        }
     }
     
 
@@ -46,12 +51,23 @@ class RegisterdoctorController extends Controller
             // Associar especialidades ao médico
             $user->specialties()->attach($request->specialty);
 
+            // Buscar nomes das especialidades para o log
+            $specialtyNames = Specialty::whereIn('id', $request->specialty)->pluck('name')->implode(', ');
+
+            // Log de criação do médico
+            ActivityLog::create([
+                'type' => 'criacao_medico',
+                'description' => "Médico {$user->name} foi registrado no sistema com as especialidades: {$specialtyNames}",
+                'user_id' => Auth::id()
+            ]);
+
             DB::commit();
 
             return response()->json(['message' => 'Médico registrado com sucesso!']);
 
         } catch (\Exception $e) {
             DB::rollBack();
+            \Log::error('Erro ao registrar médico: ' . $e->getMessage());
             return response()->json(['error' => $e->getMessage()], 500);
         }
     }

@@ -4,7 +4,7 @@ use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
 
-class CreateFamilyDoctorTable extends Migration
+return new class extends Migration
 {
     /**
      * Run the migrations.
@@ -15,16 +15,10 @@ class CreateFamilyDoctorTable extends Migration
     {
         Schema::create('family_doctor', function (Blueprint $table) {
             $table->id();
-            $table->unsignedBigInteger('patient_user_id');
-            $table->unsignedBigInteger('doctor_user_id');
-            $table->timestamps();
-
-            // Definindo as chaves estrangeiras
-            $table->foreign('patient_user_id')->references('id')->on('users')->onDelete('cascade');
-            $table->foreign('doctor_user_id')->references('id')->on('users')->onDelete('cascade');
-
-            // Adicionando uma restrição de unicidade para evitar duplicações
+            $table->foreignId('patient_user_id')->constrained('users')->onDelete('cascade');
+            $table->foreignId('doctor_user_id')->constrained('users')->onDelete('cascade');
             $table->unique(['patient_user_id', 'doctor_user_id']);
+            $table->timestamps();
         });
     }
 
@@ -37,4 +31,4 @@ class CreateFamilyDoctorTable extends Migration
     {
         Schema::dropIfExists('family_doctor');
     }
-}
+};

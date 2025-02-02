@@ -16,27 +16,32 @@ class AppointmentController extends Controller
 {
     public function create()
     {
-        // Buscar médicos (com especialidades) e pacientes
-        $doctors = User::whereHas('role', function ($query) {
-            $query->where('role', 'doctor');
-        })->get();
+        try {
+            // Buscar médicos (com especialidades) e pacientes
+            $doctors = User::whereHas('role', function ($query) {
+                $query->where('role', 'doctor');
+            })->get();
 
-        $patients = User::whereHas('role', function ($query) {
-            $query->where('role', 'patient');
-        })->get();
+            $patients = User::whereHas('role', function ($query) {
+                $query->where('role', 'patient');
+            })->get();
 
-        $specialties = Specialty::all();
-        $statuses = Status::all();
+            $specialties = Specialty::all();
+            $statuses = Status::all();
 
-        $user = Auth::user()->load('role');
+            $user = Auth::user()->load('role');
 
-        // Atividades mais recentes
-        $activities = ActivityLog::with('user')
-            ->orderBy('created_at', 'desc')
-            ->limit(20)
-            ->get();
+            // Atividades mais recentes
+            $activities = ActivityLog::with('user')
+                ->orderBy('created_at', 'desc')
+                ->limit(20)
+                ->get();
 
-        return view('appointments.create', compact('doctors', 'patients', 'specialties', 'statuses', 'user', 'activities'));
+            return view('appointments.create', compact('doctors', 'patients', 'specialties', 'statuses', 'user', 'activities'));
+        } catch (\Exception $e) {
+            \Log::error('Erro ao acessar formulário de agendamento: ' . $e->getMessage());
+            return redirect()->back()->with('error', 'Ocorreu um erro ao acessar o formulário. Tente novamente.');
+        }
     }
 
     public function store(Request $request)
@@ -70,17 +75,20 @@ class AppointmentController extends Controller
                 'appointment_date_time' => $request->appointment_date_time,
             ]);
 
-            // Registrar a atividade usando o modelo ActivityLog
+            // Buscar informações para o log
+            $patient = User::find($request->patient_user_id);
+            $doctor = User::find($request->doctor_user_id);
+            $specialty = Specialty::find($request->specialties_id);
+
+            // Log de agendamento
             ActivityLog::create([
-                'type' => 'appointment',
-                'description' => 'Consulta marcada: Paciente ' . $appointment->patient->name . 
-                             ' com o médico ' . $appointment->doctor->name . 
-                             ' para ' . Carbon::parse($appointment->appointment_date_time)->format('d/m/Y H:i'),
+                'type' => 'agendamento_consulta',
+                'description' => "Consulta agendada: Paciente {$patient->name} com Dr(a). {$doctor->name} " .
+                               "para {$appointment->appointment_date_time} na especialidade {$specialty->name}",
                 'user_id' => Auth::id()
             ]);
 
             return redirect()->back()->with('success', 'Consulta agendada com sucesso!');
-
         } catch (\Exception $e) {
             \Log::error('Erro ao criar agendamento: ' . $e->getMessage());
             return redirect()->back()
@@ -204,50 +212,97 @@ class AppointmentController extends Controller
 
     public function showPendingAppointments()
     {
-        // Buscar todos os pedidos com status Pendente
-        $appointments = Appointment::where('status_id', 4)->get();
-        $user = Auth::user();
-        return view('appointments.pending', compact('appointments','user'   ));
+        try {
+            // Buscar todos os pedidos com status Pendente
+            $appointments = Appointment::where('status_id', 4)->get();
+            $user = Auth::user();
+
+            return view('appointments.pending', compact('appointments', 'user'));
+        } catch (\Exception $e) {
+            \Log::error('Erro ao acessar consultas pendentes: ' . $e->getMessage());
+            return redirect()->back()->with('error', 'Ocorreu um erro ao acessar as consultas pendentes.');
+        }
     }
 
     public function updateStatus(Request $request, $id)
     {
-        $appointment = Appointment::findOrFail($id);
-    
-        // Validar o status recebido
-        $status = $request->input('status');
-    
-        if (!in_array($status, [1, 3])) {
-            return back()->withErrors(['error' => 'Status inválido!']);
+        try {
+            $appointment = Appointment::findOrFail($id);
+            $oldStatus = $appointment->status;
+            
+            // Validar o status recebido
+            $status = $request->input('status');
+            
+            if (!in_array($status, [1, 3])) {
+                return back()->withErrors(['error' => 'Status inválido!']);
+            }
+            
+            // Atualizar o status
+            $appointment->update(['status_id' => $status]);
+
+            // Buscar o novo status para o log
+            $newStatus = Status::find($status)->status;
+            
+            // Log de alteração de status
+            ActivityLog::create([
+                'type' => 'alteracao_status_consulta',
+                'description' => "Status da consulta do paciente {$appointment->patient->name} alterado de '{$oldStatus}' para '{$newStatus}'",
+                'user_id' => Auth::id()
+            ]);
+            
+            $message = $status == 1 ? 'Consulta aprovada afonso com sucesso!' : 'Consulta rejeitada com sucesso!';
+            return back()->with('success', $message);
+        } catch (\Exception $e) {
+            \Log::error('Erro ao atualizar status da consulta: ' . $e->getMessage());
+            return back()->with('error', 'Ocorreu um erro ao atualizar o status da consulta.');
         }
-    
-        // Atualizar o status
-        $appointment->update(['status_id' => $status]);
-    
-        $message = $status == 1 ? 'Consulta aprovada com sucesso!' : 'Consulta rejeitada com sucesso!';
-        return back()->with('success', $message);
     }
+
     
     
     public function getSchedule($id)
     {
-        $schedules = UserDoctorAgenda::where('doctor_id', $id)->get();
-        return response()->json($schedules);
+        try {
+            $schedules = UserDoctorAgenda::where('doctor_id', $id)->get();
+            return response()->json($schedules);
+        } catch (\Exception $e) {
+            \Log::error('Erro ao buscar agenda: ' . $e->getMessage());
+            return response()->json(['error' => 'Erro ao buscar agenda'], 500);
+        }
     }
 
     public function approve(Appointment $appointment)
     {
-        $appointment->update(['status_id' => 1]); // 1 = Aprovado
-        return redirect()->back()->with('success', 'Consulta aprovada com sucesso!');
+        try {
+            $oldStatus = $appointment->status->status;
+            $appointment->update(['status_id' => 1]); // 1 = Aprovado
+
+            // Log de aprovação
+            ActivityLog::create([
+                'type' => 'aprovacao_consulta',
+                'description' => "Consulta do paciente {$appointment->patient->name} foi aprovada",
+                'user_id' => Auth::id()
+            ]);
+
+            return redirect()->back()->with('success', 'Consulta aprovada com sucesso!');
+        } catch (\Exception $e) {
+            \Log::error('Erro ao aprovar consulta: ' . $e->getMessage());
+            return redirect()->back()->with('error', 'Ocorreu um erro ao aprovar a consulta.');
+        }
     }
 
     public function getDoctorsList()
     {
-        $doctors = User::whereHas('role', function ($query) {
-            $query->where('role', 'doctor');
-        })->where('status', 1)->get(['id', 'name']);
+        try {
+            $doctors = User::whereHas('role', function ($query) {
+                $query->where('role', 'doctor');
+            })->where('status', 1)->get(['id', 'name']);
 
-        return response()->json($doctors);
+            return response()->json($doctors);
+        } catch (\Exception $e) {
+            \Log::error('Erro ao buscar lista de médicos: ' . $e->getMessage());
+            return response()->json(['error' => 'Erro ao buscar lista de médicos'], 500);
+        }
     }
 
     public function reschedule(Request $request, Appointment $appointment)
