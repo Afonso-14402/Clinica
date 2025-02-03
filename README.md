@@ -93,7 +93,7 @@ Após executar os seeders, os seguintes utilizadores estarão disponíveis:
 - **Paciente:**
   - Email: `paciente@gmail.com`
   - Senha: `123456789`
-
+,
 ## Estrutura da Base de Dados
 
 O sistema utiliza as seguintes tabelas principais:
