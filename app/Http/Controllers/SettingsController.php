@@ -7,8 +7,14 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Validator;
 
+/**
+ * Controlador responsável pelas configurações do utilizador
+ */
 class SettingsController extends Controller
 {
+    /**
+     * Apresenta a página de configurações do utilizador
+     */
     public function index()
     {
         $user = Auth::user()->load('role');

@@ -16,6 +16,7 @@ use App\Http\Controllers\DoctorAgendaController;
 use App\Http\Controllers\AppointmentHistoryController;
 use App\Http\Controllers\PatientController;
 use App\Http\Controllers\FamilyDoctorController;
+use App\Http\Controllers\AdminController;
 
 
 
@@ -161,4 +162,16 @@ Route::get('/doctor/patients', [DoctorAgendaController::class, 'patients'])->nam
 
 Route::post('/patient/{id}/update', [PatientController::class, 'update'])->name('patient.update');
 
+// Rotas para Médicos de Família
+Route::get('/family', [FamilyDoctorController::class, 'index'])->name('family.index');
+Route::get('/family/create', [FamilyDoctorController::class, 'create'])->name('family.create');
+Route::post('/family', [FamilyDoctorController::class, 'store'])->name('family.store');
+Route::get('/family/edit/{id}', [FamilyDoctorController::class, 'edit'])->name('family.edit');
+Route::put('/family/{id}', [FamilyDoctorController::class, 'update'])->name('family.update');
+Route::delete('/family/{id}', [FamilyDoctorController::class, 'destroy'])->name('family.destroy');
 
+
+
+Route::get('/list/admin', [AdminController::class, 'index'])->name('list.listadmin');
+
+Route::post('/admin/store', [AdminController::class, 'store'])->name('admin.store');

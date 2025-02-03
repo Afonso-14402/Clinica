@@ -10,24 +10,34 @@ use Illuminate\Http\Request;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\Auth;
 
+/**
+ * Controlador responsável pela gestão do histórico de consultas
+ */
 class AppointmentHistoryController extends Controller
 {
+    /**
+     * Apresenta o histórico de consultas com opções de filtragem
+     * Inclui filtros por período, médico, especialidade e estado
+     */
     public function index(Request $request)
     {
         $user = Auth::user();
         
-        // Query base
+        // Consulta base para obter consultas do paciente
         $query = Appointment::where('patient_user_id', $user->id)
             ->with(['doctor', 'specialty', 'status']);
 
-        // Filtro por período
+        // Aplicar filtro por período
         if ($request->date_filter) {
             switch ($request->date_filter) {
                 case 'today':
                     $query->whereDate('appointment_date_time', Carbon::today());
                     break;
                 case 'week':
-                    $query->whereBetween('appointment_date_time', [Carbon::now()->startOfWeek(), Carbon::now()->endOfWeek()]);
+                    $query->whereBetween('appointment_date_time', [
+                        Carbon::now()->startOfWeek(), 
+                        Carbon::now()->endOfWeek()
+                    ]);
                     break;
                 case 'month':
                     $query->whereMonth('appointment_date_time', Carbon::now()->month)
@@ -44,22 +54,22 @@ class AppointmentHistoryController extends Controller
             }
         }
 
-        // Filtro por médico
+        // Aplicar filtro por médico
         if ($request->doctor_id) {
             $query->where('doctor_user_id', $request->doctor_id);
         }
 
-        // Filtro por especialidade
+        // Aplicar filtro por especialidade
         if ($request->specialty_id) {
             $query->where('specialties_id', $request->specialty_id);
         }
 
-        // Filtro por status
+        // Aplicar filtro por estado
         if ($request->status_id) {
             $query->where('status_id', $request->status_id);
         }
 
-        // Filtro por período (passado/futuro)
+        // Aplicar filtro por período (passado/futuro)
         if ($request->time_period) {
             if ($request->time_period === 'past') {
                 $query->where('appointment_date_time', '<', Carbon::now());
@@ -68,10 +78,10 @@ class AppointmentHistoryController extends Controller
             }
         }
 
-        // Ordenação padrão por data (mais recente primeiro)
+        // Ordenar por data (mais recente primeiro)
         $query->orderBy('appointment_date_time', 'desc');
 
-        // Dados para os filtros
+        // Obter dados para os filtros
         $doctors = User::whereHas('doctorAppointments', function($q) use ($user) {
             $q->where('patient_user_id', $user->id);
         })->get();
@@ -82,7 +92,7 @@ class AppointmentHistoryController extends Controller
         
         $statuses = Status::all();
 
-        // Paginação
+        // Paginar resultados
         $appointments = $query->paginate(10);
 
         return view('patient.history', compact(

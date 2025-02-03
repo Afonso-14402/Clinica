@@ -11,13 +11,19 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Auth;
 
+/**
+ * Controlador responsável pela gestão de listagens de médicos e pacientes
+ */
 class ListController extends Controller
 {
-    // Exibe a lista de médicos
+    /**
+     * Apresenta a lista de médicos com opções de pesquisa
+     */
     public function index(Request $request)
     {
+        // Obtém os médicos com as suas especialidades
         $doctors = User::where('role_id', 2)
-            ->with('specialties') // Certifique-se de usar o plural para buscar todas as especialidades
+            ->with('specialties')
             ->when($request->search, function ($query, $search) {
                 $query->where('name', 'like', "%{$search}%")
                     ->orWhere('email', 'like', "%{$search}%");
@@ -28,6 +34,9 @@ class ListController extends Controller
         return view('list.index', compact('doctors', 'user', 'specialties'));
     }
 
+    /**
+     * Procura médicos com base em critérios específicos
+     */
     public function search(Request $request)
     {
         // Obter os parâmetros da pesquisa enviados 
@@ -37,27 +46,23 @@ class ListController extends Controller
         // Iniciar uma consulta para os utilizadores com role_id = 2 (Médicos)
         $doctorsQuery = User::where('role_id', 2);
 
-        // Filtrar pelo nome do médico se o parâmetro 'query' for fornecido
+        // Filtrar pelo nome do médico se fornecido
         if (!empty($query)) {
-            $doctorsQuery->where('name', 'LIKE', "%$query%"); // Pesquisa parcial pelo nome
+            $doctorsQuery->where('name', 'LIKE', "%$query%");
         }
 
-        // Filtrar pela especialidade se o parâmetro 'specialty' for fornecido
+        // Filtrar pela especialidade se fornecida
         if (!empty($specialty)) {
-            // Verificar a relação entre o médico e as especialidades
             $doctorsQuery->whereHas('specialties', function ($q) use ($specialty) {
-                $q->where('name', 'LIKE', "%$specialty%"); // Pesquisa parcial pelo nome da especialidade
+                $q->where('name', 'LIKE', "%$specialty%");
             });
         }
 
-        
         $doctors = $doctorsQuery->with('specialties')->paginate(3);
 
-        // Preparar a resposta em formato JSON
         return response()->json([
             'success' => true, 
             'data' => $doctors->map(function ($doctor) {
-                // Transformar os dados do médico para incluir apenas as informações necessárias
                 return [
                     'id' => $doctor->id,
                     'name' => $doctor->name,
@@ -68,7 +73,6 @@ class ListController extends Controller
                     'updated_at' => $doctor->updated_at, 
                     'avatar' => $doctor->avatar, 
                     'specialties' => $doctor->specialties->map(function ($specialty) {
-                        // Transformar os dados das especialidades associadas ao médico
                         return [
                             'id' => $specialty->id,
                             'name' => $specialty->name,
@@ -76,40 +80,46 @@ class ListController extends Controller
                     }),
                 ];
             }),
-            // Informações sobre a paginação
             'pagination' => [
-                'current_page' => $doctors->currentPage(), // Página atual
-                'last_page' => $doctors->lastPage(), // Última página disponível
-                'total' => $doctors->total(), // Total de resultados
+                'current_page' => $doctors->currentPage(),
+                'last_page' => $doctors->lastPage(),
+                'total' => $doctors->total(),
             ],
         ]);
     }
 
+    /**
+     * Alterna o estado de ativo/inativo de um médico
+     */
     public function toggleStatus(User $doctor)
     {
-        // Alternar o status do médico
-        $doctor->status = $doctor->status ? 0 : 1; // 0 = inativo, 1 = ativo
+        $doctor->status = $doctor->status ? 0 : 1;
         $doctor->save();
 
-        // Retornar com uma mensagem de sucesso
-        return redirect()->back()->with('success', 'Status atualizado com sucesso!');
+        return redirect()->back()->with('success', 'Estado atualizado com sucesso!');
     }
 
-    // Exclui o médico
+    /**
+     * Remove um médico do sistema
+     */
     public function destroy(User $doctor)
     {
         $doctor->delete();
-
-        return redirect()->route('list.index')->with('success', 'Médico excluído com sucesso!');
+        return redirect()->route('list.index')->with('success', 'Médico eliminado com sucesso!');
     }
 
+    /**
+     * Obtém a lista de pacientes com opções de pesquisa
+     */
     public function getPatients(Request $request)
     {
         $search = $request->input('search');
        
+        // Consulta base para pacientes
         $query = User::where('role_id', 3)
-            ->with(['dados_pessoais']); // Carrega os dados pessoais junto
+            ->with(['dados_pessoais']);
 
+        // Aplicar filtro de pesquisa se fornecido
         if ($search) {
             $query->where(function ($q) use ($search) {
                 $q->where('name', 'LIKE', "%{$search}%")
@@ -127,16 +137,20 @@ class ListController extends Controller
         return view('list.listpatient', compact('patients', 'user'));
     }
 
+    /**
+     * Alterna o estado de ativo/inativo de um paciente
+     */
     public function toggleStatusPatients(User $patient)
     {
-        // Alternar o status do paciente
-        $patient->status = $patient->status ? 0 : 1; // 0 = inativo, 1 = ativo
+        $patient->status = $patient->status ? 0 : 1;
         $patient->save();
 
-        // Retornar com uma mensagem de sucesso
-        return redirect()->back()->with('success', 'Status atualizado com sucesso!');
+        return redirect()->back()->with('success', 'Estado atualizado com sucesso!');
     }
 
+    /**
+     * Remove um paciente do sistema
+     */
     public function destroyPatients(User $patient)
     {
         if (!$patient) {
@@ -145,9 +159,12 @@ class ListController extends Controller
 
         $patient->delete();
 
-        return redirect()->route('list.listpatient')->with('success', 'Paciente excluído com sucesso!');
+        return redirect()->route('list.listpatient')->with('success', 'Paciente eliminado com sucesso!');
     }
 
+    /**
+     * Obtém os relatórios médicos de um paciente específico
+     */
     public function getPatientReports($patientId)
     {
         $reports = Report::whereHas('appointment', function($query) use ($patientId) {
@@ -162,6 +179,9 @@ class ListController extends Controller
         }));
     }
 
+    /**
+     * Obtém os detalhes pessoais de um paciente específico
+     */
     public function getPatientDetails($id)
     {
         try {

@@ -9,8 +9,15 @@ use App\Models\ActivityLog;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
 
+/**
+ * Controlador responsável pelo registo de novos médicos no sistema
+ */
 class RegisterdoctorController extends Controller
 {
+    /**
+     * Apresenta o formulário de registo de médico
+     * Carrega as especialidades disponíveis
+     */
     public function create()
     {
         try {
@@ -23,12 +30,15 @@ class RegisterdoctorController extends Controller
             return redirect()->back()->with('error', 'Ocorreu um erro ao acessar o formulário. Tente novamente.');
         }
     }
-    
 
-
+    /**
+     * Regista um novo médico no sistema
+     * Inclui validações, associação de especialidades e registo de atividade
+     */
     public function medico(Request $request)
     {
         try {
+            // Validação dos dados
             $request->validate([
                 'name' => 'required|string|max:255',
                 'email' => 'required|string|email|max:255|unique:users',
@@ -39,7 +49,7 @@ class RegisterdoctorController extends Controller
 
             DB::beginTransaction();
 
-            // Criar o usuário
+            // Criar o utilizador com função de médico
             $user = User::create([
                 'name' => $request->name,
                 'email' => $request->email,
@@ -54,7 +64,7 @@ class RegisterdoctorController extends Controller
             // Buscar nomes das especialidades para o log
             $specialtyNames = Specialty::whereIn('id', $request->specialty)->pluck('name')->implode(', ');
 
-            // Log de criação do médico
+            // Registar atividade
             ActivityLog::create([
                 'type' => 'criacao_medico',
                 'description' => "Médico {$user->name} foi registrado no sistema com as especialidades: {$specialtyNames}",
@@ -71,10 +81,6 @@ class RegisterdoctorController extends Controller
             return response()->json(['error' => $e->getMessage()], 500);
         }
     }
-
-
-    
-
 }
 
 

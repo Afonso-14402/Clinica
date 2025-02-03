@@ -1,376 +1,8 @@
 @extends('layouts.admin')
 
-@section('title', 'Lista de Médicos')
+@section('title', 'Lista de Usuários')
 
-<style>
-.modal-body {
-    background-color: #f9f9f9;
-    border-radius: 6px;
-    padding: 20px;
-}
 
-.list-group-item {
-    border: none;
-    padding: 15px 0;
-}
-
-.list-group-item:not(:last-child) {
-    border-bottom: 1px solid #e9ecef;
-}
-
-.form-check-label {
-    font-weight: bold;
-    margin-right: 15px;
-}
-
-.status-icon {
-    font-size: 1.2rem;
-    vertical-align: middle;
-    transition: all 0.3s ease;
-    cursor: pointer;
-}
-
-.status-icon.status-active {
-    color: #28a745;
-}
-
-.status-icon.status-inactive {
-    color: #ffc107;
-}
-
-.status-icon:hover {
-    transform: scale(1.2);
-}
-
-.table th, .table td {
-    vertical-align: middle;
-    text-align: center;
-}
-
-.status-icon {
-    font-size: 1.2rem;
-    vertical-align: middle;
-    transition: all 0.3s ease;
-    cursor: pointer;
-}
-
-.status-icon:hover {
-    transform: scale(1.2);
-}
-
-form button {
-    cursor: pointer;
-}
-
-/* Container geral do formulário */
-.schedule-form-container {
-    max-width: 700px;
-    margin: 2rem auto;
-    padding: 2rem;
-    border: 1px solid #e3e3e3;
-    border-radius: 10px;
-    background-color: #ffffff;
-    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
-    font-family: 'Arial', sans-serif;
-}
-
-/* Título e subtítulo */
-.form-title {
-    font-size: 1.8rem;
-    font-weight: bold;
-    color: #2c3e50;
-    text-align: center;
-    margin-bottom: 0.5rem;
-}
-
-.form-subtitle {
-    font-size: 1rem;
-    color: #7f8c8d;
-    text-align: center;
-    margin-bottom: 1.5rem;
-}
-
-/* Lista de itens */
-.schedule-list {
-    display: flex;
-    flex-direction: column;
-    gap: 1rem;
-}
-
-/* Cada item do horário */
-.schedule-item {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    background-color: #f9f9f9;
-    padding: 1rem;
-    border: 1px solid #dcdcdc;
-    border-radius: 8px;
-    transition: all 0.3s ease;
-}
-
-.schedule-item:hover {
-    background-color: #f0f0f0;
-    border-color: #cccccc;
-}
-
-/* Checkbox e label do dia */
-.day-checkbox {
-    display: flex;
-    align-items: center;
-    gap: 0.5rem;
-}
-
-.form-check-label {
-    font-weight: 600;
-    font-size: 1rem;
-    color: #34495e;
-}
-
-/* Campos de horário */
-.time-inputs {
-    display: flex;
-    align-items: center;
-    gap: 0.5rem;
-}
-
-.time-field {
-    width: 120px;
-    padding: 0.5rem;
-    border: 1px solid #ccc;
-    border-radius: 5px;
-    font-size: 0.9rem;
-}
-
-.time-separator {
-    font-size: 0.9rem;
-    color: #7f8c8d;
-    font-weight: bold;
-}
-
-/* Botão remover */
-.btn-remove {
-    padding: 0.5rem 1rem;
-    font-size: 0.9rem;
-    font-weight: bold;
-    color: #e74c3c;
-    background-color: transparent;
-    border: 1px solid #e74c3c;
-    border-radius: 5px;
-    transition: all 0.3s ease;
-    cursor: pointer;
-}
-
-.btn-remove:hover {
-    background-color: #e74c3c;
-    color: #fff;
-}
-
-/* medico modal */
-        .modal {
-            display: none; /* Modal começa oculto */
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background-color: rgba(0, 0, 0, 0.5);
-            justify-content: center;
-            align-items: center;
-        }
-        .custom-modal {
-            background-color: rgb(239, 239, 239);
-            padding: 20px;
-            border-radius: 8px;
-            width: 150%;           /* Reduz a largura para 80% da tela */
-            max-width: 700px;     /* Aumenta a largura máxima para 700px */
-        }
-
-.prontuario-container {
-    padding: 1rem;
-    background-color: #fff;
-}
-
-.section-title {
-    color: #2c3e50;
-    font-size: 1.1rem;
-    font-weight: 600;
-    margin-bottom: 1rem;
-    padding-bottom: 0.5rem;
-    border-bottom: 2px solid #f8f9fa;
-}
-
-.table {
-    font-size: 0.9rem;
-    background-color: #fff;
-}
-
-.table th {
-    font-weight: 600;
-    color: #2c3e50;
-    border-bottom: 2px solid #f8f9fa;
-}
-
-.table td {
-    vertical-align: middle;
-    border-bottom: 1px solid #f8f9fa;
-}
-
-.btn-view-report {
-    padding: 0.25rem 0.75rem;
-    font-size: 0.875rem;
-    background-color: #fff;
-    border: 1px solid #e9ecef;
-    color: #3498db;
-}
-
-.btn-view-report:hover {
-    background-color: #3498db;
-    color: #fff;
-    border-color: #3498db;
-}
-
-.report-metadata {
-    font-size: 0.9rem;
-}
-
-.report-content {
-    font-size: 0.95rem;
-    line-height: 1.6;
-    color: #2c3e50;
-    background-color: #fff;
-}
-
-.badge {
-    font-weight: 500;
-    padding: 0.5em 0.75em;
-}
-
-.btn-outline-secondary {
-    border-color: #dee2e6;
-    background-color: #fff;
-}
-
-.btn-outline-secondary:hover {
-    background-color: #f8f9fa;
-    border-color: #dee2e6;
-    color: #2c3e50;
-}
-
-.shadow-sm {
-    box-shadow: 0 0.125rem 0.25rem rgba(0, 0, 0, 0.075) !important;
-}
-
-.card {
-    background-color: #fff;
-    border-radius: 0.5rem;
-}
-
-.modal-content {
-    background-color: #fff;
-}
-
-.modal-body {
-    background-color: #fff;
-}
-
-.tab-content {
-    background-color: #fff;
-}
-
-.tab-pane {
-    background-color: #fff;
-}
-
-/* Estilos para o modal de novo paciente */
-.modal-content {
-    border: none;
-    border-radius: 8px;
-    box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.15);
-}
-
-.modal-header {
-    background-color: #fff;
-    border-bottom: 1px solid #e9ecef;
-    padding: 1rem 1.5rem;
-}
-
-.modal-title {
-    color: #2c3e50;
-    font-size: 1.1rem;
-}
-
-.modal-body {
-    padding: 1.5rem;
-}
-
-.form-label {
-    font-size: 0.875rem;
-    color: #495057;
-    font-weight: 500;
-}
-
-.form-control {
-    border: 1px solid #e9ecef;
-    padding: 0.5rem 0.75rem;
-    font-size: 0.875rem;
-}
-
-.form-control:focus {
-    border-color: #3498db;
-    box-shadow: 0 0 0 0.2rem rgba(52, 152, 219, 0.25);
-}
-
-.input-group-text {
-    background-color: #fff;
-    border: 1px solid #e9ecef;
-}
-
-.toggle-password {
-    border-color: #e9ecef;
-}
-
-.toggle-password:hover {
-    background-color: #f8f9fa;
-}
-
-.btn {
-    font-size: 0.875rem;
-    padding: 0.5rem 1rem;
-}
-
-.btn-primary {
-    background-color: #3498db;
-    border-color: #3498db;
-}
-
-.btn-primary:hover {
-    background-color: #2980b9;
-    border-color: #2980b9;
-}
-
-.btn-outline-secondary {
-    color: #6c757d;
-    border-color: #e9ecef;
-}
-
-.btn-outline-secondary:hover {
-    background-color: #f8f9fa;
-    color: #495057;
-}
-
-h6.fw-bold {
-    color: #2c3e50;
-    font-size: 0.95rem;
-    padding-bottom: 0.5rem;
-    border-bottom: 1px solid #e9ecef;
-}
-
-.bx {
-    font-size: 1.1rem;
-    vertical-align: middle;
-}
-</style>
 
 @section('content')
 
@@ -435,7 +67,7 @@ h6.fw-bold {
     <div class="card">
         <h5 class="card-header d-flex justify-content-between align-items-center">
             
-            Lista de Utentes
+            Lista de Usuários
             
 
 
@@ -447,7 +79,9 @@ h6.fw-bold {
                 <i class="bx bx-download"></i> Exportar para Excel
             </button>
 
-            <button id="openModal" class="btn btn-primary">Novo utente </button>
+            <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#novoUsuarioModal">
+                Novos utilizadores
+            </button>
             
             
         </h5>
@@ -455,56 +89,47 @@ h6.fw-bold {
             <table class="table">
                 <thead>
                     <tr>
-                        <th>id</th>
+                        <th>ID</th>
                         <th>Nome</th>
                         <th>Email</th>
+                        <th>Função</th>
                         <th>Status</th>
                         <th>Ações</th>
                     </tr>
                 </thead>
                 <tbody id="patientTableBody">
-                    @foreach($patients as $patient)
+                    @foreach($users as $user)
                     <tr>
-                        <td>{{ $patient->id }}</td>
-                        <td>{{ $patient->name }}</td>
-                        <td>{{ $patient->email }}</td>
-                        
-                        
-                        <!-- Status do utente   -->
+                        <td>{{ $user->id }}</td>
+                        <td>{{ $user->name }}</td>
+                        <td>{{ $user->email }}</td>
+                        <td>{{ $user->role->role }}</td>
                         <td>
-                            <form action="{{ route('patients.toggle-status', $patient->id) }}" method="POST" style="display: inline;">
+                            <form action="{{ route('patients.toggle-status', $user->id) }}" method="POST" style="display: inline;">
                                 @csrf
                                 <button type="submit" style="border: none; background: none; padding: 0;">
-                                    <i class="status-icon {{ $patient->status ? 'status-active bx bx-check-circle' : 'status-inactive bx bx-x-circle' }}" data-toggle="tooltip" title="{{ $patient->status ? 'Ativo - Clique para desativar' : 'Inativo - Clique para ativar' }}"></i>
+                                    <i class="status-icon {{ $user->status ? 'status-active bx bx-check-circle' : 'status-inactive bx bx-x-circle' }}" 
+                                       data-toggle="tooltip" 
+                                       title="{{ $user->status ? 'Ativo - Clique para desativar' : 'Inativo - Clique para ativar' }}">
+                                    </i>
                                 </button>
                             </form>
                         </td>
-                        
-                        
-                        <!-- Ações -->
                         <td>
                             <div class="dropdown">
                                 <button type="button" class="btn btn-sm btn-outline-primary dropdown-toggle" data-bs-toggle="dropdown" aria-expanded="false">
                                     Ações
                                 </button>
                                 <ul class="dropdown-menu">
-                                    <!-- Editar Utente -->
                                     <li>
-                                        <a class="dropdown-item" href="#">
+                                        <a class="dropdown-item" href="#" onclick="editUser({{ $user->id }})">
                                             <i class="bx bx-edit-alt me-1"></i> Editar
                                         </a>
                                     </li>
                                     
-                                    <!-- Ver Prontuário -->
                                     <li>
-                                        <a class="dropdown-item" data-bs-toggle="modal" data-bs-target="#addUtenteModal" data-patient-id="{{ $patient->id }}">
-                                            <i class="bx bx-file me-1"></i> Ver Prontuário
-                                        </a>
-                                    </li>
-                                    
-                                    <!-- Excluir Utente -->
-                                    <li>
-                                        <form action="{{ route('patients.destroy', $patient->id) }}" method="POST" onsubmit="return confirm('Tem a certeza que pretende eliminar este utente?');">
+                                        <form action="{{ route('patients.destroy', $user->id) }}" method="POST" 
+                                              onsubmit="return confirm('Tem a certeza que pretende eliminar este usuário?');">
                                             @csrf
                                             @method('DELETE')
                                             <button type="submit" class="dropdown-item text-danger">
@@ -522,27 +147,27 @@ h6.fw-bold {
             <nav>
                 <ul class="pagination justify-content-center">
                     {{-- Link para a página anterior --}}
-                    @if ($patients->onFirstPage())
+                    @if ($users->onFirstPage())
                         <li class="page-item disabled">
                             <span class="page-link">Anterior</span>
                         </li>
                     @else
                         <li class="page-item">
-                            <a class="page-link" href="{{ $patients->previousPageUrl() }}">Anterior</a>
+                            <a class="page-link" href="{{ $users->previousPageUrl() }}">Anterior</a>
                         </li>
                     @endif
                 
                     {{-- Links para as páginas --}}
-                    @for ($i = 1; $i <= $patients->lastPage(); $i++)
-                        <li class="page-item {{ $patients->currentPage() == $i ? 'active' : '' }}">
-                            <a class="page-link" href="{{ $patients->url($i) }}">{{ $i }}</a>
+                    @for ($i = 1; $i <= $users->lastPage(); $i++)
+                        <li class="page-item {{ $users->currentPage() == $i ? 'active' : '' }}">
+                            <a class="page-link" href="{{ $users->url($i) }}">{{ $i }}</a>
                         </li>
                     @endfor
                 
                     {{-- Link para a próxima página --}}
-                    @if ($patients->hasMorePages())
+                    @if ($users->hasMorePages())
                         <li class="page-item">
-                            <a class="page-link" href="{{ $patients->nextPageUrl() }}">Próxima</a>
+                            <a class="page-link" href="{{ $users->nextPageUrl() }}">Próxima</a>
                         </li>
                     @else
                         <li class="page-item disabled">
@@ -554,606 +179,74 @@ h6.fw-bold {
         </div>
     </div>
 </div>
-   <!-- Modal para Novo Utente -->
-   <div class="modal" id="novoutenteModal" tabindex="-1"> 
-    <div class="modal-dialog modal-lg">
+
+<!-- Modal de Novo Usuário -->
+<div class="modal fade" id="novoUsuarioModal" tabindex="-1" aria-labelledby="novoUsuarioModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
         <div class="modal-content">
             <div class="modal-header">
-                <h5 class="modal-title">
-                    <i class="bx bx-user-plus me-2"></i>Registar Novo Utente
-                </h5>
-                <button type="button" class="btn-close" id="closeModal" aria-label="Close"></button>
+                <h5 class="modal-title" id="novoUsuarioModalLabel">Novo Usuário</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
-            <div class="modal-body bg-white">
-                <form action="{{ route('registar.paciente') }}" method="POST" class="needs-validation" novalidate>
-                    @csrf
-                    <!-- Informações Pessoais -->
-                    <div class="row g-3 mb-4">
-                        <div class="col-12">
-                            <h6 class="fw-bold mb-3">
-                                <i class="bx bx-user me-2"></i>Dados Pessoais
-                            </h6>
-                        </div>
-                        <div class="col-md-6">
-                            <label for="name" class="form-label">Nome Próprio</label>
-                            <input type="text" 
-                                   class="form-control" 
-                                   id="name" 
-                                   name="name" 
-                                   value="{{ old('name') }}" 
-                                   required>
-                        </div>
-                        <div class="col-md-6">
-                            <label for="last_name" class="form-label">Apelido</label>
-                            <input type="text" 
-                                   class="form-control" 
-                                   id="last_name" 
-                                   name="last_name" 
-                                   value="{{ old('last_name') }}" 
-                                   required>
-                        </div>
-                        <div class="col-md-6">
-                            <label for="email" class="form-label">Email</label>
-                            <input type="email" 
-                                   class="form-control" 
-                                   id="email" 
-                                   name="email" 
-                                   value="{{ old('email') }}" 
-                                   required>
-                        </div>
-                        
+            <form action="{{ route('admin.store') }}" method="POST">
+                @csrf
+                <div class="modal-body">
+                    <div class="mb-3">
+                        <label for="name" class="form-label">Nome</label>
+                        <input type="text" class="form-control" id="name" name="name" required>
                     </div>
-
-                    <!-- Dados de Acesso -->
-                    <div class="row g-3">
-                        <div class="col-12">
-                            <h6 class="fw-bold mb-3">
-                                <i class="bx bx-lock me-2"></i> Dados de Acesso
-                            </h6>
-                        </div>
-                        <div class="col-md-6">
-                            <label for="password" class="form-label">Palavra-passe</label>
-                            <div class="input-group">
-                                <input type="text" 
-                                    class="form-control"
-                                       id="password" 
-                                    name="password"
-                                       required>
-                            </div>
-                        </div>
-                        <div class="col-md-6">
-                            <label for="password_confirmation" class="form-label">Confirmar Palavra-passe</label>
-                            <div class="input-group">
-                                <input type="text" 
-                                    class="form-control"
-                                       id="password_confirmation" 
-                                    name="password_confirmation"
-                                       required>
-                            </div>
-                        </div>
+                    
+                    <div class="mb-3">
+                        <label for="email" class="form-label">Email</label>
+                        <input type="email" class="form-control" id="email" name="email" required>
                     </div>
-
-                    <div class="modal-footer border-0 pt-4">
-                        <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">
-                            <i class="bx bx-x me-1"></i>Cancelar
-                        </button>
-                        <button type="submit" class="btn btn-primary">
-                            <i class="bx bx-check me-1"></i>Registar
-                        </button>
+                    
+                    <div class="mb-3">
+                        <label for="password" class="form-label">Senha</label>
+                        <input type="password" class="form-control" id="password" name="password" required>
                     </div>
-                </form>
-            </div>
+                    
+                    <div class="mb-3">
+                        <label for="password_confirmation" class="form-label">Confirmar Senha</label>
+                        <input type="password" class="form-control" id="password_confirmation" name="password_confirmation" required>
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label for="role_id" class="form-label">Função</label>
+                        <select class="form-select" id="role_id" name="role_id" required>
+                            <option value="">Selecione uma função</option>
+                            @foreach($roles as $role)
+                                <option value="{{ $role->id }}">{{ $role->role }}</option>
+                            @endforeach
+                        </select>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                    <button type="submit" class="btn btn-primary">Salvar</button>
+                </div>
+            </form>
         </div>
     </div>
-</div>  
+</div>
 
-
-<!-- Modal -->
-<div class="modal fade" id="addUtenteModal" tabindex="-1" aria-labelledby="addUtenteModalLabel" aria-hidden="true">
-    <div class="modal-dialog modal-lg">
-      <div class="modal-content">
-        <div class="modal-header">
-          <h5 class="modal-title" id="addUtenteModalLabel">Adicionar Utente</h5>
-          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-        </div>
-        <div class="modal-body">
-          <!-- Formulário com abas -->
-          <div class="card shadow-sm">
-            <div class="card-header">
-              <ul class="nav nav-tabs card-header-tabs" id="utenteModalTab" role="tablist">
-                @foreach (['Dados Pessoais', 'Prontuário Médico'] as $index => $tab)
-                <li class="nav-item" role="presentation">
-                  <button 
-                    class="nav-link {{ $index === 0 ? 'active' : '' }}" 
-                    id="modal-{{ Str::slug($tab) }}-tab" 
-                    data-bs-toggle="tab" 
-                    data-bs-target="#modal-{{ Str::slug($tab) }}" 
-                    type="button" 
-                    role="tab">
-                    {{ $tab }}
-                  </button>
-                </li>
-                @endforeach
-              </ul>
-            </div>
-            <div class="card-body">
-              <div class="tab-content" id="utenteModalTabContent">
-                <!-- Aba: Dados Pessoais -->
-                <div class="tab-pane fade show active" id="modal-dados-pessoais" role="tabpanel">
-                    <div class="row">
-                        <!-- Informações Básicas -->
-                        <div class="col-12 mb-3">
-                            <button class="btn btn-primary btn-sm edit-personal-data" data-patient-id="${patient.id}">
-                                <i class="bx bx-edit-alt me-1"></i>Editar Dados Pessoais
-                            </button>
-                        </div>
-                        <div class="col-md-6 mb-3">
-                            <label class="form-label fw-bold">Nome Completo</label>
-                            <p>${patient.name}</p>
-                        </div>
-                        <div class="col-md-6 mb-3">
-                            <label class="form-label fw-bold">Data de Nascimento</label>
-                            <p>${dados.data_nascimento || 'Não preenchido'}</p>
-                        </div>
-                        
-                        <!-- Documentos -->
-                        <div class="col-md-6 mb-3">
-                            <label class="form-label fw-bold">NIF</label>
-                            <p>${dados.nif || 'Não preenchido'}</p>
-                        </div>
-                        
-                        <!-- Informações Pessoais -->
-                        <div class="col-md-6 mb-3">
-                            <label class="form-label fw-bold">Sexo</label>
-                            <p>${dados.sexo || 'Não preenchido'}</p>
-                        </div>
-                        <div class="col-md-6 mb-3">
-                            <label class="form-label fw-bold">Estado Civil</label>
-                            <p>${dados.estado_civil || 'Não preenchido'}</p>
-                        </div>
-                        
-                        <!-- Endereço -->
-                        <div class="col-md-12 mb-3">
-                            <h6 class="fw-bold">Endereço</h6>
-                            <div class="row">
-                                <div class="col-md-8">
-                                    <label class="form-label fw-bold">Morada</label>
-                                    <p>${dados.morada || 'Não preenchido'}</p>
-                                </div>
-                                <div class="col-md-4">
-                                    <label class="form-label fw-bold">Número</label>
-                                    <p>${dados.numero || 'Não preenchido'}</p>
-                                </div>
-                                <div class="col-md-4">
-                                    <label class="form-label fw-bold">Código Postal</label>
-                                    <p>${dados.codigo_postal || 'Não preenchido'}</p>
-                                </div>
-                                <div class="col-md-4">
-                                    <label class="form-label fw-bold">Freguesia</label>
-                                    <p>${dados.freguesia || 'Não preenchido'}</p>
-                                </div>
-                                <div class="col-md-4">
-                                    <label class="form-label fw-bold">Concelho</label>
-                                    <p>${dados.concelho || 'Não preenchido'}</p>
-                                </div>
-                                <div class="col-md-4">
-                                    <label class="form-label fw-bold">Distrito</label>
-                                    <p>${dados.distrito || 'Não preenchido'}</p>
-                                </div>
-                            </div>
-                        </div>
-                        
-                    <div class="col-md-12 mb-3">
-                        <h6 class="fw-bold">Informações médicas</h6> <!-- Informações Médicas -->
-                        <div class="col-md-4 mb-3">
-                            <label class="form-label fw-bold">Grupo Sanguíneo</label>
-                            <p>${dados.grupo_sanguineo || 'Não informado'}</p>
-                        </div>
-                        <div class="col-md-4 mb-3">
-                            <label class="form-label fw-bold">Peso (kg)</label>
-                            <p>${dados.peso || 'Não informado'}</p>
-                        </div>
-                        <div class="col-md-4 mb-3">
-                            <label class="form-label fw-bold">Altura (m)</label>
-                            <p>${dados.altura || 'Não informado'}</p>
-                        </div>
-                    </div>
-                </div>
-                </div>
-                <!-- Aba: Prontuário Médico -->
-                <div class="tab-pane fade" id="modal-prontuario-medico" role="tabpanel">
-                    <div class="prontuario-container">
-                        <!-- Cabeçalho do Prontuário -->
-                        <div class="prontuario-header mb-4">
-                            <h5 class="section-title">
-                                <i class="bx bx-file me-2"></i>Histórico de Prontuários
-                            </h5>
-                            <p class="text-muted small">
-                                Histórico completo dos prontuários e relatórios médicos do utente.
-                            </p>
-                        </div>
-
-                        <!-- Lista de Relatórios -->
-                        <div class="report-list bg-white p-3 rounded shadow-sm">
-                            <div class="table-responsive">
-                                <table class="table table-hover">
-                            <thead>
-                                <tr>
-                                            <th style="width: 30%">Data e Hora</th>
-                                            <th style="width: 40%">Médico</th>
-                                            <th style="width: 30%">Ações</th>
-                                </tr>
-                            </thead>
-                                    <tbody>
-                                        <!-- Será preenchido via JavaScript -->
-                                    </tbody>
-                        </table>
-                    </div>
-                        </div>
-
-                        <!-- Detalhes do Relatório (inicialmente oculto) -->
-                    <div class="report-details mt-4" style="display: none;">
-                            <div class="card border-0 bg-white shadow-sm">
-                                <div class="card-body">
-                                    <div class="d-flex justify-content-between align-items-center mb-3">
-                                        <h6 class="card-title mb-0">
-                                            <i class="bx bx-detail me-2"></i>Detalhes do Relatório
-                                        </h6>
-                                        <button class="btn btn-sm btn-outline-secondary" id="backToList">
-                                            <i class="bx bx-arrow-back me-1"></i>Voltar
-                                        </button>
-                                    </div>
-                                    
-                                    <div class="report-metadata mb-3">
-                                        <span class="badge bg-primary me-2" id="reportDate"></span>
-                                        <span class="text-muted" id="reportDoctor"></span>
-                                    </div>
-                                    
-                                    <div class="report-content p-3 border rounded">
-                                        <p id="reportContent" class="mb-0"></p>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>             
-              </div>
-            </div>
-          </div>
-        </div>
-        <div class="modal-footer">
-          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
-          <button type="button" class="btn btn-primary" id="salvarUtente">Guardar</button>
-        </div>
-      </div>
+@if(session('success'))
+    <div class="alert alert-success alert-dismissible fade show" role="alert">
+        {{ session('success') }}
+        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
     </div>
-  </div>
-  
-<script>
-// Gestão do modal para adicionar novo utente
-document.getElementById('openModal')?.addEventListener('click', () => {
-    document.getElementById('novoutenteModal').style.display = 'block';  // Mostra o modal
-});
+@endif
 
-document.getElementById('closeModal')?.addEventListener('click', () => {
-    document.getElementById('novoutenteModal').style.display = 'none';   // Esconde o modal
-});
-
-// Função para visualizar o prontuário médico do utente
-$(document).ready(function() {
-    $('#addUtenteModal').on('show.bs.modal', function(event) {
-        // Obtém o ID do utente selecionado
-        const patientId = $(event.relatedTarget).data('patient-id');
-        const prontuarioTab = $('#modal-prontuario-medico');
-        const reportList = prontuarioTab.find('.report-list tbody');
-        const reportDetails = prontuarioTab.find('.report-details');
-
-        // Carrega os dados pessoais do utente através de uma chamada AJAX
-        $.get(`/patient-details/${patientId}`, function(response) {
-            if (response.success) {
-                const dados = response.dados_pessoais;
-                const patient = response.patient;
-
-                // Atualiza o modal com os dados do utente
-                $('#modal-dados-pessoais').html(`
-                    <div class="row">
-                        <!-- Informações Básicas -->
-                        <div class="col-12 mb-3">
-                            <button class="btn btn-primary btn-sm edit-personal-data" data-patient-id="${patient.id}">
-                                <i class="bx bx-edit-alt me-1"></i>Editar Dados Pessoais
-                            </button>
-                        </div>
-                        <div class="col-md-6 mb-3">
-                            <label class="form-label fw-bold">Nome Completo</label>
-                            <p>${patient.name}</p>
-                        </div>
-                        <div class="col-md-6 mb-3">
-                            <label class="form-label fw-bold">Data de Nascimento</label>
-                            <p>${dados.data_nascimento || 'Não preenchido'}</p>
-                        </div>
-                        
-                        <!-- Documentos -->
-                        <div class="col-md-6 mb-3">
-                            <label class="form-label fw-bold">NIF</label>
-                            <p>${dados.nif || 'Não preenchido'}</p>
-                        </div>
-                        
-                        <!-- Informações Pessoais -->
-                        <div class="col-md-6 mb-3">
-                            <label class="form-label fw-bold">Sexo</label>
-                            <p>${dados.sexo || 'Não preenchido'}</p>
-                        </div>
-                        <div class="col-md-6 mb-3">
-                            <label class="form-label fw-bold">Estado Civil</label>
-                            <p>${dados.estado_civil || 'Não preenchido'}</p>
-                        </div>
-                        
-                        <!-- Endereço -->
-                        <div class="col-md-12 mb-3">
-                            <h6 class="fw-bold">Endereço</h6>
-                            <div class="row">
-                                <div class="col-md-8">
-                                    <label class="form-label fw-bold">Morada</label>
-                                    <p>${dados.morada || 'Não preenchido'}</p>
-                                </div>
-                                <div class="col-md-4">
-                                    <label class="form-label fw-bold">Número</label>
-                                    <p>${dados.numero || 'Não preenchido'}</p>
-                                </div>
-                                <div class="col-md-4">
-                                    <label class="form-label fw-bold">Código Postal</label>
-                                    <p>${dados.codigo_postal || 'Não preenchido'}</p>
-                                </div>
-                                <div class="col-md-4">
-                                    <label class="form-label fw-bold">Freguesia</label>
-                                    <p>${dados.freguesia || 'Não preenchido'}</p>
-                                </div>
-                                <div class="col-md-4">
-                                    <label class="form-label fw-bold">Concelho</label>
-                                    <p>${dados.concelho || 'Não preenchido'}</p>
-                                </div>
-                                <div class="col-md-4">
-                                    <label class="form-label fw-bold">Distrito</label>
-                                    <p>${dados.distrito || 'Não preenchido'}</p>
-                                </div>
-                            </div>
-                        </div>
-                    <div class="col-md-12 mb-3">
-                        <h6 class="fw-bold">Informações médicas</h6>
-                        <!-- Informações Médicas -->
-                        <div class="col-md-4 mb-3">
-                            <label class="form-label fw-bold">Grupo Sanguíneo</label>
-                            <p>${dados.grupo_sanguineo || 'Não preenchido'}</p>
-                        </div>
-                        <div class="col-md-4 mb-3">
-                            <label class="form-label fw-bold">Peso (kg)</label>
-                            <p>${dados.peso || 'Não preenchido'}</p>
-                        </div>
-                        <div class="col-md-4 mb-3">
-                            <label class="form-label fw-bold">Altura (m)</label>
-                            <p>${dados.altura || 'Não preenchido'}</p>
-                        </div>
-                    </div>
-                </div>
-                `);
-            } else {
-                // Mostra mensagem de erro se falhar
-                console.error('Erro ao carregar dados:', response.message);
-                alert('Erro ao carregar dados do utente');
-            }
-        }).fail(function(error) {
-            // Tratamento de erro na chamada AJAX
-            console.error('Erro na requisição:', error);
-            alert('Erro ao carregar dados do utente');
-        });
-
-        // Carrega os relatórios médicos do utente
-        $.get(`/patient-reports/${patientId}`, data => {
-            reportList.empty();  // Limpa a lista atual
-            if (data.length) {
-                // Se existirem relatórios, mostra-os na tabela
-                data.forEach(report => {
-                    const date = new Date(report.report_date_time);
-                    reportList.append(`
-                        <tr>
-                            <td>${date.toLocaleDateString('pt-PT')} ${date.toLocaleTimeString('pt-PT')}</td>
-                            <td>${report.doctor_name || 'Não informado'}</td>
-                            <td>
-                                <button class="btn btn-sm btn-primary view-report" 
-                                    data-content="${report.content}"
-                                    data-date="${date.toLocaleDateString('pt-PT')}"
-                                    data-doctor="${report.doctor_name}">
-                                    Ver Relatório
-                                </button>
-                            </td>
-                        </tr>
-                    `);
-                });
-            } else {
-                // Se não houver relatórios, mostra mensagem
-                reportList.append('<tr><td colspan="3" class="text-center">Sem relatórios</td></tr>');
-            }
-        });
-
-        // Gestão da visualização de relatórios individuais
-        $(document).on('click', '.view-report', function() {
-            // Mostra os detalhes do relatório selecionado
-            $('#reportContent').text($(this).data('content'));
-            $('#reportDate').text($(this).data('date'));
-            $('#reportDoctor').text($(this).data('doctor'));
-            $('.report-list').hide();
-            reportDetails.show();
-        });
-
-        // Botão para voltar à lista de relatórios
-        $('#backToList').on('click', () => {
-            reportDetails.hide();
-            $('.report-list').show();
-        });
-    });
-});
-
-// Função para eliminar um utente
-document.querySelectorAll('.delete-patient')?.forEach(button => {
-    button.addEventListener('click', function() {
-        // Confirmação antes de eliminar
-        if (confirm('Tem a certeza que pretende eliminar este utente?')) {
-            // Chamada AJAX para eliminar o utente
-            fetch(`/list/patients/${this.dataset.id}`, {
-                method: 'DELETE',
-                headers: {
-                    'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content
-                }
-            })
-            .then(res => {
-                if (res.ok) {
-                    // Remove a linha da tabela se eliminado com sucesso
-                    this.closest('tr').remove();
-                    alert('Utente eliminado com sucesso');
-                }
-            });
-        }
-    });
-});
-
-// Sistema de pesquisa de utentes em tempo real
-document.addEventListener('DOMContentLoaded', function () {
-    const patientSearch = document.getElementById('patientSearch');
-
-    if (patientSearch) {
-        patientSearch.addEventListener('input', function () {
-            const searchQuery = this.value;
-
-            fetch(`/list/patients?search=${encodeURIComponent(searchQuery)}`)
-                .then(response => response.text())
-                .then(html => {
-                    const parser = new DOMParser();
-                    const doc = parser.parseFromString(html, 'text/html');
-                    const newTableBody = doc.querySelector('#patientTableBody');
-                    const newPagination = doc.querySelector('.pagination');
-
-                    document.querySelector('#patientTableBody').innerHTML = newTableBody.innerHTML;
-                    document.querySelector('.pagination').innerHTML = newPagination.innerHTML;
-                })
-                .catch(error => {
-                    console.error('Erro ao buscar os utentes:', error);
-                });
-        });
-    } else {
-        console.error('Elemento com ID "patientSearch" não encontrado!');
-    }
-});
-
-// Manipulador de evento para o botão de editar dados pessoais
-$(document).on('click', '.edit-personal-data', function() {
-    const patientId = $(this).data('patient-id');
-    const personalDataContainer = $(this).closest('.row');
-    
-    // Transformar os campos em inputs editáveis
-    personalDataContainer.find('p').each(function() {
-        const currentValue = $(this).text();
-        const fieldLabel = $(this).prev('label').text().toLowerCase();
-        const fieldName = fieldLabel.replace(/\s+/g, '_');
-        
-        // Campos específicos com opções restritas
-        if (fieldLabel === 'sexo') {
-            $(this).html(`
-                <select class="form-control form-control-sm" name="${fieldName}">
-                    <option value="Masculino" ${currentValue === 'Masculino' ? 'selected' : ''}>Masculino</option>
-                    <option value="Feminino" ${currentValue === 'Feminino' ? 'selected' : ''}>Feminino</option>
-                </select>
-            `);
-        } else if (fieldLabel === 'estado civil') {
-            $(this).html(`
-                <select class="form-control form-control-sm" name="${fieldName}">
-                    <option value="Solteiro" ${currentValue === 'Solteiro' ? 'selected' : ''}>Solteiro</option>
-                    <option value="Casado" ${currentValue === 'Casado' ? 'selected' : ''}>Casado</option>
-                    <option value="Divorciado" ${currentValue === 'Divorciado' ? 'selected' : ''}>Divorciado</option>
-                    <option value="Viúvo" ${currentValue === 'Viúvo' ? 'selected' : ''}>Viúvo</option>
-                </select>
-            `);
-        } else if (fieldLabel === 'grupo sanguíneo') {
-            $(this).html(`
-                <select class="form-control form-control-sm" name="${fieldName}">
-                    <option value="A+" ${currentValue === 'A+' ? 'selected' : ''}>A+</option>
-                    <option value="A-" ${currentValue === 'A-' ? 'selected' : ''}>A-</option>
-                    <option value="B+" ${currentValue === 'B+' ? 'selected' : ''}>B+</option>
-                    <option value="B-" ${currentValue === 'B-' ? 'selected' : ''}>B-</option>
-                    <option value="AB+" ${currentValue === 'AB+' ? 'selected' : ''}>AB+</option>
-                    <option value="AB-" ${currentValue === 'AB-' ? 'selected' : ''}>AB-</option>
-                    <option value="O+" ${currentValue === 'O+' ? 'selected' : ''}>O+</option>
-                    <option value="O-" ${currentValue === 'O-' ? 'selected' : ''}>O-</option>
-                </select>
-            `);
-        } else if (fieldLabel === 'data de nascimento') {
-            $(this).html(`
-                <input type="date" 
-                       class="form-control form-control-sm" 
-                       name="${fieldName}" 
-                       value="${currentValue === 'Não preenchido' ? '' : currentValue}">
-            `);
-        } else {
-            $(this).html(`
-                <input type="text" 
-                       class="form-control form-control-sm" 
-                       name="${fieldName}" 
-                       value="${currentValue === 'Não preenchido' ? '' : currentValue}">
-            `);
-        }
-    });
-    
-    // Trocar o botão de editar por salvar/cancelar
-    $(this).replaceWith(`
-        <div class="btn-group">
-            <button class="btn btn-success btn-sm save-personal-data" data-patient-id="${patientId}">
-                <i class="bx bx-check me-1"></i>Salvar
-            </button>
-            <button class="btn btn-danger btn-sm cancel-edit">
-                <i class="bx bx-x me-1"></i>Cancelar
-            </button>
-        </div>
-    `);
-});
-
-// Manipulador para o botão de salvar
-$(document).on('click', '.save-personal-data', function() {
-    const patientId = $(this).data('patient-id');
-    const formData = {};
-    
-    // Coletar todos os valores dos inputs e selects
-    $(this).closest('.row').find('input, select').each(function() {
-        const name = $(this).attr('name');
-        const value = $(this).val();
-        
-        if (value && value !== 'Não preenchido') {
-            formData[name] = value;
-        }
-    });
-    
-    // Enviar dados para o servidor
-    $.ajax({
-        url: `/patient/${patientId}/update-personal-data`,
-        method: 'POST',
-        data: {
-            _token: $('meta[name="csrf-token"]').attr('content'),
-            ...formData
-        },
-        success: function(response) {
-            location.reload();
-        },
-        error: function(xhr) {
-            console.error('Erro ao atualizar dados:', xhr);
-            location.reload();
-        }
-    });
-});
-
-// Manipulador para o botão de cancelar
-$(document).on('click', '.cancel-edit', function() {
-    location.reload();
-});
-</script>
- 
+@if($errors->any())
+    <div class="alert alert-danger alert-dismissible fade show" role="alert">
+        <ul class="mb-0">
+            @foreach($errors->all() as $error)
+                <li>{{ $error }}</li>
+            @endforeach
+        </ul>
+        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+    </div>
+@endif
 
 @endsection
 <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>

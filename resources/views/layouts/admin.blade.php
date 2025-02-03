@@ -156,6 +156,26 @@
                     </a>
                 </li>
                 @endif
+
+                @if (isset($user) && $user->role->role != 'Doctor')
+                <li class="menu-item">
+                    <a href="{{ route('family.index') }}" class="menu-link">
+                    <i class="menu-icon tf-icons bx bx-crown"></i>
+                    <div class="text-truncate" data-i18n="Boxicons">Médicos de Família</div>
+                    </a>
+                </li>
+                @endif
+
+                @if (isset($user) && $user->role->role != 'Doctor')
+                <li class="menu-item">
+                    <a href="{{ route('list.listadmin') }}" class="menu-link">
+                    <i class="menu-icon tf-icons bx bx-crown"></i>
+                    <div class="text-truncate" data-i18n="Boxicons">tabela de admin</div>
+                    </a>
+                </li>
+                @endif
+                
+                
             
                 <!-- Forms & Tables -->
                 <li class="menu-header small text-uppercase"><span class="menu-header-text">Forms &amp; Tables</span></li>

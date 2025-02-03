@@ -6,13 +6,21 @@ use App\Models\User;
 use App\Models\UserDoctorAgenda;
 use Illuminate\Http\Request;
 
+/**
+ * Controlador responsável pela gestão dos horários de atendimento dos médicos
+ */
 class DoctorScheduleController extends Controller
 {
-    // Método para listar horários do médico
+    /**
+     * Lista os horários de atendimento de um médico específico
+     * 
+     * @param int $doctorId Identificador do médico
+     * @return \Illuminate\Http\JsonResponse
+     */
     public function index($doctorId)
     {
         try {
-            // Verificar se o médico existe
+            // Verificar se o médico existe e tem função adequada
             $doctor = User::where('id', $doctorId)->whereHas('role', function ($query) {
                 $query->where('role', 'Doctor');
             })->first();
@@ -24,7 +32,7 @@ class DoctorScheduleController extends Controller
                 ], 404);
             }
 
-            // Buscar os horários do médico
+            // Obter os horários do médico
             $schedules = UserDoctorAgenda::where('doctor_id', $doctorId)->get();
 
             return response()->json([
@@ -34,15 +42,22 @@ class DoctorScheduleController extends Controller
         } catch (\Exception $e) {
             return response()->json([
                 'success' => false,
-                'message' => 'Erro ao buscar horários: ' . $e->getMessage(),
+                'message' => 'Erro ao obter horários: ' . $e->getMessage(),
             ], 500);
         }
     }
 
-    // Método para salvar ou atualizar horários do médico
+    /**
+     * Guarda ou atualiza os horários de atendimento de um médico
+     * 
+     * @param Request $request
+     * @param int $doctorId Identificador do médico
+     * @return \Illuminate\Http\JsonResponse
+     */
     public function store(Request $request, $doctorId)
     {
         try {
+            // Verificar se o médico existe e tem função adequada
             $doctor = User::where('id', $doctorId)->whereHas('role', function ($query) {
                 $query->where('role', 'Doctor');
             })->first();
@@ -54,10 +69,10 @@ class DoctorScheduleController extends Controller
                 ], 404);
             }
     
-            // Deleta os horários existentes antes de salvar os novos
+            // Eliminar horários existentes antes de guardar os novos
             UserDoctorAgenda::where('doctor_id', $doctorId)->delete();
     
-            // Salva os novos horários
+            // Guardar os novos horários
             foreach ($request->input('days', []) as $day => $times) {
                 if (!empty($times['start_time']) && !empty($times['end_time'])) {
                     UserDoctorAgenda::create([
@@ -71,15 +86,13 @@ class DoctorScheduleController extends Controller
     
             return response()->json([
                 'success' => true,
-                'message' => 'Horários salvos com sucesso.',
+                'message' => 'Horários guardados com sucesso.',
             ]);
         } catch (\Exception $e) {
             return response()->json([
                 'success' => false,
-                'message' => 'Erro ao salvar horários: ' . $e->getMessage(),
+                'message' => 'Erro ao guardar horários: ' . $e->getMessage(),
             ], 500);
         }
-        
     }
-        
 }

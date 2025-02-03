@@ -1,235 +1,340 @@
 @extends('layouts.admin')
 
 <style>
-    .card {
-        border-radius: 10px;
-        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+    .dashboard-container {
+        padding: 2rem;
     }
 
-    .dashboard-card {
+    .welcome-section {
+        background: linear-gradient(135deg, #0073e6 0%, #00428f 100%);
+        color: white;
+        padding: 2rem;
+        border-radius: 15px;
+        margin-bottom: 2rem;
+        box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+    }
+
+    .stats-card {
+        background: white;
         border-radius: 12px;
-        box-shadow: 0 6px 12px rgba(0, 0, 0, 0.15);
-        background-color: #f5f8ff;
-        padding: 25px;
-        text-align: center;
-        font-family: Arial, sans-serif;
-        max-width: 600px;
-        margin: 20px auto;
+        padding: 1.5rem;
+        margin-bottom: 1.5rem;
+        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
+        transition: transform 0.3s ease;
     }
 
-    .dashboard-card h1 {
-        font-size: 3.2rem;
+    .stats-card:hover {
+        transform: translateY(-5px);
+    }
+
+    .next-appointment-card {
+        background: #ffffff;
+        border-radius: 15px;
+        padding: 2rem;
+        box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+        border-left: 5px solid #0073e6;
+    }
+
+    .appointment-time {
+        font-size: 2rem;
         font-weight: bold;
-        color: #0073e5;
-        margin-bottom: 15px;
-        letter-spacing: 1px;
+        color: #0073e6;
     }
 
-    .dashboard-card h2 {
-        font-size: 1.5rem;
-        color: #333333;
-        margin-bottom: 10px;
+    .appointment-details {
+        margin-top: 1rem;
+        padding: 1rem;
+        background: #f8f9fa;
+        border-radius: 8px;
     }
 
-    .dashboard-card p {
-        font-size: 1.1rem;
-        color: #555555;
-        line-height: 1.6;
-    }
-
-    .dashboard-card p strong {
-        font-weight: bold;
-        color: #0073e5;
-    }
-
-    .dashboard-card .details-button {
-        margin-top: 20px;
-        padding: 10px 25px;
-        font-size: 1rem;
-        background-color: #004a26;
-        color: #ffffff;
+    .start-consultation-btn {
+        background: #004a26;
+        color: white;
+        padding: 0.8rem 1.5rem;
+        border-radius: 8px;
         border: none;
-        border-radius: 6px;
-        cursor: pointer;
+        transition: all 0.3s ease;
         text-decoration: none;
-        transition: background-color 0.3s ease;
+        display: inline-block;
+        margin-top: 1rem;
     }
 
-    .dashboard-card .details-button:hover {
-        background-color: #007a35;
+    .start-consultation-btn:hover {
+        background: #006633;
+        transform: translateY(-2px);
+        color: white;
     }
+
+    .appointments-table {
+        background: white;
+        border-radius: 12px;
+        overflow: hidden;
+        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
+    }
+
+    .appointments-table th {
+        background: #f8f9fa;
+        padding: 1rem;
+        font-weight: 600;
+    }
+
+    .appointments-table td {
+        padding: 1rem;
+        vertical-align: middle;
+    }
+
+    .status-badge {
+        padding: 0.5rem 1rem;
+        border-radius: 20px;
+        font-size: 0.875rem;
+        font-weight: 500;
+    }
+
+    .pagination {
+        margin-top: 2rem;
+    }
+
+    .page-link {
+        color: #0073e6;
+        border: none;
+        padding: 0.5rem 1rem;
+        margin: 0 0.2rem;
+        border-radius: 5px;
+    }
+
+    .page-item.active .page-link {
+        background: #0073e6;
+        border-color: #0073e6;
+    }
+
+    /* Novos estilos para a tabela simplificada */
+    .simple-table {
+        width: 100%;
+        background: white;
+        border-radius: 10px;
+        overflow: hidden;
+        box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+        margin-top: 2rem;
+    }
+
+    .simple-table thead {
+        background-color: #f8f9fa;
+    }
+
+    .simple-table th {
+        color: #495057;
+        font-weight: 600;
+        padding: 1rem;
+        text-align: left;
+    }
+
+    .simple-table td {
+        padding: 1rem;
+        border-bottom: 1px solid #f0f0f0;
+        color: #666;
+    }
+
+    .simple-table tr:last-child td {
+        border-bottom: none;
+    }
+
+    .simple-table tr:hover {
+        background-color: #f8f9fa;
+    }
+
+    .status-pill {
+        padding: 0.4rem 1rem;
+        border-radius: 20px;
+        font-size: 0.875rem;
+        display: inline-block;
+    }
+
+    .status-agendado { background-color: #e3f2fd; color: #1976d2; }
+    .status-concluido { background-color: #e8f5e9; color: #2e7d32; }
+    .status-cancelado { background-color: #ffebee; color: #c62828; }
+    .status-andamento { background-color: #fff3e0; color: #f57c00; }
 </style>
 
 @section('content')
 
-<nav class="layout-navbar container-xxl navbar navbar-expand-xl navbar-detached align-items-center bg-navbar-theme" id="layout-navbar">
+<nav class="layout-navbar container-xxl navbar navbar-expand-xl navbar-detached align-items-center bg-navbar-theme shadow-sm" id="layout-navbar">
+    <!-- Navbar Content -->
     <div class="layout-menu-toggle navbar-nav align-items-xl-center me-4 me-xl-0 d-xl-none">
         <a class="nav-item nav-link px-0 me-xl-6" href="javascript:void(0)">
-            <i class="bx bx-menu bx-md"></i>
+            <i class="bx bx-menu bx-sm"></i>
         </a>
     </div>
     <div class="navbar-nav-right d-flex align-items-center" id="navbar-collapse">
         <ul class="navbar-nav flex-row align-items-center ms-auto">
-            <!-- Notification -->
-            <li class="nav-item dropdown-notifications navbar-dropdown dropdown me-3 me-xl-2">
-                <a class="nav-link dropdown-toggle hide-arrow" href="javascript:void(0);" data-bs-toggle="dropdown" data-bs-auto-close="outside" aria-expanded="false">
-                    <span class="position-relative">
-                        <i class="bx bx-bell bx-md"></i>
-                        <span class="badge rounded-pill bg-danger badge-dot badge-notifications border"></span>
-                    </span>
+            <!-- Notifications -->
+            <li class="nav-item dropdown-notifications navbar-dropdown dropdown">
+                <a class="nav-link dropdown-toggle hide-arrow" href="javascript:void(0);" data-bs-toggle="dropdown">
+                    <i class="bx bx-bell bx-sm"></i>
+                    <span class="badge rounded-pill bg-danger badge-notifications"></span>
                 </a>
             </li>
-            <!--/ Notification -->
-            <!-- User -->
-            <li class="nav-item navbar-dropdown dropdown-user dropdown">
+            <!-- User Profile -->
+            <li class="nav-item dropdown-user navbar-dropdown dropdown">
                 <a class="nav-link dropdown-toggle hide-arrow p-0" href="javascript:void(0);" data-bs-toggle="dropdown">
                     <div class="avatar avatar-online">
-                        <img src="{{ $user->avatar ? asset('storage/' . $user->avatar) : asset('default-avatar.png') }}" alt="Avatar do usuário" class="avatar">
+                        <img src="{{ $user->avatar ? asset('storage/' . $user->avatar) : asset('default-avatar.png') }}" alt="User Avatar" class="avatar">
                     </div>
                 </a>
                 <ul class="dropdown-menu dropdown-menu-end">
                     <li>
                         <a class="dropdown-item">
                             <div class="d-flex">
-                                <div class="flex-shrink-0 me-3">
-                                    <div class="avatar avatar-online">
-                                        <img src="{{ $user->avatar ? asset('storage/' . $user->avatar) : asset('default-avatar.png') }}" alt="Avatar do usuário" class="avatar">
-                                    </div>
+                                <div class="avatar avatar-online me-3">
+                                    <img src="{{ $user->avatar ? asset('storage/' . $user->avatar) : asset('default-avatar.png') }}" alt="User Avatar">
                                 </div>
-                                <div class="flex-grow-1">
+                                <div>
                                     <h6 class="mb-0">{{ $user->name }}</h6>
                                     <small class="text-muted">{{ $user->role->role }}</small>
                                 </div>
                             </div>
                         </a>
                     </li>
-                    <li>
-                        <div class="dropdown-divider my-1"></div>
-                    </li>
-                    <li>
-                        <a class="dropdown-item" href="#">
-                            <i class="bx bx-user bx-md me-3"></i><span>My Profile</span>
-                        </a>
-                    </li>
+                    <li><hr class="dropdown-divider"></li>
                     <li>
                         <a class="dropdown-item" href="{{ route('settings.index') }}">
-                            <i class="bx bx-cog bx-md me-3"></i><span>Settings</span>
+                            <i class="bx bx-cog me-2"></i>
+                            <span>Configurações</span>
                         </a>
-                    </li>
-                    <li>
-                        <div class="dropdown-divider my-1"></div>
                     </li>
                     <li>
                         <a class="dropdown-item" href="{{ route('login.destroy') }}">
-                            <i class="bx bx-power-off bx-md me-3"></i><span>Log Out</span>
+                            <i class="bx bx-power-off me-2"></i>
+                            <span>Logout</span>
                         </a>
                     </li>
                 </ul>
             </li>
-            <!--/ User -->
         </ul>
     </div>
-
-    <!-- Search Small Screens -->
-    <div class="navbar-search-wrapper search-input-wrapper d-none">
-        <input type="text" class="form-control search-input container-xxl border-0" placeholder="Search..." aria-label="Search...">
-        <i class="bx bx-x bx-md search-toggler cursor-pointer"></i>
-    </div>
 </nav>
+<div class="dashboard-container">
+    
+    <div>
+        <h1>Olá, Dr. {{ $user->name }}</h1>
+        <p class="dashboard-subtitle">Seu Painel</p>
+        <style>
+            .dashboard-subtitle {
+                color: #6c757d;
+                font-size: 1.1rem;
+                margin-top: 0.5rem;
+                padding-bottom: 1rem;
+                border-bottom: 2px solid #e9ecef;
+            }
+        </style>
+    </div>
 
-<div class="container">
-    <h1>Bem-vindo, {{ $user->name }}</h1>
-    <div class="container text-center">
-        <div class="row align-items-start">
-          <div class="col-6">
-
-            <div class="dashboard-card" style="border: 1px solid #e0e0e0; border-radius: 8px; padding: 24px; background-color: #fff; box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.1); width: 400px;">
-
+    <div class="row">
+        <div class="col-md-6">
+            <div class="next-appointment-card">
+                <h3 class="mb-4"><i class="bx bx-calendar me-2"></i>Próximo Atendimento</h3>
+                
                 @if ($nextAppointment)
-                    <p style="font-size: 16px; margin: 0; color: #666; text-align: left;">Próximo Atendimento inicia-se em</p>
-                    <p style="font-size: 18px; font-weight: bold; margin: 12px 0; text-align: left;">{{ $tempoRestante->h }} horas e {{ $tempoRestante->i }} minutos</p>
-                    <p style="font-size: 16px; color: #333; margin: 0; text-align: left;"><strong>Paciente:</strong> {{ $nextAppointment->patient->name }}</p>
-                    <a href="{{ route('consulta.iniciar', ['id' => $nextAppointment->id]) }}" style="display: inline-block; margin-top: 16px; padding: 12px 20px; text-decoration: none; color: #fff; background-color: #6c63ff; border-radius: 6px; font-size: 16px; text-align: left;">Iniciar Consulta</a>
+                    <div class="appointment-time">
+                        {{ $tempoRestante->h }}h {{ $tempoRestante->i }}min
+                    </div>
+                    <div class="appointment-details">
+                        <p><i class="bx bx-user me-2"></i><strong>Paciente:</strong> {{ $nextAppointment->patient->name }}</p>
+                        <p><i class="bx bx-time me-2"></i><strong>Horário:</strong> 
+                            {{ \Carbon\Carbon::parse($nextAppointment->appointment_date_time)->format('H:i') }}
+                        </p>
+                        <a href="{{ route('consulta.iniciar', ['id' => $nextAppointment->id]) }}" 
+                           class="start-consultation-btn">
+                            <i class="bx bx-play-circle me-2"></i>Iniciar Consulta
+                        </a>
+                    </div>
                 @else
-                    <p style="font-size: 16px; margin: 0; color: #666; text-align: left;">Nenhuma consulta agendada no momento.</p>
-                    <span style="display: inline-block; margin-top: 16px; padding: 12px 20px; text-decoration: none; color: #aaa; background-color: #f0f0f0; border-radius: 6px; font-size: 16px; text-align: left;">Sem consultas disponíveis</span>
+                    <div class="text-muted">
+                        <i class="bx bx-calendar-x fs-1"></i>
+                        <p class="mt-3">Nenhuma consulta agendada no momento.</p>
+                    </div>
                 @endif
-            
             </div>
-            
-            
-          </div>
-          <div class="col-6">
-            
-          </div>
         </div>
-      </div>
-    
-    
 
-    <!-- Lista de consultas -->
-    <div class="row mt-5">
-        <div class="col-12">
-            <h2>Minhas Consultas</h2>
-            <table class="table table-striped">
+        <div class="col-md-6">
+            <div class="row">
+                <div class="col-md-6">
+                    <div class="stats-card">
+                        <h4>Consultas Hoje</h4>
+                        <h2 class="text-primary">{{ $consultasHoje ?? 0 }}</h2>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <br>
+    <br>
+    <h3 class="mb-4">Minhas Consultas</h3>
+    <div class="appointments-table mt-5">
+        <div class="table-responsive">
+            <table class="simple-table" style="border: 1px solid #e0e0e0; border-radius: 12px; box-shadow: 0 4px 6px rgba(0,0,0,0.05);">
                 <thead>
-                    <tr>
-                        <th>Data e Hora</th>
-                        <th>Paciente</th>
-                        <th>Especialidade</th>
-                        <th>Status</th>
+                    <tr style="border-bottom: 2px solid #f0f0f0; background-color: #fafafa;">
+                        <th style="border-right: 1px solid #f0f0f0; padding: 1.3rem; font-weight: 600;">Data e Hora</th>
+                        <th style="border-right: 1px solid #f0f0f0; padding: 1.3rem; font-weight: 600;">Paciente</th>
+                        <th style="border-right: 1px solid #f0f0f0; padding: 1.3rem; font-weight: 600;">Especialidade</th>
+                        <th style="padding: 1.3rem; font-weight: 600;">Status</th>
                     </tr>
                 </thead>
                 <tbody>
                     @forelse ($custasdortor as $appointment)
-                        <tr>
-                            <td>{{ $appointment->appointment_date_time }}</td>
-                            <td>{{ $appointment->patient->name }}</td>
-                            <td>{{ $appointment->specialty->name }}</td>
-                            <td>{{ $appointment->status->status }}</td>
+                        <tr style="border-bottom: 1px solid #f5f5f5; transition: all 0.2s ease;">
+                            <td style="border-right: 1px solid #f5f5f5; padding: 1.2rem; background-color: #ffffff;">
+                                <i class='bx bx-calendar' style="color: #0073e6; margin-right: 8px;"></i>
+                                {{ \Carbon\Carbon::parse($appointment->appointment_date_time)->format('d/m/Y H:i') }}
+                            </td>
+                            <td style="border-right: 1px solid #f5f5f5; padding: 1.2rem; background-color: #ffffff;">
+                                <i class='bx bx-user' style="color: #666; margin-right: 8px;"></i>
+                                {{ $appointment->patient->name }}
+                            </td>
+                            <td style="border-right: 1px solid #f5f5f5; padding: 1.2rem; background-color: #ffffff;">
+                                <i class='bx bx-plus-medical' style="color: #666; margin-right: 8px;"></i>
+                                {{ $appointment->specialty->name }}
+                            </td>
+                            <td style="padding: 1.2rem; background-color: #ffffff;">
+                                <span class="status-pill status-{{ strtolower(str_replace(' ', '', $appointment->status->status)) }}" 
+                                      style="box-shadow: 0 2px 4px rgba(0,0,0,0.08); border: 1px solid rgba(0,0,0,0.05);">
+                                    {{ $appointment->status->status }}
+                                </span>
+                            </td>
                         </tr>
                     @empty
                         <tr>
-                            <td colspan="4">Nenhuma consulta encontrada.</td>
+                            <td colspan="4" class="text-center" style="padding: 2.5rem; background-color: #ffffff;">
+                                <i class='bx bx-calendar-x' style="font-size: 2.2rem; color: #888"></i>
+                                <p class="mt-3" style="color: #666;">Nenhuma consulta encontrada.</p>
+                            </td>
                         </tr>
                     @endforelse
                 </tbody>
             </table>
-            <nav>
-                <ul class="pagination justify-content-center">
-                    {{-- Link para a página anterior --}}
-                    @if ($custasdortor->onFirstPage())
-                        <li class="page-item disabled">
-                            <span class="page-link">Anterior</span>
-                        </li>
-                    @else
-                        <li class="page-item">
-                            <a class="page-link" href="{{ $custasdortor->previousPageUrl() }}">Anterior</a>
-                        </li>
-                    @endif
-                
-                    {{-- Links para as páginas --}}
-                    @for ($i = 1; $i <= $custasdortor->lastPage(); $i++)
-                        <li class="page-item {{ $custasdortor->currentPage() == $i ? 'active' : '' }}">
-                            <a class="page-link" href="{{ $custasdortor->url($i) }}">{{ $i }}</a>
-                        </li>
-                    @endfor
-                
-                    {{-- Link para a próxima página --}}
-                    @if ($custasdortor->hasMorePages())
-                        <li class="page-item">
-                            <a class="page-link" href="{{ $custasdortor->nextPageUrl() }}">Próxima</a>
-                        </li>
-                    @else
-                        <li class="page-item disabled">
-                            <span class="page-link">Próxima</span>
-                        </li>
-                    @endif
-                </ul>
-            </nav>
-            
+        </div>
+
+        <div class="d-flex justify-content-center mt-4">
+            {{ $custasdortor->links() }}
         </div>
     </div>
 </div>
+
+@push('scripts')
+<script>
+    // Função auxiliar para definir cores dos status
+    function getStatusColor(status) {
+        const colors = {
+            'Agendado': 'info',
+            'Concluído': 'success',
+            'Cancelado': 'danger',
+            'Em andamento': 'warning'
+        };
+        return colors[status] || 'secondary';
+    }
+</script>
+@endpush
 
 @endsection

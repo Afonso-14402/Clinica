@@ -9,18 +9,27 @@ use App\Models\ActivityLog;
 use Illuminate\Support\Facades\DB;
 use App\Models\DadosPessoais;
 
+/**
+ * Controlador responsável pelo registo de novos utilizadores
+ */
 class RegisterController extends Controller
 {
+    /**
+     * Apresenta o formulário de registo
+     */
     public function create()
     {
         $user = Auth::user();
         return view('registar.create', compact('user'));
-      
     }
 
+    /**
+     * Regista um novo paciente no sistema
+     * Inclui validações e registo de atividade
+     */
     public function paciente(Request $request)
     {
-        // Validação dos dados enviados pelo formulário
+        // Validação dos dados do formulário
         $validated = $request->validate([
             'name' => 'required|string|max:255',
             'last_name' => 'required|string|max:255',
@@ -29,27 +38,32 @@ class RegisterController extends Controller
             'birth_date' => 'required|date|before:today',
         ]);
         
-        // Juntar o nome e o sobrenome em um campo único 'full_name'
+        // Juntar nome e apelido num campo único
         $fullName = $validated['name'] . ' ' . $validated['last_name'];
 
-        // Criar o usuário no banco de dados
+        // Criar o utilizador
         $user = User::create([
             'name' => $fullName,  
             'email' => $validated['email'],
             'password' => Hash::make($validated['password']),
             'birth_date' => $validated['birth_date'],
-            'active' => 1, // Usuário ativo por padrão
+            'active' => 1, // Utilizador ativo por predefinição
         ]);
-        ActivityLog::create([
-            'type' => 'Criaçao do paciente', // Tipo da ação
-            'description' => "Paciente {$user->name} foi registrado no sistema", // Use $user->name para acessar o nome do usuário
-            'user_id' => auth()->id(), // Usuário autenticado que realizou a ação
-        ]);
-        
 
-        return redirect()->route('list.listpatient')->with('success', 'Registro realizado com sucesso!');
+        // Registar atividade
+        ActivityLog::create([
+            'type' => 'Criação do paciente',
+            'description' => "Paciente {$user->name} foi registado no sistema",
+            'user_id' => auth()->id(),
+        ]);
+
+        return redirect()->route('list.listpatient')->with('success', 'Registo efetuado com sucesso!');
     }
     
+    /**
+     * Regista um novo paciente através da API
+     * Inclui criação de dados pessoais
+     */
     public function registarPaciente(Request $request)
     {
         try {
@@ -63,18 +77,17 @@ class RegisterController extends Controller
 
             DB::beginTransaction();
 
-            // Criar o usuário
+            // Criar o utilizador
             $user = User::create([
                 'name' => $validated['name'] . ' ' . $validated['last_name'],
                 'email' => $validated['email'],
                 'password' => Hash::make($validated['password']),
-                'role_id' => 3, // ID do papel de paciente
+                'role_id' => 3, // ID da função de paciente
             ]);
 
             // Criar dados pessoais do paciente
             $dadosPessoais = DadosPessoais::create([
                 'user_id' => $user->id,
-                // Adicione outros campos conforme necessário
             ]);
 
             DB::commit();
@@ -93,6 +106,10 @@ class RegisterController extends Controller
         }
     }
 
+    /**
+     * Regista um novo médico no sistema
+     * Inclui associação de especialidades
+     */
     public function store(Request $request) {
         try {
             $request->validate([
@@ -105,7 +122,7 @@ class RegisterController extends Controller
                 'specialties' => 'required|array',
             ]);
 
-            // Criação do novo médico
+            // Criar o novo médico
             $doctor = User::create([
                 'name' => $request->name,
                 'last_name' => $request->last_name,
@@ -117,7 +134,7 @@ class RegisterController extends Controller
             // Associar especialidades
             $doctor->specialties()->attach($request->specialties);
 
-            return redirect()->back()->with('success', 'Médico registrado com sucesso!');
+            return redirect()->back()->with('success', 'Médico registado com sucesso!');
         } catch (\Exception $e) {
             return redirect()->back()->withErrors(['error' => $e->getMessage()]);
         }

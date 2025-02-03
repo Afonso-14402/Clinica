@@ -9,20 +9,29 @@ use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 use App\Models\User;
 
+/**
+ * Controlador responsável pela gestão de dados dos pacientes
+ */
 class PatientController extends Controller
 {
+    /**
+     * Atualiza os dados pessoais e clínicos de um paciente
+     * Inclui validações e tratamento de erros
+     * 
+     * @param Request $request
+     * @param int $id Identificador do paciente
+     * @return \Illuminate\Http\JsonResponse
+     */
     public function update(Request $request, $id)
     {
         try {
-            // Busca o usuário primeiro
+            // Obter o utilizador
             $user = User::findOrFail($id);
             
-            // Se o email não foi enviado, usa o email existente do usuário
+            // Se o email não foi enviado, usar o email existente
             if (!$request->has('email')) {
                 $request->merge(['email' => $user->email]);
             }
-
-           
 
             // Validação dos dados
             $validated = $request->validate([
@@ -49,14 +58,14 @@ class PatientController extends Controller
 
             DB::beginTransaction();
 
-            // Atualiza os dados do usuário
+            // Atualizar dados do utilizador
             $user->name = $request->name;
             if ($request->has('email') && $request->email !== $user->email) {
                 $user->email = $request->email;
             }
             $user->save();
 
-            // Verifica se já existe dados pessoais
+            // Verificar se já existem dados pessoais
             $dadosPessoais = DadosPessoais::where('user_id', $id)->first();
 
             if (!$dadosPessoais) {
@@ -64,7 +73,7 @@ class PatientController extends Controller
                 $dadosPessoais->user_id = $id;
             }
 
-            // Atualiza os dados pessoais
+            // Atualizar dados pessoais
             $dadosPessoais->data_nascimento = $request->data_nascimento;
             $dadosPessoais->nif = $request->nif;
             $dadosPessoais->sexo = $request->sexo;
@@ -96,7 +105,7 @@ class PatientController extends Controller
                 'success' => false,
                 'message' => 'Erro de validação',
                 'errors' => $e->errors(),
-                'data_received' => $request->all() // Para debug
+                'data_received' => $request->all()
             ], 422);
 
         } catch (\Exception $e) {

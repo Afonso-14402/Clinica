@@ -15,9 +15,7 @@ class FamilyDoctor extends Model
     // Campos que podem ser preenchidos em massa
     protected $fillable = [
         'patient_user_id',
-        'doctor_user_id',
-        'created_at',
-        'updated_at',
+        'doctor_user_id'
     ];
 
     /**
@@ -26,7 +24,7 @@ class FamilyDoctor extends Model
      */
     public function patient()
     {
-        return $this->belongsTo(User::class, 'patient_user_id', 'id');
+        return $this->belongsTo(User::class, 'patient_user_id');
     }
 
     /**

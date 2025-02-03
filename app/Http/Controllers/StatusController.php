@@ -7,8 +7,14 @@ use App\Models\ActivityLog;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 
+/**
+ * Controlador responsável pela gestão dos estados das consultas
+ */
 class StatusController extends Controller
 {
+    /**
+     * Obtém o estado de uma consulta específica
+     */
     public function showStatus()
     {
         try {
@@ -20,17 +26,23 @@ class StatusController extends Controller
         }
     }
 
+    /**
+     * Cria um novo estado no sistema
+     * Inclui registo de atividade
+     */
     public function store(Request $request)
     {
         try {
+            // Validação dos dados
             $request->validate([
                 'status' => 'required|string|max:255|unique:status',
                 'description' => 'nullable|string'
             ]);
 
+            // Criar o estado
             $status = Status::create($request->all());
 
-            // Log de criação de status
+            // Registar atividade
             ActivityLog::create([
                 'type' => 'criacao_status',
                 'description' => "Novo status '{$status->status}' foi criado",
@@ -44,9 +56,14 @@ class StatusController extends Controller
         }
     }
 
+    /**
+     * Atualiza um estado existente
+     * Inclui registo de alteração
+     */
     public function update(Request $request, $id)
     {
         try {
+            // Validação dos dados
             $request->validate([
                 'status' => 'required|string|max:255|unique:status,status,' . $id,
                 'description' => 'nullable|string'
@@ -56,7 +73,7 @@ class StatusController extends Controller
             $oldStatus = $status->status;
             $status->update($request->all());
 
-            // Log de atualização de status
+            // Registar alteração
             ActivityLog::create([
                 'type' => 'atualizacao_status',
                 'description' => "Status alterado de '{$oldStatus}' para '{$status->status}'",
@@ -70,6 +87,10 @@ class StatusController extends Controller
         }
     }
 
+    /**
+     * Remove um estado do sistema
+     * Inclui registo de eliminação
+     */
     public function destroy($id)
     {
         try {
@@ -77,7 +98,7 @@ class StatusController extends Controller
             $statusName = $status->status;
             $status->delete();
 
-            // Log de exclusão de status
+            // Registar eliminação
             ActivityLog::create([
                 'type' => 'exclusao_status',
                 'description' => "Status '{$statusName}' foi excluído",

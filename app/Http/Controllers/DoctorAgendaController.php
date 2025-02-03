@@ -7,8 +7,15 @@ use App\Models\UserDoctorAgenda;
 use App\Models\Appointment;
 use Carbon\Carbon;
 
+/**
+ * Controlador responsável pela gestão da agenda dos médicos
+ */
 class DoctorAgendaController extends Controller
 {
+    /**
+     * Obtém os horários disponíveis para um médico numa data específica
+     * Considera a agenda do médico e consultas já marcadas
+     */
     public function getAvailableTimes(Request $request)
     {
         try {
@@ -18,7 +25,7 @@ class DoctorAgendaController extends Controller
             // Converter a data para obter o dia da semana (0 = Domingo, 1 = Segunda, etc)
             $dayOfWeek = Carbon::parse($date)->dayOfWeek;
 
-            // Buscar a agenda do médico para este dia da semana
+            // Obter a agenda do médico para este dia da semana
             $agenda = UserDoctorAgenda::where('doctor_id', $doctorId)
                 ->where('day_of_week', $dayOfWeek)
                 ->first();
@@ -30,7 +37,7 @@ class DoctorAgendaController extends Controller
                 ]);
             }
 
-            // Gerar array de horários disponíveis com intervalo de 1 hora
+            // Gerar lista de horários disponíveis com intervalo de 1 hora
             $startTime = Carbon::parse($agenda->start_time);
             $endTime = Carbon::parse($agenda->end_time);
             $availableTimes = [];
@@ -40,7 +47,7 @@ class DoctorAgendaController extends Controller
                 $startTime->addHour();
             }
 
-            // Buscar consultas já marcadas para este médico neste dia
+            // Obter consultas já marcadas para este médico neste dia
             $bookedAppointments = Appointment::where('doctor_user_id', $doctorId)
                 ->whereDate('appointment_date_time', $date)
                 ->get()
@@ -55,11 +62,15 @@ class DoctorAgendaController extends Controller
             return response()->json($availableTimes);
 
         } catch (\Exception $e) {
-            \Log::error('Erro ao buscar horários disponíveis: ' . $e->getMessage());
+            \Log::error('Erro ao obter horários disponíveis: ' . $e->getMessage());
             return response()->json([], 500);
         }
     }
 
+    /**
+     * Verifica a disponibilidade de um médico numa data específica
+     * Considera apenas a agenda regular do médico
+     */
     public function checkAvailability($doctorId, Request $request)
     {
         try {

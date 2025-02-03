@@ -78,90 +78,227 @@
     </nav>
 
     <div class="container py-5">
-        <!-- Título -->
-        <h2 class="mb-4 text-center text-primary">Ficha de Anamnese</h2>
-    
-        <!-- Card Principal -->
-        <div class="card shadow-lg">
-            <div class="card-body d-flex flex-column flex-md-row align-items-center">
-                <!-- Imagem do Paciente -->
-                <div class="text-center me-md-4 mb-4 mb-md-0">
-                    <img src="https://via.placeholder.com/120" alt="Foto do Paciente" class="rounded-circle border border-primary" style="width: 120px; height: 120px;">
-                </div>
-    
-                <!-- Informações do Paciente -->
+        <!-- Título com ícone -->
+        <div class="text-center mb-5">
+            <i class="bx bx-file text-primary" style="font-size: 3rem;"></i>
+           
+            <h4 class="text-muted mb-2">Paciente: {{ $appointment->patient->name }}</h4>
+            <p class="text-muted">Preencha os dados da consulta com atenção</p>
+        </div>
+
+        <!-- Card Principal com hover effect -->
+        <div class="card shadow-lg hover-shadow-lg transition-all duration-300">
+            <div class="card-body p-4">
+                <!-- Informações do Paciente com melhor organização -->
                 <div class="flex-grow-1">
-                    <h4 class="text-dark mb-2">{{ $appointment->patient->name }}</h4>
-                    <p><strong>Data e Hora:</strong> {{ \Carbon\Carbon::parse($appointment->appointment_date_time)->format('d/m/Y H:i') }}</p>
-                    <p><strong>Médico:</strong> {{ $appointment->doctor->name }}</p>
-                    @if($appointment->specialties_id)
-                        <p><strong>Especialidade:</strong> {{ $appointment->specialty->name }}</p>
-                    @endif
+                    <div class="row g-3">
+                        <div class="col-md-4">
+                            <div class="d-flex align-items-center">
+                                <i class="bx bx-calendar text-primary me-2"></i>
+                                <span>{{ \Carbon\Carbon::parse($appointment->appointment_date_time)->format('d/m/Y H:i') }}</span>
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="d-flex align-items-center">
+                                <i class="bx bx-user-md text-primary me-2"></i>
+                                <span>Dr(a). {{ $appointment->doctor->name }}</span>
+                            </div>
+                        </div>
+                        @if($appointment->specialties_id)
+                        <div class="col-md-4">
+                            <div class="d-flex align-items-center">
+                                <i class="bx bx-badge-check text-primary me-2"></i>
+                                <span>{{ $appointment->specialty->name }}</span>
+                            </div>
+                        </div>
+                        @endif
+                    </div>
                 </div>
             </div>
         </div>
-    
+
         <!-- Formulário de Relatório Médico -->
         <div class="card mt-4 shadow-lg">
-            <div class="card-body">
-                <h4 class="text-primary mb-4">Preencher Relatório Médico</h4>
-    
-                <!-- Formulário -->
-                <form action="{{ route('consulta.salvarRelatorio', $appointment->id) }}" method="POST">
+            <div class="card-body p-4">
+                <h4 class="text-primary mb-4 d-flex align-items-center">
+                    <i class="bx bx-notepad me-2"></i>
+                    Relatório Médico
+                </h4>
+
+                <!-- Formulário com visual melhorado -->
+                <form action="{{ route('consulta.salvarRelatorio', $appointment->id) }}" method="POST" enctype="multipart/form-data">
                     @csrf
-    
-                    <!-- Seção 1: O que o paciente sente -->
-                    <div class="mb-4">
-                        <label for="sintomas" class="form-label">O que o paciente sente?</label>
-                        <textarea 
-                            class="form-control" 
-                            id="sintomas" 
-                            name="sintomas" 
-                            rows="3" 
-                            placeholder="Descreva aqui os sintomas relatados pelo paciente..." 
-                            required></textarea>
+
+                    <div class="row g-4">
+                        <!-- Seção 1: O que o paciente sente -->
+                        <div class="col-12">
+                            <div class="form-floating">
+                                <textarea 
+                                    class="form-control" 
+                                    id="sintomas" 
+                                    name="sintomas" 
+                                    style="height: 100px"
+                                    required></textarea>
+                                <label for="sintomas">
+                                    <i class="bx bx-health me-2"></i>
+                                    O que o paciente sente?
+                                </label>
+                            </div>
+                        </div>
+
+                        <!-- Seção 2: Diagnóstico -->
+                        <div class="col-12">
+                            <div class="form-floating">
+                                <textarea 
+                                    class="form-control" 
+                                    id="diagnostico" 
+                                    name="diagnostico" 
+                                    style="height: 100px"
+                                    required></textarea>
+                                <label for="diagnostico">
+                                    <i class="bx bx-search-alt-2 me-2"></i>
+                                    Diagnóstico
+                                </label>
+                            </div>
+                        </div>
+
+                        <!-- Seção 3: Tratamento -->
+                        <div class="col-12">
+                            <div class="form-floating">
+                                <textarea 
+                                    class="form-control" 
+                                    id="tratamento" 
+                                    name="tratamento" 
+                                    style="height: 100px"
+                                    required></textarea>
+                                <label for="tratamento">
+                                    <i class="bx bx-plus-medical me-2"></i>
+                                    Tratamento
+                                </label>
+                            </div>
+                        </div>
+
+                        <!-- Seção 4: Observações -->
+                        <div class="col-12">
+                            <div class="form-floating">
+                                <textarea 
+                                    class="form-control" 
+                                    id="observacoes" 
+                                    name="observacoes" 
+                                    style="height: 100px"
+                                    required></textarea>
+                                <label for="observacoes">
+                                    <i class="bx bx-note me-2"></i>
+                                    Observações
+                                </label>
+                            </div>
+                        </div>
+
+                        <!-- Nova Seção: Upload de Imagens de Exames -->
+                        <div class="col-12">
+                            <div class="card">
+                                <div class="card-body">
+                                    <h5 class="card-title mb-3">
+                                        <i class="bx bx-images text-primary me-2"></i>
+                                        Imagens de Exames
+                                    </h5>
+                                    
+                                    <div class="mb-3">
+                                        <div class="d-flex align-items-center gap-2 mb-2">
+                                            <label for="exam_images" class="form-label mb-0">
+                                                Adicionar imagens de exames
+                                            </label>
+                                            <span class="badge bg-info">Máximo 5 arquivos</span>
+                                        </div>
+                                        <input 
+                                            type="file" 
+                                            class="form-control" 
+                                            id="exam_images" 
+                                            name="exam_images[]" 
+                                            accept="image/*,.pdf"
+                                            multiple
+                                        >
+                                        <small class="text-muted">
+                                            Formatos aceitos: JPG, PNG, PDF (Máximo 5MB por arquivo)
+                                        </small>
+                                    </div>
+
+                                    <!-- Preview das imagens -->
+                                    <div id="imagePreview" class="d-flex flex-wrap gap-2 mt-3"></div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Botões de ação -->
+                        <div class="col-12 d-flex gap-2 justify-content-end mt-4">
+                            <button type="button" class="btn btn-outline-secondary">
+                                <i class="bx bx-x me-2"></i>
+                                Cancelar
+                            </button>
+                            <button type="submit" class="btn btn-primary">
+                                <i class="bx bx-check me-2"></i>
+                                Finalizar Consulta
+                            </button>
+                        </div>
                     </div>
-    
-                    <!-- Seção 2: Diagnóstico -->
-                    <div class="mb-4">
-                        <label for="diagnostico" class="form-label">Diagnóstico</label>
-                        <textarea 
-                            class="form-control" 
-                            id="diagnostico" 
-                            name="diagnostico" 
-                            rows="3" 
-                            placeholder="Informe o diagnóstico do paciente..." 
-                            required></textarea>
-                    </div>
-    
-                    <!-- Seção 3: Tratamento -->
-                    <div class="mb-4">
-                        <label for="tratamento" class="form-label">Tratamento</label>
-                        <textarea 
-                            class="form-control" 
-                            id="tratamento" 
-                            name="tratamento" 
-                            rows="3" 
-                            placeholder="Detalhe o tratamento recomendado..." 
-                            required></textarea>
-                    </div>
-    
-                    <!-- Seção 4: Observações -->
-                    <div class="mb-4">
-                        <label for="observacoes" class="form-label">Observações</label>
-                        <textarea 
-                            class="form-control" 
-                            id="observacoes" 
-                            name="observacoes" 
-                            rows="3" 
-                            placeholder="Insira aqui quaisquer observações adicionais..." 
-                            required></textarea>
-                    </div>
-    
-                    <!-- Botão de Envio -->
-                    <button type="submit" class="btn btn-success w-100">Finalizar consulta</button>
                 </form>
             </div>
         </div>
     </div>
+
+    <!-- Adicione este script no final do arquivo -->
+    @push('scripts')
+    <script>
+        document.getElementById('exam_images').addEventListener('change', function(e) {
+            const preview = document.getElementById('imagePreview');
+            preview.innerHTML = '';
+
+            if (this.files.length > 5) {
+                alert('Por favor, selecione no máximo 5 arquivos.');
+                this.value = '';
+                return;
+            }
+
+            // Criar um FormData para enviar as imagens
+            const formData = new FormData();
+
+            Array.from(this.files).forEach((file, index) => {
+                if (file.size > 5 * 1024 * 1024) {
+                    alert(`O arquivo ${file.name} excede o tamanho máximo de 5MB`);
+                    return;
+                }
+
+                // Adicionar arquivo ao FormData
+                formData.append(`exam_images[]`, file);
+
+                const div = document.createElement('div');
+                div.className = 'position-relative';
+
+                if (file.type.startsWith('image/')) {
+                    const img = document.createElement('img');
+                    img.src = URL.createObjectURL(file);
+                    img.className = 'img-thumbnail';
+                    img.style.maxWidth = '150px';
+                    img.style.height = '150px';
+                    div.appendChild(img);
+                } else {
+                    const icon = document.createElement('i');
+                    icon.className = 'bx bxs-file-pdf text-danger';
+                    icon.style.fontSize = '48px';
+                    div.appendChild(icon);
+                    
+                    const fileName = document.createElement('p');
+                    fileName.textContent = file.name;
+                    fileName.className = 'small mt-1';
+                    div.appendChild(fileName);
+                }
+
+                preview.appendChild(div);
+            });
+
+            // Adicionar token CSRF ao FormData
+            formData.append('_token', '{{ csrf_token() }}');
+        });
+    </script>
+    @endpush
 @endsection

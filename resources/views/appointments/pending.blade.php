@@ -239,7 +239,9 @@
                     </div>
                     <div class="mb-3">
                         <label for="new_time" class="form-label">Novo Horário</label>
-                        <input type="time" class="form-control" id="new_time" name="new_time" required>
+                        <select class="form-select" id="new_time" name="new_time" required>
+                            <option value="">Selecione um horário</option>
+                        </select>
                     </div>
                 </form>
             </div>
@@ -359,6 +361,195 @@
         }
 
         this.submit();
+    });
+
+    function loadAvailableTimes() {
+        const newDate = document.getElementById('new_date').value;
+        const doctorId = document.getElementById('new_doctor').value;
+        const timeInput = document.getElementById('new_time');
+
+        if (!doctorId) {
+            alert('Por favor, selecione um médico primeiro');
+            timeInput.value = '';
+            return;
+        }
+
+        if (!newDate) {
+            alert('Por favor, selecione uma data primeiro');
+            timeInput.value = '';
+            return;
+        }
+
+        // Desabilitar o input enquanto carrega
+        timeInput.disabled = true;
+
+        fetch(`/available-times?doctor_id=${doctorId}&day=${newDate}`)
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error('Erro ao carregar horários');
+                }
+                return response.json();
+            })
+            .then(data => {
+                timeInput.disabled = false;
+
+                if (!data || data.length === 0) {
+                    alert('Não há horários disponíveis para esta data');
+                    timeInput.value = '';
+                    return;
+                }
+
+                // Criar um datalist para mostrar os horários disponíveis
+                let datalistId = 'available-times-list';
+                let existingDatalist = document.getElementById(datalistId);
+                
+                if (!existingDatalist) {
+                    existingDatalist = document.createElement('datalist');
+                    existingDatalist.id = datalistId;
+                    document.body.appendChild(existingDatalist);
+                }
+
+                existingDatalist.innerHTML = '';
+                data.forEach(time => {
+                    const option = document.createElement('option');
+                    option.value = time;
+                    existingDatalist.appendChild(option);
+                });
+
+                // Associar o datalist ao input de tempo
+                timeInput.setAttribute('list', datalistId);
+            })
+            .catch(error => {
+                console.error('Erro:', error);
+                alert('Erro ao carregar horários disponíveis. Por favor, tente novamente.');
+                timeInput.disabled = false;
+            });
+    }
+
+    // Adicione estes event listeners ao modal de reagendamento
+    document.getElementById('rescheduleModal').addEventListener('show.bs.modal', function () {
+        // Adicionar os event listeners quando o modal abrir
+        document.getElementById('new_date').addEventListener('change', loadAvailableTimes);
+        document.getElementById('new_doctor').addEventListener('change', loadAvailableTimes);
+    });
+
+    // Modificar o handler de submit do formulário para incluir a validação do horário
+    document.getElementById('rescheduleForm').addEventListener('submit', function(e) {
+        e.preventDefault();
+        
+        const newDate = document.getElementById('new_date').value;
+        const newTime = document.getElementById('new_time').value;
+        const doctorId = document.getElementById('new_doctor').value;
+        
+        if (!newDate || !newTime || !doctorId) {
+            alert('Por favor, preencha todos os campos');
+            return;
+        }
+
+        // Verificar se a data não é no passado
+        const selectedDateTime = new Date(newDate + ' ' + newTime);
+        const now = new Date();
+        
+        if (selectedDateTime < now) {
+            alert('Não é possível reagendar para uma data/hora no passado');
+            return;
+        }
+
+        // Verificar se o horário selecionado está na lista de horários disponíveis
+        const datalist = document.getElementById('available-times-list');
+        const isTimeAvailable = Array.from(datalist.options).some(option => option.value === newTime);
+        
+        if (!isTimeAvailable) {
+            alert('O horário selecionado não está disponível. Por favor, escolha um horário da lista.');
+            return;
+        }
+
+        this.submit();
+    });
+
+    // Adicione este código ao seu script existente
+    document.addEventListener('DOMContentLoaded', function() {
+        const newDoctorSelect = document.getElementById('new_doctor');
+        const newDateInput = document.getElementById('new_date');
+        const newTimeSelect = document.getElementById('new_time');
+
+        // Carregar médicos quando o modal abrir
+        document.getElementById('rescheduleModal').addEventListener('show.bs.modal', function(event) {
+            const button = event.relatedTarget;
+            const doctorId = button.getAttribute('data-doctor-id');
+            
+            // Carregar lista de médicos
+            fetch('/autocomplete/doctors')
+                .then(response => response.json())
+                .then(doctors => {
+                    newDoctorSelect.innerHTML = '<option value="">Selecione um médico</option>';
+                    doctors.forEach(doctor => {
+                        const option = document.createElement('option');
+                        option.value = doctor.id;
+                        option.textContent = doctor.name;
+                        if (doctor.id == doctorId) {
+                            option.selected = true;
+                        }
+                        newDoctorSelect.appendChild(option);
+                    });
+                    
+                    // Se um médico já estiver selecionado, carregue seus horários
+                    if (doctorId) {
+                        loadAvailableDates(doctorId);
+                    }
+                });
+        });
+
+        // Carregar datas disponíveis quando um médico for selecionado
+        newDoctorSelect.addEventListener('change', function() {
+            if (this.value) {
+                loadAvailableDates(this.value);
+            }
+        });
+
+        // Carregar horários disponíveis quando uma data for selecionada
+        newDateInput.addEventListener('change', function() {
+            if (this.value && newDoctorSelect.value) {
+                loadAvailableTimes(newDoctorSelect.value, this.value);
+            }
+        });
+
+        function loadAvailableDates(doctorId) {
+            // Limpar data e horário selecionados
+            newDateInput.value = '';
+            newTimeSelect.innerHTML = '<option value="">Selecione um horário</option>';
+            
+            // Definir data mínima como hoje
+            const today = new Date().toISOString().split('T')[0];
+            newDateInput.min = today;
+        }
+
+        function loadAvailableTimes(doctorId, date) {
+            fetch(`/available-times?doctor_id=${doctorId}&day=${date}`)
+                .then(response => response.json())
+                .then(times => {
+                    newTimeSelect.innerHTML = '<option value="">Selecione um horário</option>';
+                    
+                    if (times.length === 0) {
+                        const option = document.createElement('option');
+                        option.value = '';
+                        option.textContent = 'Nenhum horário disponível';
+                        option.disabled = true;
+                        newTimeSelect.appendChild(option);
+                    } else {
+                        times.forEach(time => {
+                            const option = document.createElement('option');
+                            option.value = time;
+                            option.textContent = time;
+                            newTimeSelect.appendChild(option);
+                        });
+                    }
+                })
+                .catch(error => {
+                    console.error('Erro ao carregar horários:', error);
+                    newTimeSelect.innerHTML = '<option value="">Erro ao carregar horários</option>';
+                });
+        }
     });
 </script>
 @endsection
