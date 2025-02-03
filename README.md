@@ -35,6 +35,12 @@
    npm install highlight.js
    ```
 
+Para acessar imagens armazenadas na pasta de storage no Laravel, você pode usar o seguinte comando:
+
+```bash
+php artisan storage:link
+```
+
 6. **Copie o arquivo de ambiente:**
    ```bash
    cp .env.example e mude o nome para .env
@@ -116,3 +122,4 @@ O sistema utiliza as seguintes tabelas principais:
 ## Suporte
 
 Para suporte, entre em contacto através do email: [a14402@oficina.pt](mailto:a14402@oficina.pt)
+
