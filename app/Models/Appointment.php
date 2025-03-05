@@ -34,12 +34,12 @@ class Appointment extends Model
 
     public function status()
     {
-        return $this->belongsTo(Status::class, 'status_id');
+        return $this->belongsTo(Status::class);
     }
 
-    public function report()
+    public function reports()
     {
-        return $this->hasOne(Report::class);
+        return $this->hasMany(Report::class);
     }
 }
 

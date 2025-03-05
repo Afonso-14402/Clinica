@@ -49,11 +49,7 @@
                 <li>
                   <div class="dropdown-divider my-1"></div>
                 </li>
-                <li>
-                  <a class="dropdown-item" href="#">
-                    <i class="bx bx-user bx-md me-3"></i><span>My Profile</span>
-                  </a>
-                </li>
+                
                 <li>
                   <a class="dropdown-item" href="{{ route('settings.index') }}">
                     <i class="bx bx-cog bx-md me-3"></i><span>Settings</span>
@@ -86,26 +82,32 @@
       </nav>
       <div class="container mt-3">
         @if (session('success'))
-            <div class="alert alert-success alert-dismissible" role="alert">
-                <h4 class="alert-heading d-flex align-items-center">
-                    <span class="alert-icon rounded-circle"><i class="bx bx-coffee"></i></span>
-                    Sucesso!
-                </h4>
-                <hr>
-                <p class="mb-0">{{ session('success') }}</p>
-                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+            <div class="alert alert-success bg-success text-white border-0 alert-dismissible fade show" role="alert">
+                <div class="d-flex align-items-center">
+                    <div class="alert-icon me-3">
+                        <i class="bx bx-check-circle bx-md"></i>
+                    </div>
+                    <div>
+                        <h5 class="text-white mb-1">Sucesso!</h5>
+                        <div>{{ session('success') }}</div>
+                    </div>
+                </div>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="alert" aria-label="Close"></button>
             </div>
         @endif
     
         @if (session('error'))
-            <div class="alert alert-danger alert-dismissible" role="alert">
-                <h4 class="alert-heading d-flex align-items-center">
-                    <span class="alert-icon rounded-circle"><i class="bx bx-error"></i></span>
-                    Erro!
-                </h4>
-                <hr>
-                <p class="mb-0">{{ session('error') }}</p>
-                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+            <div class="alert alert-danger bg-danger text-white border-0 alert-dismissible fade show" role="alert">
+                <div class="d-flex align-items-center">
+                    <div class="alert-icon me-3">
+                        <i class="bx bx-error-circle bx-md"></i>
+                    </div>
+                    <div>
+                        <h5 class="text-white mb-1">Erro!</h5>
+                        <div>{{ session('error') }}</div>
+                    </div>
+                </div>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="alert" aria-label="Close"></button>
             </div>
         @endif
     </div>
@@ -131,7 +133,9 @@
           <div class="modal-dialog modal-lg">
               <div class="modal-content">
                   <div class="modal-header">
-                      <h5 class="modal-title" id="addEventModalLabel">Marcar Consulta</h5>
+                      <h5 class="modal-title" id="addEventModalLabel">
+                          <i class="bx bx-calendar-plus"></i> Marcar Consulta
+                      </h5>
                       <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Fechar"></button>
                   </div>
                   <div class="modal-body">
@@ -140,7 +144,9 @@
       
                           <!-- Campo de paciente -->
                           <div class="mb-3">
-                              <label for="patient_user_id" class="form-label">Utente</label>
+                              <label for="patient_user_id" class="form-label">
+                                  <i class="bx bx-user"></i> Utente
+                              </label>
                               <div>
                                   <input 
                                       type="text" 
@@ -156,7 +162,9 @@
       
                           <!-- Campo de médico -->
                           <div class="mb-3">
-                              <label for="doctor_user_id" class="form-label">Médico</label>
+                              <label for="doctor_user_id" class="form-label">
+                                  <i class="bx bx-user-pin"></i> Médico
+                              </label>
                               <div>
                                   <input 
                                       type="text" 
@@ -172,7 +180,9 @@
       
                           <!-- Campo de especialidade -->
                           <div class="mb-3">
-                              <label for="specialties_id" class="form-label">Especialidade</label>
+                              <label for="specialties_id" class="form-label">
+                                  <i class="bx bx-plus-medical"></i> Especialidade
+                              </label>
                               <select class="form-select" name="specialties_id" required>
                                   <!-- Opções preenchidas dinamicamente -->
                               </select>
@@ -180,7 +190,9 @@
       
                           <!-- Campos de data e hora -->
                           <div class="mb-3">
-                              <label for="appointment_day" class="form-label">Dia</label>
+                              <label for="appointment_day" class="form-label">
+                                  <i class="bx bx-calendar"></i> Dia
+                              </label>
                               <input 
                                   type="date" 
                                   class="form-control" 
@@ -192,7 +204,9 @@
                           </div>
                           
                           <div class="mb-3">
-                              <label for="appointment_time" class="form-label">Hora</label>
+                              <label for="appointment_time" class="form-label">
+                                  <i class="bx bx-time"></i> Hora
+                              </label>
                               <select 
                                   class="form-select" 
                                   name="appointment_time" 
@@ -215,8 +229,12 @@
                           @endif
       
                           <div class="modal-footer">
-                              <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
-                              <button type="submit" class="btn btn-primary">Marcar Consulta</button>
+                              <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+                                  <i class="bx bx-x"></i> Cancelar
+                              </button>
+                              <button type="submit" class="btn btn-primary">
+                                  <i class="bx bx-check"></i> Marcar Consulta
+                              </button>
                           </div>
                       </form>
                   </div>
@@ -232,15 +250,19 @@
     
                     <!-- Campo de busca e botões de ação -->
                     <div class="row mb-3">
+                       
                         <div class="col-md-7">
+                                 <!--
                             <div class="col-md-4">
                                 <input type="text" id="doctorSearch" class="form-control" placeholder="Pesquisar por nome...">
                             </div>
+                            -->
                         </div>
                         <div class="col-md- text-end">
                             <button id="exportButton" class="btn btn-success">Exportar Calendário</button>
                         </div>
                     </div>
+                    
                     <!-- Calendário -->
                     
                     <div id="calendar" style="width: 100%; height: 100vh;"></div>          

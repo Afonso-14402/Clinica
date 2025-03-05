@@ -24,11 +24,133 @@
 
        
 <style>
+    :root {
+        --primary-color: #2563eb;
+        --primary-dark: #1e40af;
+        --primary-light: #60a5fa;
+        --text-light: #ffffff;
+        --text-muted: #cbd5e1;
+        --bg-dark: #0f172a;
+    }
 
+    .sidebar {
+        background: var(--bg-dark);
+        box-shadow: 2px 0 10px rgba(0, 0, 0, 0.2);
+    }
 
+    #container {
+        background: var(--bg-dark) !important;
+        border-right: 1px solid rgba(255, 255, 255, 0.07);
+    }
 
+    .app-brand-text {
+        color: #ffffff !important;
+        font-weight: 800;
+        font-size: 2.2rem;
+        letter-spacing: -0.5px;
+        text-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+        text-transform: none;
+        font-family: 'Public Sans', sans-serif;
+    }
 
-    
+    .app-brand-link {
+        text-decoration: none !important;
+        padding: 0 1.5rem;
+        margin-bottom: 1rem;
+    }
+
+    .app-brand-link:hover .app-brand-text {
+        color: var(--primary-light) !important;
+        transition: all 0.3s ease;
+    }
+
+    .menu-inner > .menu-item {
+        margin: 8px 12px;
+    }
+
+    .menu-link {
+        color: var(--text-light) !important;
+        border-radius: 8px;
+        margin: 4px 8px;
+        transition: all 0.3s ease;
+        font-weight: 500;
+        font-size: 1rem;
+        padding: 12px 16px;
+    }
+
+    .menu-link:hover, 
+    .menu-link:focus {
+        background: rgba(59, 130, 246, 0.15) !important;
+        color: var(--primary-light) !important;
+        transform: translateX(4px);
+    }
+
+    .menu-link.active {
+        background: var(--primary-color) !important;
+        color: var(--text-light) !important;
+        font-weight: 600;
+    }
+
+    .menu-icon {
+        color: var(--text-light);
+        font-size: 1.2rem;
+        margin-right: 12px;
+    }
+
+    .menu-link:hover .menu-icon,
+    .menu-link.active .menu-icon {
+        color: var(--primary-light);
+    }
+
+    .menu-sub {
+        background: rgba(15, 23, 42, 0.9);
+        margin: 0 12px;
+        border-radius: 8px;
+        padding: 8px 0;
+    }
+
+    .menu-sub .menu-link {
+        padding: 10px 16px;
+        font-size: 0.95rem;
+        color: var(--text-muted) !important;
+        margin: 4px 8px;
+    }
+
+    .menu-sub .menu-link:hover {
+        color: var(--text-light) !important;
+    }
+
+    .menu-header-text {
+        color: var(--primary-light);
+        font-size: 0.8rem;
+        font-weight: 600;
+        text-transform: uppercase;
+        letter-spacing: 1.5px;
+        margin: 24px 0 12px 24px;
+        opacity: 0.9;
+    }
+
+    .menu-inner-shadow {
+        display: none;
+    }
+
+    /* Scrollbar personalizada */
+    #container::-webkit-scrollbar {
+        width: 6px;
+    }
+
+    #container::-webkit-scrollbar-track {
+        background: var(--bg-dark);
+    }
+
+    #container::-webkit-scrollbar-thumb {
+        background: #334155;
+        border-radius: 3px;
+    }
+
+    #container::-webkit-scrollbar-thumb:hover {
+        background: #475569;
+    }
 </style>
 
     </head>
@@ -86,7 +208,7 @@
                     </svg>
                     </span>
                     <a href="{{ route('home') }}">
-                        <span class="app-brand-text demo menu-text fw-bold ms-2">APclinica</span>
+                        <span class="app-brand-text demo menu-text fw-bold ms-2">APclínica</span>
                     </a>   
                 </a>
             
@@ -104,18 +226,20 @@
                 @if (isset($user) && $user->role->role != 'Patient')
                 <li class="menu-item">
                     <a href="javascript:void(0);" class="menu-link menu-toggle">
-                        <i class="menu-icon tf-icons bx bx-layout"></i>
+                        <i class="menu-icon tf-icons bx bx-user-plus"></i>
                         <div class="text-truncate" data-i18n="Registar">Registar</div>
                     </a>
                     <ul class="menu-sub">
                         <li class="menu-item">
                             <a href="{{ route('list.listpatient') }}" class="menu-link">
+                                <i class="menu-icon tf-icons bx bx-group"></i>
                                 Resgitar utentes
                             </a>
                         </li>
                         @if (isset($user) && $user->role->role != 'Patient' && $user->role->role != 'Doctor')
                         <li class="menu-item">
                             <a href="{{ route('list.index') }}" class="menu-link">
+                                <i class="menu-icon tf-icons bx bx-plus-medical"></i>
                                 Registar medico
                             </a>
                         </li>
@@ -124,61 +248,58 @@
                 </li>
                 @endif
 
-                @if (isset($user) && $user->role->role != 'Patient')
+                @if (isset($user) && $user->role->role != 'Patient'&& $user->role->role != 'Doctor')
                 <li class="menu-item">
                     <a href="javascript:void(0)" class="menu-link menu-toggle">
-                    <i class="menu-icon tf-icons bx bx-copy"></i>
-                    <div class="text-truncate" data-i18n="Marcações">Marcações</div>
+                        <i class="menu-icon tf-icons bx bx-calendar-plus"></i>
+                        <div class="text-truncate" data-i18n="Marcações">Marcações</div>
                     </a>
                     <ul class="menu-sub">
-                    @if (isset($user) && $user->role->role != 'Patient' && $user->role->role != 'Doctor')
-                    <li class="menu-item">
-                        <a href="{{ route('appointments.create') }}" class="menu-link">
-                        <div class="text-truncate" data-i18n="Agenda/Calendário">Agenda/Calendário</div>
-                        </a>
-                    </li>
-                    
-                    <li class="menu-item">
-                        <a href="{{ route('appointments.pending') }}" class="menu-link">
-                        <div class="text-truncate" data-i18n="Pedidos Pendentes ">Pedidos Pendentes </div>
-                        </a>
-                    </li>
-                    @endif
+                        @if (isset($user) && $user->role->role != 'Patient' && $user->role->role != 'Doctor')
+                        <li class="menu-item">
+                            <a href="{{ route('appointments.create') }}" class="menu-link">
+                                <i class="menu-icon tf-icons bx bx-calendar"></i>
+                                <div class="text-truncate" data-i18n="Agenda/Calendário">Agenda/Calendário</div>
+                            </a>
+                        </li>
+                        
+                        <li class="menu-item">
+                            <a href="{{ route('appointments.pending') }}" class="menu-link">
+                                <i class="menu-icon tf-icons bx bx-time-five"></i>
+                                <div class="text-truncate" data-i18n="Pedidos Pendentes">Pedidos Pendentes</div>
+                            </a>
+                        </li>
+                        @endif
                     </ul>
                 </li>
                 @endif
 
-                @if (isset($user) && $user->role->role != 'Doctor')
                 <li class="menu-item">
                     <a href="{{ route('appointments.history') }}" class="menu-link">
-                    <i class="menu-icon tf-icons bx bx-crown"></i>
-                    <div class="text-truncate" data-i18n="Boxicons">Histórico de Consultas</div>
+                        <i class="menu-icon tf-icons bx bx-history"></i>
+                        <div class="text-truncate" data-i18n="Histórico">Histórico de Consultas</div>
                     </a>
                 </li>
-                @endif
+                
 
-                @if (isset($user) && $user->role->role != 'Doctor')
+                @if (isset($user) && $user->role->role != 'Patient' && $user->role->role != 'Doctor')
                 <li class="menu-item">
                     <a href="{{ route('family.index') }}" class="menu-link">
-                    <i class="menu-icon tf-icons bx bx-crown"></i>
-                    <div class="text-truncate" data-i18n="Boxicons">Médicos de Família</div>
+                        <i class="menu-icon tf-icons bx bx-heart"></i>
+                        <div class="text-truncate" data-i18n="Médicos">Médicos de Família</div>
                     </a>
                 </li>
                 @endif
 
-                @if (isset($user) && $user->role->role != 'Doctor')
+                @if (isset($user) && $user->role->role != 'Patient' && $user->role->role != 'Doctor')
                 <li class="menu-item">
-                    <a href="{{ route('list.listadmin') }}" class="menu-link">
-                    <i class="menu-icon tf-icons bx bx-crown"></i>
-                    <div class="text-truncate" data-i18n="Boxicons">tabela de admin</div>
+                    <a href="{{ route('admin.list') }}" class="menu-link">
+                        <i class="menu-icon tf-icons bx bx-cog"></i>
+                        <div class="text-truncate" data-i18n="Admin">Contas</div>
                     </a>
                 </li>
                 @endif
-                
-                
-            
-                <!-- Forms & Tables -->
-                <li class="menu-header small text-uppercase"><span class="menu-header-text">Forms &amp; Tables</span></li>
+
                 </ul>
             </div>
             </aside>

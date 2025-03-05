@@ -217,6 +217,41 @@ class ListController extends Controller
             ], 500);
         }
     }
+
+    public function edit($id)
+    {
+        $doctor = User::with(['specialties', 'role'])
+            ->whereHas('role', function($query) {
+                $query->where('role', 'Médico');
+            })
+            ->findOrFail($id);
+        
+        $specialties = Specialty::all();
+        
+        return view('list.edit', compact('doctor', 'specialties'));
+    }
+
+    public function update(Request $request, $id)
+    {
+        $request->validate([
+            'name' => 'required|string|max:255',
+            'email' => 'required|email|max:255|unique:users,email,' . $id,
+            'specialties' => 'required|array',
+            'status' => 'required|in:active,inactive',
+        ]);
+
+        $doctor = User::findOrFail($id);
+        
+        $doctor->update([
+            'name' => $request->name,
+            'email' => $request->email,
+            'status' => $request->status === 'active' ? 1 : 0,
+        ]);
+
+        $doctor->specialties()->sync($request->specialties);
+
+        return redirect()->back()->with('success', 'Médico atualizado com sucesso!');
+    }
 }
 
 

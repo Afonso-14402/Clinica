@@ -150,17 +150,31 @@ class UserController extends Controller
                 ->orderBy('activity_log.created_at', 'desc')
                 ->paginate(15);
 
+            // Buscar especialidades para o filtro do modal
+            $especialidades = Specialty::all();
+
+            // Buscar consultas com relacionamentos para o modal
+            $appointments = Appointment::with([
+                'patient',
+                'doctor',
+                'status'
+            ])
+            ->where('status_id', 2)
+            ->orderBy('appointment_date_time', 'desc')
+            ->paginate(10);
+
             return view('admin.dashboard', compact(
                 'user',
                 'totalMedicos',
                 'totalPacientes',
                 'totalConsultasRealizadas',
                 'totalEspecialidades',
-                'consultasRecentes',
                 'consultasHoje',
                 'consultasPendentes',
-                'consultasCanceladas',
-                'activityLogs'
+                'consultasRecentes',
+                'activityLogs',
+                'especialidades',
+                'appointments'
             ));
 
         } catch (\Exception $e) {
@@ -187,17 +201,16 @@ class UserController extends Controller
             // Data atual
             $today = Carbon::today();
 
-            // Próxima consulta (somente com status 1)
+            // Próxima consulta (somente com status 1 - Agendada)
             $nextAppointment = Appointment::where('doctor_user_id', $user->id)
                 ->where('appointment_date_time', '>', Carbon::now())
                 ->where('status_id', 1)
                 ->orderBy('appointment_date_time', 'asc')
                 ->first();
 
-            // Consultas previstas para hoje (somente com status 1)
-            $consultasAgendadas = Appointment::where('doctor_user_id', $user->id)
-                ->whereDate('appointment_date_time', $today)
-                ->where('status_id', 1)
+            // Consultas de hoje (corrigido para contar todas as consultas de hoje)
+            $consultasHoje = Appointment::where('doctor_user_id', $user->id)
+                ->whereDate('appointment_date_time', Carbon::today())
                 ->count();
 
             // Tempo restante para a próxima consulta em horas e minutos
@@ -205,14 +218,14 @@ class UserController extends Controller
                 ? Carbon::now()->diff(Carbon::parse($nextAppointment->appointment_date_time))
                 : null;
 
-            // Todas as consultas do médico com status 1
+            // Todas as consultas do médico (mantendo apenas status 1 - Agendada)
             $appointments = Appointment::where('doctor_user_id', $user->id)
                 ->where('status_id', 1)
                 ->with(['patient', 'specialty', 'status'])
                 ->orderBy('appointment_date_time', 'desc')
                 ->get();
 
-            // Consultas paginadas (somente com status 1)
+            // Consultas paginadas
             $custasdortor = Appointment::where('doctor_user_id', $user->id)
                 ->where('status_id', 1)
                 ->with(['patient', 'specialty', 'status'])
@@ -222,7 +235,7 @@ class UserController extends Controller
             return view('doctor.index', compact(
                 'user',
                 'nextAppointment',
-                'consultasAgendadas',
+                'consultasHoje', // Agora mostrará o número correto de consultas para hoje
                 'tempoRestante',
                 'appointments',
                 'custasdortor'

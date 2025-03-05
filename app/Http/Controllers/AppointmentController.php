@@ -464,4 +464,65 @@ class AppointmentController extends Controller
         return redirect()->route('appointments.index')
             ->with('success', 'Relatório guardado com sucesso!');
     }
+
+    public function start($id)
+    {
+        $appointment = Appointment::with(['patient', 'specialty', 'doctor'])
+            ->findOrFail($id);
+        
+        return view('appointments.start', compact('appointment'));
+    }
+
+    public function search(Request $request)
+    {
+        $query = $request->input('query');
+        
+        $appointments = Appointment::where('status', 'pending')
+            ->where(function($q) use ($query) {
+                $q->whereHas('patient', function($q) use ($query) {
+                    $q->where('name', 'like', "%{$query}%");
+                })
+                ->orWhereHas('doctor', function($q) use ($query) {
+                    $q->where('name', 'like', "%{$query}%");
+                })
+                ->orWhere('appointment_date_time', 'like', "%{$query}%");
+            })
+            ->paginate(10);
+
+        return view('appointments.pending', [
+            'appointments' => $appointments,
+            'user' => auth()->user()
+        ])->render();
+    }
+
+    public function searchPending(Request $request)
+    {
+        try {
+            $query = $request->input('query');
+            
+            $appointments = Appointment::where('status_id', 4) // 4 = pendente
+                ->where(function($q) use ($query) {
+                    $q->whereHas('patient', function($q) use ($query) {
+                        $q->where('name', 'like', "%{$query}%")
+                          ->whereHas('role', function($q) {
+                              $q->where('id', 3); // Apenas role_id = 3
+                          });
+                    })
+                    ->orWhereHas('doctor', function($q) use ($query) {
+                        $q->where('name', 'like', "%{$query}%");
+                    })
+                    ->orWhere('appointment_date_time', 'like', "%{$query}%");
+                })
+                ->with(['patient', 'doctor', 'status']) // Carrega os relacionamentos
+                ->paginate(10);
+
+            return view('appointments.pending', [
+                'appointments' => $appointments,
+                'user' => auth()->user()
+            ])->render();
+        } catch (\Exception $e) {
+            \Log::error('Erro na pesquisa de consultas pendentes: ' . $e->getMessage());
+            return response()->json(['error' => 'Erro ao buscar consultas'], 500);
+        }
+    }
 }

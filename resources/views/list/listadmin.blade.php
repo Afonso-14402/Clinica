@@ -1,11 +1,11 @@
 @extends('layouts.admin')
+@section('title', 'Contas')
 
-@section('title', 'Lista de Usuários')
-
-
+<style>
+// ... manter os mesmos estilos existentes ...
+</style>
 
 @section('content')
-
 <!-- Navbar -->
 <nav class="layout-navbar container-xxl navbar navbar-expand-xl navbar-detached align-items-center bg-navbar-theme shadow-sm" id="layout-navbar">
     <!-- Navbar Content -->
@@ -16,13 +16,7 @@
     </div>
     <div class="navbar-nav-right d-flex align-items-center" id="navbar-collapse">
         <ul class="navbar-nav flex-row align-items-center ms-auto">
-            <!-- Notifications -->
-            <li class="nav-item dropdown-notifications navbar-dropdown dropdown">
-                <a class="nav-link dropdown-toggle hide-arrow" href="javascript:void(0);" data-bs-toggle="dropdown">
-                    <i class="bx bx-bell bx-sm"></i>
-                    <span class="badge rounded-pill bg-danger badge-notifications"></span>
-                </a>
-            </li>
+           
             <!-- User Profile -->
             <li class="nav-item dropdown-user navbar-dropdown dropdown">
                 <a class="nav-link dropdown-toggle hide-arrow p-0" href="javascript:void(0);" data-bs-toggle="dropdown">
@@ -66,51 +60,43 @@
 <div class="container py-5">
     <div class="card">
         <h5 class="card-header d-flex justify-content-between align-items-center">
-            
-            Lista de Usuários
-            
-
+            Contas
 
             <div class="col-md-4">
-                <input type="text" id="patientSearch" class="form-control" placeholder="Pesquisar por nome...">
+                <input type="text" id="adminSearch" class="form-control" placeholder="Pesquisar por nome...">
             </div>
 
             <button id="exportButton" class="btn btn-success btn-sm">
                 <i class="bx bx-download"></i> Exportar para Excel
             </button>
 
-            <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#novoUsuarioModal">
-                Novos utilizadores
-            </button>
-            
-            
+            <button id="openModal" class="btn btn-primary">Novo Administrador</button>
         </h5>
-        <div class="table-responsive text-nowrap" id="doctorTable">
+        
+        <div class="table-responsive text-nowrap" id="adminTable">
             <table class="table">
                 <thead>
                     <tr>
                         <th>ID</th>
                         <th>Nome</th>
                         <th>Email</th>
-                        <th>Função</th>
                         <th>Status</th>
                         <th>Ações</th>
                     </tr>
                 </thead>
-                <tbody id="patientTableBody">
-                    @foreach($users as $user)
+                <tbody id="adminTableBody">
+                    @foreach($admins as $admin)
                     <tr>
-                        <td>{{ $user->id }}</td>
-                        <td>{{ $user->name }}</td>
-                        <td>{{ $user->email }}</td>
-                        <td>{{ $user->role->role }}</td>
+                        <td>{{ $admin->id }}</td>
+                        <td>{{ $admin->name }}</td>
+                        <td>{{ $admin->email }}</td>
                         <td>
-                            <form action="{{ route('patients.toggle-status', $user->id) }}" method="POST" style="display: inline;">
+                            <form action="{{ route('admin.toggle-status', $admin->id) }}" method="POST" style="display: inline;">
                                 @csrf
                                 <button type="submit" style="border: none; background: none; padding: 0;">
-                                    <i class="status-icon {{ $user->status ? 'status-active bx bx-check-circle' : 'status-inactive bx bx-x-circle' }}" 
+                                    <i class="status-icon {{ $admin->status ? 'status-active bx bx-check-circle' : 'status-inactive bx bx-x-circle' }}" 
                                        data-toggle="tooltip" 
-                                       title="{{ $user->status ? 'Ativo - Clique para desativar' : 'Inativo - Clique para ativar' }}">
+                                       title="{{ $admin->status ? 'Ativo - Clique para desativar' : 'Inativo - Clique para ativar' }}">
                                     </i>
                                 </button>
                             </form>
@@ -122,14 +108,16 @@
                                 </button>
                                 <ul class="dropdown-menu">
                                     <li>
-                                        <a class="dropdown-item" href="#" onclick="editUser({{ $user->id }})">
+                                        <a class="dropdown-item" href="javascript:void(0);" 
+                                           data-bs-toggle="modal" 
+                                           data-bs-target="#editAdminModal" 
+                                           data-admin-id="{{ $admin->id }}">
                                             <i class="bx bx-edit-alt me-1"></i> Editar
                                         </a>
                                     </li>
-                                    
                                     <li>
-                                        <form action="{{ route('patients.destroy', $user->id) }}" method="POST" 
-                                              onsubmit="return confirm('Tem a certeza que pretende eliminar este usuário?');">
+                                        <form action="{{ route('admin.destroy', $admin->id) }}" method="POST" 
+                                              onsubmit="return confirm('Tem certeza que deseja eliminar este administrador?');">
                                             @csrf
                                             @method('DELETE')
                                             <button type="submit" class="dropdown-item text-danger">
@@ -144,35 +132,38 @@
                     @endforeach
                 </tbody>
             </table>
+            
             <nav>
                 <ul class="pagination justify-content-center">
-                    {{-- Link para a página anterior --}}
-                    @if ($users->onFirstPage())
-                        <li class="page-item disabled">
-                            <span class="page-link">Anterior</span>
-                        </li>
-                    @else
-                        <li class="page-item">
-                            <a class="page-link" href="{{ $users->previousPageUrl() }}">Anterior</a>
-                        </li>
-                    @endif
-                
-                    {{-- Links para as páginas --}}
-                    @for ($i = 1; $i <= $users->lastPage(); $i++)
-                        <li class="page-item {{ $users->currentPage() == $i ? 'active' : '' }}">
-                            <a class="page-link" href="{{ $users->url($i) }}">{{ $i }}</a>
-                        </li>
-                    @endfor
-                
-                    {{-- Link para a próxima página --}}
-                    @if ($users->hasMorePages())
-                        <li class="page-item">
-                            <a class="page-link" href="{{ $users->nextPageUrl() }}">Próxima</a>
-                        </li>
-                    @else
-                        <li class="page-item disabled">
-                            <span class="page-link">Próxima</span>
-                        </li>
+                    @if ($admins instanceof \Illuminate\Pagination\LengthAwarePaginator)
+                        {{-- Link para a página anterior --}}
+                        @if ($admins->onFirstPage())
+                            <li class="page-item disabled">
+                                <span class="page-link">Anterior</span>
+                            </li>
+                        @else
+                            <li class="page-item">
+                                <a class="page-link" href="{{ $admins->previousPageUrl() }}">Anterior</a>
+                            </li>
+                        @endif
+                    
+                        {{-- Links para as páginas --}}
+                        @for ($i = 1; $i <= $admins->lastPage(); $i++)
+                            <li class="page-item {{ $admins->currentPage() == $i ? 'active' : '' }}">
+                                <a class="page-link" href="{{ $admins->url($i) }}">{{ $i }}</a>
+                            </li>
+                        @endfor
+                    
+                        {{-- Link para a próxima página --}}
+                        @if ($admins->hasMorePages())
+                            <li class="page-item">
+                                <a class="page-link" href="{{ $admins->nextPageUrl() }}">Próxima</a>
+                            </li>
+                        @else
+                            <li class="page-item disabled">
+                                <span class="page-link">Próxima</span>
+                            </li>
+                        @endif
                     @endif
                 </ul>
             </nav>
@@ -180,75 +171,287 @@
     </div>
 </div>
 
-<!-- Modal de Novo Usuário -->
-<div class="modal fade" id="novoUsuarioModal" tabindex="-1" aria-labelledby="novoUsuarioModalLabel" aria-hidden="true">
-    <div class="modal-dialog">
+<!-- Modal para Novo Administrador -->
+<div class="modal" id="novoadminModal" tabindex="-1">
+    <div class="modal-dialog modal-lg">
         <div class="modal-content">
             <div class="modal-header">
-                <h5 class="modal-title" id="novoUsuarioModalLabel">Novo Usuário</h5>
-                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                <h5 class="modal-title">
+                    <i class="bx bx-user-plus me-2"></i>Registar Novo Administrador
+                </h5>
+                <button type="button" class="btn-close" id="closeModal" aria-label="Close"></button>
             </div>
-            <form action="{{ route('admin.store') }}" method="POST">
-                @csrf
-                <div class="modal-body">
-                    <div class="mb-3">
-                        <label for="name" class="form-label">Nome</label>
-                        <input type="text" class="form-control" id="name" name="name" required>
+            <div class="modal-body bg-white">
+                <form action="{{ route('admin.store') }}" method="POST" class="needs-validation" novalidate>
+                    @csrf
+                    <div class="row g-3">
+                        <div class="col-md-6">
+                            <label for="name" class="form-label">Nome Completo</label>
+                            <input type="text" class="form-control" id="name" name="name" required>
+                        </div>
+                        <div class="col-md-6">
+                            <label for="email" class="form-label">Email</label>
+                            <input type="email" class="form-control" id="email" name="email" required>
+                        </div>
+                        <div class="col-md-6">
+                            <label for="password" class="form-label">Senha</label>
+                            <input type="password" class="form-control" id="password" name="password" required>
+                        </div>
+                        <div class="col-md-6">
+                            <label for="password_confirmation" class="form-label">Confirmar Senha</label>
+                            <input type="password" class="form-control" id="password_confirmation" name="password_confirmation" required>
+                        </div>
                     </div>
-                    
-                    <div class="mb-3">
-                        <label for="email" class="form-label">Email</label>
-                        <input type="email" class="form-control" id="email" name="email" required>
+
+                    <div class="modal-footer border-0 pt-4">
+                        <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">
+                            <i class="bx bx-x me-1"></i>Cancelar
+                        </button>
+                        <button type="submit" class="btn btn-primary">
+                            <i class="bx bx-check me-1"></i>Registar
+                        </button>
                     </div>
-                    
-                    <div class="mb-3">
-                        <label for="password" class="form-label">Senha</label>
-                        <input type="password" class="form-control" id="password" name="password" required>
-                    </div>
-                    
-                    <div class="mb-3">
-                        <label for="password_confirmation" class="form-label">Confirmar Senha</label>
-                        <input type="password" class="form-control" id="password_confirmation" name="password_confirmation" required>
-                    </div>
-                    
-                    <div class="mb-3">
-                        <label for="role_id" class="form-label">Função</label>
-                        <select class="form-select" id="role_id" name="role_id" required>
-                            <option value="">Selecione uma função</option>
-                            @foreach($roles as $role)
-                                <option value="{{ $role->id }}">{{ $role->role }}</option>
-                            @endforeach
-                        </select>
-                    </div>
-                </div>
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
-                    <button type="submit" class="btn btn-primary">Salvar</button>
-                </div>
-            </form>
+                </form>
+            </div>
         </div>
     </div>
 </div>
 
-@if(session('success'))
-    <div class="alert alert-success alert-dismissible fade show" role="alert">
-        {{ session('success') }}
-        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-    </div>
-@endif
+<!-- Modal para Editar Administrador -->
+<div class="modal fade" id="editAdminModal" tabindex="-1">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">
+                    <i class="bx bx-edit-alt me-2"></i>Editar Administrador
+                </h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body bg-white">
+                <form id="editAdminForm" method="POST" class="needs-validation" novalidate>
+                    @csrf
+                    @method('PUT')
+                    <div class="row g-3">
+                        <div class="col-md-6">
+                            <label for="editName" class="form-label">Nome Completo</label>
+                            <input type="text" class="form-control" id="editName" name="name" required>
+                        </div>
+                        <div class="col-md-6">
+                            <label for="editEmail" class="form-label">Email</label>
+                            <input type="email" class="form-control" id="editEmail" name="email" required>
+                        </div>
+                        <div class="col-md-6">
+                            <label for="editPassword" class="form-label">Nova Senha (opcional)</label>
+                            <input type="password" class="form-control" id="editPassword" name="password">
+                        </div>
+                        <div class="col-md-6">
+                            <label for="editPasswordConfirmation" class="form-label">Confirmar Nova Senha</label>
+                            <input type="password" class="form-control" id="editPasswordConfirmation" name="password_confirmation">
+                        </div>
+                    </div>
 
-@if($errors->any())
-    <div class="alert alert-danger alert-dismissible fade show" role="alert">
-        <ul class="mb-0">
-            @foreach($errors->all() as $error)
-                <li>{{ $error }}</li>
-            @endforeach
-        </ul>
-        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                    <div class="modal-footer border-0 pt-4">
+                        <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">
+                            <i class="bx bx-x me-1"></i>Cancelar
+                        </button>
+                        <button type="submit" class="btn btn-primary">
+                            <i class="bx bx-check me-1"></i>Salvar Alterações
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
     </div>
-@endif
+</div>
 
 @endsection
+
 <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
 <script src="https://code.jquery.com/jquery-3.6.4.min.js"></script>
-<link href='https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css' rel='stylesheet'>    
+<link href='https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css' rel='stylesheet'>
+
+<script>
+// Gestão do modal para adicionar novo administrador
+document.addEventListener('DOMContentLoaded', function() {
+    // Modal
+    document.getElementById('openModal')?.addEventListener('click', () => {
+        document.getElementById('novoadminModal').style.display = 'block';
+    });
+
+    document.getElementById('closeModal')?.addEventListener('click', () => {
+        document.getElementById('novoadminModal').style.display = 'none';
+    });
+
+    // Pesquisa em tempo real
+    const adminSearch = document.getElementById('adminSearch');
+    if (adminSearch) {
+        let searchTimeout;
+        
+        adminSearch.addEventListener('input', function() {
+            clearTimeout(searchTimeout);
+            const searchQuery = this.value;
+            
+            searchTimeout = setTimeout(() => {
+            fetch(`/admin/search?query=${encodeURIComponent(searchQuery)}`)
+                    .then(response => {
+                        if (!response.ok) {
+                            throw new Error('Erro na resposta do servidor');
+                        }
+                        return response.text();
+                    })
+                .then(html => {
+                    const parser = new DOMParser();
+                    const doc = parser.parseFromString(html, 'text/html');
+                    const newTableBody = doc.querySelector('#adminTableBody');
+                        const newPagination = doc.querySelector('.pagination');
+                        
+                    if (newTableBody) {
+                        document.querySelector('#adminTableBody').innerHTML = newTableBody.innerHTML;
+                    }
+                        if (newPagination) {
+                            document.querySelector('.pagination').innerHTML = newPagination.innerHTML;
+                        }
+                    })
+                    .catch(error => {
+                        console.error('Erro ao buscar administradores:', error);
+                    });
+            }, 300); // Delay para evitar muitas requisições
+        });
+    }
+
+    // Exportar para Excel
+    document.getElementById('exportButton')?.addEventListener('click', function() {
+        const table = document.querySelector('#adminTable table');
+        if (!table) return;
+
+        const rows = Array.from(table.rows).map(row =>
+            Array.from(row.cells).map(cell => {
+                let clone = cell.cloneNode(true);
+                let buttons = clone.querySelectorAll('button, .bx');
+                buttons.forEach(btn => btn.remove());
+                return clone.innerText.trim();
+            })
+        );
+
+        const wb = XLSX.utils.book_new();
+        const ws = XLSX.utils.aoa_to_sheet(rows);
+        XLSX.utils.book_append_sheet(wb, ws, 'Administradores');
+        XLSX.writeFile(wb, 'lista_administradores.xlsx');
+    });
+
+    // Formulário de novo administrador
+    const form = document.querySelector('#novoadminModal form');
+    if (form) {
+        form.addEventListener('submit', function(e) {
+            e.preventDefault();
+            const formData = new FormData(this);
+            
+            fetch(this.action, {
+                method: 'POST',
+                body: formData,
+                headers: {
+                    'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content,
+                    'Accept': 'application/json'
+                }
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    alert(data.message);
+                    document.getElementById('novoadminModal').style.display = 'none';
+                    window.location.reload();
+                } else {
+                    let errorMessage = data.message;
+                    if (data.errors) {
+                        errorMessage = Object.values(data.errors).join('\n');
+                    }
+                    alert('Erro ao registrar administrador: ' + errorMessage);
+                }
+            })
+            .catch(error => {
+                console.error('Erro:', error);
+                alert('Erro ao registrar administrador. Por favor, tente novamente.');
+            });
+        });
+    }
+
+    // Edição de administrador
+    $(document).on('click', '[data-bs-target="#editAdminModal"]', function() {
+        const adminId = $(this).data('admin-id');
+        
+        // Busca os dados do administrador
+        $.ajax({
+            url: `/admin/${adminId}/edit`,
+            method: 'GET',
+            success: function(admin) {
+                $('#editAdminForm').attr('action', `/admin/${adminId}`);
+                $('#editName').val(admin.name);
+                $('#editEmail').val(admin.email);
+                
+                // Limpa os campos de senha
+                $('#editPassword').val('');
+                $('#editPasswordConfirmation').val('');
+                
+                // Abre o modal usando o Bootstrap
+                new bootstrap.Modal(document.getElementById('editAdminModal')).show();
+            },
+            error: function(xhr) {
+                alert('Erro ao carregar dados do administrador');
+            }
+        });
+    });
+
+    // Atualização de administrador
+    $('#editAdminForm').on('submit', function(e) {
+        e.preventDefault();
+        const form = $(this);
+        const url = form.attr('action');
+        
+        $.ajax({
+            url: url,
+            type: 'PUT',
+            data: form.serialize(),
+            headers: {
+                'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+            },
+            success: function(response) {
+                if (response.success) {
+                    alert(response.message);
+                    $('#editAdminModal').modal('hide');
+                    window.location.reload();
+                }
+            },
+            error: function(xhr) {
+                const errors = xhr.responseJSON.errors;
+                let errorMessage = 'Ocorreram os seguintes erros:\n';
+                for (let field in errors) {
+                    errorMessage += `${errors[field]}\n`;
+                }
+                alert(errorMessage);
+            }
+        });
+    });
+
+    // Toggle Status
+    $(document).on('submit', '.toggle-status-form', function(e) {
+        e.preventDefault();
+        const form = $(this);
+        
+        $.ajax({
+            url: form.attr('action'),
+            type: 'POST',
+            data: form.serialize(),
+            headers: {
+                'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+            },
+            success: function(response) {
+                if (response.success) {
+                    const icon = form.find('.status-icon');
+                    icon.toggleClass('status-active status-inactive bx-check-circle bx-x-circle');
+                    icon.attr('title', response.status ? 'Ativo - Clique para desativar' : 'Inativo - Clique para ativar');
+                }
+            }
+        });
+    });
+});
+</script>

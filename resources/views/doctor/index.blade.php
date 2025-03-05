@@ -16,15 +16,46 @@
 
     .stats-card {
         background: white;
-        border-radius: 12px;
-        padding: 1.5rem;
+        border-radius: 15px;
+        padding: 1.8rem;
         margin-bottom: 1.5rem;
-        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
-        transition: transform 0.3s ease;
+        box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+        transition: all 0.3s ease;
     }
 
     .stats-card:hover {
         transform: translateY(-5px);
+        box-shadow: 0 8px 20px rgba(0, 0, 0, 0.15);
+    }
+
+    .stats-icon {
+        background: #e3f2fd;
+        width: 48px;
+        height: 48px;
+        border-radius: 12px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+
+    .stats-icon i {
+        font-size: 24px;
+        color: #0073e6;
+    }
+
+    .stats-label {
+        color: #6c757d;
+        font-size: 0.9rem;
+        font-weight: 500;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+    }
+
+    .stats-number {
+        color: #0073e6;
+        font-size: 2.2rem;
+        font-weight: 600;
+        margin: 0;
     }
 
     .next-appointment-card {
@@ -167,13 +198,7 @@
     </div>
     <div class="navbar-nav-right d-flex align-items-center" id="navbar-collapse">
         <ul class="navbar-nav flex-row align-items-center ms-auto">
-            <!-- Notifications -->
-            <li class="nav-item dropdown-notifications navbar-dropdown dropdown">
-                <a class="nav-link dropdown-toggle hide-arrow" href="javascript:void(0);" data-bs-toggle="dropdown">
-                    <i class="bx bx-bell bx-sm"></i>
-                    <span class="badge rounded-pill bg-danger badge-notifications"></span>
-                </a>
-            </li>
+           
             <!-- User Profile -->
             <li class="nav-item dropdown-user navbar-dropdown dropdown">
                 <a class="nav-link dropdown-toggle hide-arrow p-0" href="javascript:void(0);" data-bs-toggle="dropdown">
@@ -234,7 +259,7 @@
             <div class="next-appointment-card">
                 <h3 class="mb-4"><i class="bx bx-calendar me-2"></i>Próximo Atendimento</h3>
                 
-                @if ($nextAppointment)
+                @if ($nextAppointment && \Carbon\Carbon::parse($nextAppointment->appointment_date_time)->isToday())
                     <div class="appointment-time">
                         {{ $tempoRestante->h }}h {{ $tempoRestante->i }}min
                     </div>
@@ -251,7 +276,7 @@
                 @else
                     <div class="text-muted">
                         <i class="bx bx-calendar-x fs-1"></i>
-                        <p class="mt-3">Nenhuma consulta agendada no momento.</p>
+                        <p class="mt-3">Nenhuma consulta agendada para hoje.</p>
                     </div>
                 @endif
             </div>
@@ -261,8 +286,15 @@
             <div class="row">
                 <div class="col-md-6">
                     <div class="stats-card">
-                        <h4>Consultas Hoje</h4>
-                        <h2 class="text-primary">{{ $consultasHoje ?? 0 }}</h2>
+                        <div class="d-flex align-items-center">
+                            <div class="stats-icon">
+                                <i class='bx bx-calendar-check' style="font-size: 24px;"></i>
+                            </div>
+                            <div class="ms-3">
+                                <p class="stats-label mb-1">Consultas Hoje</p>
+                                <h2 class="stats-number mb-0">{{ $consultasHoje }}</h2>
+                            </div>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -291,11 +323,11 @@
                             </td>
                             <td style="border-right: 1px solid #f5f5f5; padding: 1.2rem; background-color: #ffffff;">
                                 <i class='bx bx-user' style="color: #666; margin-right: 8px;"></i>
-                                {{ $appointment->patient->name }}
+                                {{ $appointment->patient ? $appointment->patient->name : 'Paciente não encontrado' }}
                             </td>
                             <td style="border-right: 1px solid #f5f5f5; padding: 1.2rem; background-color: #ffffff;">
                                 <i class='bx bx-plus-medical' style="color: #666; margin-right: 8px;"></i>
-                                {{ $appointment->specialty->name }}
+                                {{ $appointment->specialty ? $appointment->specialty->name : 'Especialidade não encontrada' }}
                             </td>
                             <td style="padding: 1.2rem; background-color: #ffffff;">
                                 <span class="status-pill status-{{ strtolower(str_replace(' ', '', $appointment->status->status)) }}" 

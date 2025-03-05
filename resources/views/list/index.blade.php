@@ -186,8 +186,14 @@ form button {
             max-width: 700px;     /* Aumenta a largura máxima para 700px */
         }
 
+.select2-container {
+    width: 100% !important;
+}
 
-
+.select2-selection--multiple {
+    min-height: 38px !important;
+    border: 1px solid #ddd !important;
+}
 
 </style>
 
@@ -203,13 +209,7 @@ form button {
     </div>
     <div class="navbar-nav-right d-flex align-items-center" id="navbar-collapse">
         <ul class="navbar-nav flex-row align-items-center ms-auto">
-            <!-- Notifications -->
-            <li class="nav-item dropdown-notifications navbar-dropdown dropdown">
-                <a class="nav-link dropdown-toggle hide-arrow" href="javascript:void(0);" data-bs-toggle="dropdown">
-                    <i class="bx bx-bell bx-sm"></i>
-                    <span class="badge rounded-pill bg-danger badge-notifications"></span>
-                </a>
-            </li>
+           
             <!-- User Profile -->
             <li class="nav-item dropdown-user navbar-dropdown dropdown">
                 <a class="nav-link dropdown-toggle hide-arrow p-0" href="javascript:void(0);" data-bs-toggle="dropdown">
@@ -307,7 +307,7 @@ form button {
                                 </button>
                                 <ul class="dropdown-menu">
                                     <li>
-                                        <a class="dropdown-item" href="{{ route('doctors.edit', $doctor->id) }}">
+                                        <a class="dropdown-item" href="#" data-bs-toggle="modal" data-bs-target="#editDoctorModal{{ $doctor->id }}">
                                             <i class="bx bx-edit-alt me-1"></i> Editar
                                         </a>
                                     </li>
@@ -500,6 +500,77 @@ form button {
     </div>
 </div>
 
+<!-- Modal para editar médico -->
+@foreach($doctors as $doctor)
+<div class="modal fade" id="editDoctorModal{{ $doctor->id }}" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Editar Médico</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <form action="{{ route('doctors.update', $doctor->id) }}" method="POST">
+                @csrf
+                @method('PUT')
+                <div class="modal-body">
+                    @if ($errors->any())
+                        <div class="alert alert-danger">
+                            <ul class="mb-0">
+                                @foreach ($errors->all() as $error)
+                                    <li>{{ $error }}</li>
+                                @endforeach
+                            </ul>
+                        </div>
+                    @endif
+                    
+                    <div class="row">
+                        <div class="col mb-3">
+                            <label for="name" class="form-label">Nome</label>
+                            <input type="text" class="form-control" name="name" value="{{ $doctor->name }}" required>
+                        </div>
+                    </div>
+
+                    <div class="row">
+                        <div class="col mb-3">
+                            <label for="email" class="form-label">Email</label>
+                            <input type="email" class="form-control" name="email" value="{{ $doctor->email }}" required>
+                        </div>
+                    </div>
+
+                    <div class="row">
+                        <div class="col mb-3">
+                            <label for="specialties" class="form-label">Especialidades</label>
+                            <select class="form-select" id="edit_specialties{{ $doctor->id }}" name="specialties[]" multiple required>
+                                @foreach($specialties as $specialty)
+                                    <option value="{{ $specialty->id }}" 
+                                        {{ in_array($specialty->id, $doctor->specialties->pluck('id')->toArray()) ? 'selected' : '' }}>
+                                        {{ $specialty->name }}
+                                    </option>
+                                @endforeach
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="row">
+                        <div class="col mb-3">
+                            <label for="status" class="form-label">Status</label>
+                            <select class="form-select" name="status" required>
+                                <option value="active" {{ $doctor->status == 'active' ? 'selected' : '' }}>Ativo</option>
+                                <option value="inactive" {{ $doctor->status == 'inactive' ? 'selected' : '' }}>Inativo</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Cancelar</button>
+                    <button type="submit" class="btn btn-primary">Salvar Alterações</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+@endforeach
+
 <script>
     const scheduleModal = document.getElementById('schedulesModal');
     const scheduleContent = document.getElementById('scheduleContent');
@@ -564,7 +635,7 @@ form button {
                         style="width: 110px;" 
                         ${disabled}
                     >
-                    <span class="fw-bold text-muted">to</span>
+                    <span class="fw-bold text-muted">até</span>
                     <input 
                         type="time" 
                         name="days[${index}][end_time]" 
@@ -750,6 +821,16 @@ document.getElementById('exportButton').addEventListener('click', function () {
             row.style.display = 'none';
         }
     });
+});
+
+$(document).ready(function() {
+    // Inicializa Select2 para os campos de especialidades na edição
+    @foreach($doctors as $doctor)
+        $(`#edit_specialties{{ $doctor->id }}`).select2({
+            dropdownParent: $(`#editDoctorModal{{ $doctor->id }}`),
+            width: '100%'
+        });
+    @endforeach
 });
 
 </script>

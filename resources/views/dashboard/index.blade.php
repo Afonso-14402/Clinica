@@ -14,13 +14,7 @@
         </div>
         <div class="navbar-nav-right d-flex align-items-center" id="navbar-collapse">
             <ul class="navbar-nav flex-row align-items-center ms-auto">
-                <!-- Notifications -->
-                <li class="nav-item dropdown-notifications navbar-dropdown dropdown">
-                    <a class="nav-link dropdown-toggle hide-arrow" href="javascript:void(0);" data-bs-toggle="dropdown">
-                        <i class="bx bx-bell bx-sm"></i>
-                        <span class="badge rounded-pill bg-danger badge-notifications"></span>
-                    </a>
-                </li>
+               
                 <!-- User Profile -->
                 <li class="nav-item dropdown-user navbar-dropdown dropdown">
                     <a class="nav-link dropdown-toggle hide-arrow p-0" href="javascript:void(0);" data-bs-toggle="dropdown">

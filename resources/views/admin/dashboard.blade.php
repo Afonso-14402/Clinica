@@ -4,24 +4,63 @@
     .stat-card {
         border-radius: 10px;
         color: white;
-        padding: 20px;
+        padding: 15px;
         text-align: center;
-        transition: transform 0.2s ease-in-out;
-        margin-bottom: 20px;
+        transition: transform 0.2s ease-in-out, box-shadow 0.2s ease-in-out;
+        margin-bottom: 15px;
+        background: #1a237e; /* Azul escuro */
+        cursor: pointer;
     }
+    
+    /* Cores específicas para cada card */
+    .stat-card.bg-primary {
+        background: #1a237e; /* Azul escuro */
+    }
+    
+    .stat-card.bg-success {
+        background: #0d47a1; /* Variação do azul escuro */
+    }
+    
+    .stat-card.bg-info {
+        background: #283593; /* Outra variação do azul escuro */
+    }
+    
+    .stat-card.bg-warning {
+        background: #1e3799; /* Mais uma variação do azul escuro */
+    }
+    
+    /* Ajustando as cores dos cards adicionais */
+    .card.border-left-primary {
+        border-left: 4px solid #1a237e !important;
+    }
+    
+    .card.border-left-warning {
+        border-left: 4px solid #283593 !important;
+    }
+    
+    .card.border-left-danger {
+        border-left: 4px solid #0d47a1 !important;
+    }
+    
+    /* Ajustando a cor do cabeçalho do log de atividades */
+    .card-header.bg-gradient-primary {
+        background: linear-gradient(to right, #1a237e, #283593) !important;
+    }
+    
     .stat-card:hover {
-        transform: scale(1.05);
+        transform: translateY(-5px);
+        box-shadow: 0 5px 15px rgba(0,0,0,0.3);
     }
     .stat-card .icon {
-        font-size: 40px;
-        margin-bottom: 10px;
+        font-size: 30px;
+        margin-bottom: 5px;
     }
     .stat-card .number {
-        font-size: 32px;
+        font-size: 24px;
         font-weight: bold;
     }
     .stat-card .description {
-        font-size: 16px;
+        font-size: 14px;
     }
     .stat-card .more-info {
         margin-top: 10px;
@@ -166,13 +205,7 @@
     </div>
     <div class="navbar-nav-right d-flex align-items-center" id="navbar-collapse">
         <ul class="navbar-nav flex-row align-items-center ms-auto">
-            <!-- Notifications -->
-            <li class="nav-item dropdown-notifications navbar-dropdown dropdown">
-                <a class="nav-link dropdown-toggle hide-arrow" href="javascript:void(0);" data-bs-toggle="dropdown">
-                    <i class="bx bx-bell bx-sm"></i>
-                    <span class="badge rounded-pill bg-danger badge-notifications"></span>
-                </a>
-            </li>
+            
             <!-- User Profile -->
             <li class="nav-item dropdown-user navbar-dropdown dropdown">
                 <a class="nav-link dropdown-toggle hide-arrow p-0" href="javascript:void(0);" data-bs-toggle="dropdown">
@@ -221,28 +254,32 @@
     <!-- Cards de Estatísticas -->
     <div class="row">
         <div class="col-xl-3 col-md-6">
-            <div class="stat-card bg-primary">
-                <div class="icon"><i class="fas fa-user-md"></i></div>
-                <div class="number">{{ $totalMedicos }}</div>
-                <div class="description">Médicos Ativos</div>
-            </div>
+            <a href="{{ route('doctors.index') }}" style="text-decoration: none;">
+                <div class="stat-card" style="background: #1a237e; cursor: pointer;">
+                    <div class="icon"><i class="fas fa-user-md"></i></div>
+                    <div class="number">{{ $totalMedicos }}</div>
+                    <div class="description">Médicos Ativos</div>
+                </div>
+            </a>
         </div>
         <div class="col-xl-3 col-md-6">
-            <div class="stat-card bg-success">
-                <div class="icon"><i class="fas fa-users"></i></div>
-                <div class="number">{{ $totalPacientes }}</div>
-                <div class="description">Utentes Registados</div>
-            </div>
+            <a href="{{ route('patients.search') }}" style="text-decoration: none;">
+                <div class="stat-card" style="background: #1a237e; cursor: pointer;">
+                    <div class="icon"><i class="fas fa-users"></i></div>
+                    <div class="number">{{ $totalPacientes }}</div>
+                    <div class="description">Utentes Registados</div>
+                </div>
+            </a>
         </div>
         <div class="col-xl-3 col-md-6">
-            <div class="stat-card bg-info">
+            <div class="stat-card" style="background: #1a237e" data-bs-toggle="modal" data-bs-target="#consultasModal">
                 <div class="icon"><i class="fas fa-calendar-check"></i></div>
                 <div class="number">{{ $totalConsultasRealizadas }}</div>
                 <div class="description">Consultas Realizadas</div>
             </div>
         </div>
         <div class="col-xl-3 col-md-6">
-            <div class="stat-card bg-warning">
+            <div class="stat-card" style="background: #1a237e">
                 <div class="icon"><i class="fas fa-stethoscope"></i></div>
                 <div class="number">{{ $totalEspecialidades }}</div>
                 <div class="description">Especialidades</div>
@@ -252,46 +289,31 @@
 
     <!-- Estatísticas Adicionais -->
     <div class="row mb-4">
-        <div class="col-xl-4 col-md-6">
-            <div class="card border-left-primary shadow h-100 py-2">
+        <div class="col-xl-6 col-md-6">
+            <div class="card shadow h-100 py-2" style="border-left: 4px solid #1a237e">
                 <div class="card-body">
                     <div class="row no-gutters align-items-center">
                         <div class="col mr-2">
-                            <div class="text-xs font-weight-bold text-primary text-uppercase mb-1">Consultas Hoje</div>
+                            <div class="text-xs font-weight-bold text-uppercase mb-1" style="color: #1a237e">Consultas Hoje</div>
                             <div class="h5 mb-0 font-weight-bold text-gray-800">{{ $consultasHoje }}</div>
                         </div>
                         <div class="col-auto">
-                            <i class="fas fa-calendar fa-2x text-gray-300"></i>
+                            <i class="fas fa-calendar fa-2x" style="color: #1a237e"></i>
                         </div>
                     </div>
                 </div>
             </div>
         </div>
-        <div class="col-xl-4 col-md-6">
-            <div class="card border-left-warning shadow h-100 py-2">
+        <div class="col-xl-6 col-md-6">
+            <div class="card shadow h-100 py-2" style="border-left: 4px solid #1a237e">
                 <div class="card-body">
                     <div class="row no-gutters align-items-center">
                         <div class="col mr-2">
-                            <div class="text-xs font-weight-bold text-warning text-uppercase mb-1">Consultas Pendentes</div>
+                            <div class="text-xs font-weight-bold text-uppercase mb-1" style="color: #1a237e">Consultas Pendentes</div>
                             <div class="h5 mb-0 font-weight-bold text-gray-800">{{ $consultasPendentes }}</div>
                         </div>
                         <div class="col-auto">
-                            <i class="fas fa-clock fa-2x text-gray-300"></i>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-        <div class="col-xl-4 col-md-6">
-            <div class="card border-left-danger shadow h-100 py-2">
-                <div class="card-body">
-                    <div class="row no-gutters align-items-center">
-                        <div class="col mr-2">
-                            <div class="text-xs font-weight-bold text-danger text-uppercase mb-1">Consultas Canceladas</div>
-                            <div class="h5 mb-0 font-weight-bold text-gray-800">{{ $consultasCanceladas }}</div>
-                        </div>
-                        <div class="col-auto">
-                            <i class="fas fa-times-circle fa-2x text-gray-300"></i>
+                            <i class="fas fa-clock fa-2x" style="color: #1a237e"></i>
                         </div>
                     </div>
                 </div>
@@ -549,6 +571,69 @@
     </div>
 </div>
 
+<!-- Modal de Consultas Realizadas -->
+<div class="modal fade" id="consultasModal" tabindex="-1" aria-labelledby="consultasModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-xl">
+        <div class="modal-content">
+            <div class="modal-header bg-gradient-primary text-white">
+                <h5 class="modal-title" id="consultasModalLabel">
+                    <i class="fas fa-calendar-check me-2"></i>
+                    Detalhes das Consultas Realizadas
+                </h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                
+
+                <!-- Tabela Responsiva -->
+                <div class="table-responsive">
+                    <table class="table table-hover">
+                        <thead>
+                            <tr>
+                                <th><i class="fas fa-calendar-alt me-2"></i>Data/Hora</th>
+                                <th><i class="fas fa-user me-2"></i>Utente</th>
+                                <th><i class="fas fa-user-md me-2"></i>Médico</th>
+                                <th class="text-center"><i class="fas fa-info-circle me-2"></i>Status</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach($appointments as $consulta)
+                            <tr>
+                                <td>
+                                    <span class="activity-badge date">
+                                        {{ \Carbon\Carbon::parse($consulta->appointment_date_time)->format('d/m/Y H:i') }}
+                                    </span>
+                                </td>
+                                <td>{{ $consulta->patient->name ?? 'N/A' }}</td>
+                                <td>{{ $consulta->doctor->name ?? 'N/A' }}</td>
+                                <td class="text-center">
+                                    <span class="activity-badge type-adicao">
+                                        <i class="fas fa-check-circle"></i>
+                                        {{ $consulta->status->status ?? 'N/A' }}
+                                    </span>
+                                </td>
+                            </tr>
+                            @endforeach
+                        </tbody>
+                    </table>
+                </div>
+
+                <!-- Paginação -->
+                <div class="d-flex justify-content-between align-items-center mt-3">
+                    <div class="text-muted">
+                        Mostrando {{ $appointments->firstItem() ?? 0 }} até {{ $appointments->lastItem() ?? 0 }} 
+                        de {{ $appointments->total() ?? 0 }} consultas
+                    </div>
+                    {{ $appointments->links() }}
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Fechar</button>
+            </div>
+        </div>
+    </div>
+</div>
+
 @push('scripts')
 <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.29.1/moment.min.js"></script>
@@ -600,6 +685,19 @@ $(document).ready(function() {
             window.history.pushState("", "", url);
         }
         return false;
+    });
+
+    // Adiciona cursor pointer e hover effect ao card
+    $('.stat-card').css('cursor', 'pointer');
+    
+    // Configuração do modal
+    var consultasModal = new bootstrap.Modal(document.getElementById('consultasModal'));
+    
+    // Evento de clique no card (opcional, já que usamos data-bs-toggle)
+    $('.stat-card').on('click', function() {
+        if ($(this).data('bs-target') === '#consultasModal') {
+            consultasModal.show();
+        }
     });
 });
 </script>

@@ -45,11 +45,7 @@
             <li>
             <div class="dropdown-divider my-1"></div>
             </li>
-            <li>
-            <a class="dropdown-item" href="#">
-                <i class="bx bx-user bx-md me-3"></i><span>My Profile</span>
-            </a>
-            </li>
+            
             <li>
             <a class="dropdown-item" href="{{ route('settings.index') }}">
                 <i class="bx bx-cog bx-md me-3"></i><span>Settings</span>
@@ -110,7 +106,7 @@
                     <label class="form-label">Data Final</label>
                     <input type="date" name="date_end" class="form-control" value="{{ request('date_end') }}">
                 </div>
-
+                @if (isset($user) && $user->role->role != 'Doctor')
                 <!-- Filtro de Médico -->
                 <div class="col-md-3">
                     <label class="form-label">Médico</label>
@@ -136,7 +132,7 @@
                         @endforeach
                     </select>
                 </div>
-
+                @endif
                 <!-- Filtro de Status -->
                 <div class="col-md-3">
                     <label class="form-label">Status</label>
@@ -187,7 +183,13 @@
                         @forelse ($appointments as $appointment)
                             <tr>
                                 <td>{{ \Carbon\Carbon::parse($appointment->appointment_date_time)->format('d/m/Y H:i') }}</td>
-                                <td>{{ $appointment->doctor->name }}</td>
+                                <td>
+                                    @if($appointment->doctor_user_id === auth()->id())
+                                        {{ $appointment->patient->name }} (Paciente)
+                                    @else
+                                        {{ $appointment->doctor->name }} (Médico)
+                                    @endif
+                                </td>
                                 <td>{{ $appointment->specialty->name }}</td>
                                 <td>
                                     <span class="badge bg-{{ $appointment->status->id == 1 ? 'warning' : 

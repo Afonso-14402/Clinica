@@ -17,6 +17,7 @@ use App\Http\Controllers\AppointmentHistoryController;
 use App\Http\Controllers\PatientController;
 use App\Http\Controllers\FamilyDoctorController;
 use App\Http\Controllers\AdminController;
+use App\Http\Controllers\TabelaAdminController;
 
 
 
@@ -111,8 +112,58 @@ Route::group(['middleware'=> 'auth' ] , function(){
     
 
     
+    Route::get('/list-patients', [PatientController::class, 'search'])->name('patients.search');
+
+    
+
+    Route::get('/patients/{patient}/info', [ListController::class, 'getPatientInfo']);
+    Route::get('/patients/{patient}/appointments', [ListController::class, 'getPatientAppointments']);
+
+    Route::get('/appointments/{id}/report', [AppointmentController::class, 'getReport'])->name('appointments.report');
+    Route::get('/patient-details/{id}', [ListController::class, 'getPatientDetails'])->name('patient.details');
+
+    Route::get('/doctor/{doctorId}/works-saturday', [DoctorAgendaController::class, 'checkWorksSaturday']);
+
+    Route::get('/doctor/{doctorId}/check-availability', [DoctorAgendaController::class, 'checkAvailability']);
+
+    // Rota para médico ver pacientes
+    Route::get('/doctor/patients', [DoctorAgendaController::class, 'patients'])->name('doctor.patient');
+
+
+    Route::post('/patient/{id}/update', [PatientController::class, 'update'])->name('patient.update');
+
+    // Rotas para Médicos de Família
+    Route::get('/family', [FamilyDoctorController::class, 'index'])->name('family.index');
+    Route::get('/family/create', [FamilyDoctorController::class, 'create'])->name('family.create');
+    Route::post('/family', [FamilyDoctorController::class, 'store'])->name('family.store');
+    Route::get('/family/edit/{id}', [FamilyDoctorController::class, 'edit'])->name('family.edit');
+    Route::put('/family/{id}', [FamilyDoctorController::class, 'update'])->name('family.update');
+    Route::delete('/family/{id}', [FamilyDoctorController::class, 'destroy'])->name('family.destroy');
+
+    //Route::get('/list/admin', [AdminController::class, 'index'])->name('list.listadmin');
+
+    //Route::post('/admin/store', [AdminController::class, 'store'])->name('admin.store');
+
+    Route::get('/doctors/{id}/edit', [ListController::class, 'edit'])->name('doctors.edit');
+    Route::put('/doctors/{id}', [ListController::class, 'update'])->name('doctors.update');
+
+
+
+    Route::get('/admin/lista', [TabelaAdminController::class, 'index'])->name('admin.list');
+    Route::post('/admin/store', [TabelaAdminController::class, 'store'])->name('admin.store');
+    Route::get('/admin/search', [TabelaAdminController::class, 'search'])->name('admin.search');
+    Route::post('/admin/{id}/toggle-status', [TabelaAdminController::class, 'toggleStatus'])->name('admin.toggle-status');
+    Route::get('/admin/{id}/edit', [TabelaAdminController::class, 'edit'])->name('admin.edit');
+    Route::put('/admin/{id}', [TabelaAdminController::class, 'update'])->name('admin.update');
+    Route::delete('/admin/{id}', [TabelaAdminController::class, 'destroy'])->name('admin.destroy');
+
+    // Adicionar esta nova rota para a pesquisa de consultas pendentes
+    Route::get('/appointments/pending/search', [AppointmentController::class, 'searchPending'])
+        ->name('appointments.pending.search');
+
 });
 
+   
 
 
 Route::get('/autocomplete/doctors', function () {
@@ -146,32 +197,7 @@ Route::get('/autocomplete/patient', function () {
     return response()->json($patient);
 });
 
-Route::get('/patients/{patient}/info', [ListController::class, 'getPatientInfo']);
-Route::get('/patients/{patient}/appointments', [ListController::class, 'getPatientAppointments']);
 
-Route::get('/appointments/{id}/report', [AppointmentController::class, 'getReport'])->name('appointments.report');
-Route::get('/patient-details/{id}', [ListController::class, 'getPatientDetails'])->name('patient.details');
-
-Route::get('/doctor/{doctorId}/works-saturday', [DoctorAgendaController::class, 'checkWorksSaturday']);
-
-Route::get('/doctor/{doctorId}/check-availability', [DoctorAgendaController::class, 'checkAvailability']);
-
-// Rota para médico ver pacientes
-Route::get('/doctor/patients', [DoctorAgendaController::class, 'patients'])->name('doctor.patient');
+    
 
 
-Route::post('/patient/{id}/update', [PatientController::class, 'update'])->name('patient.update');
-
-// Rotas para Médicos de Família
-Route::get('/family', [FamilyDoctorController::class, 'index'])->name('family.index');
-Route::get('/family/create', [FamilyDoctorController::class, 'create'])->name('family.create');
-Route::post('/family', [FamilyDoctorController::class, 'store'])->name('family.store');
-Route::get('/family/edit/{id}', [FamilyDoctorController::class, 'edit'])->name('family.edit');
-Route::put('/family/{id}', [FamilyDoctorController::class, 'update'])->name('family.update');
-Route::delete('/family/{id}', [FamilyDoctorController::class, 'destroy'])->name('family.destroy');
-
-
-
-Route::get('/list/admin', [AdminController::class, 'index'])->name('list.listadmin');
-
-Route::post('/admin/store', [AdminController::class, 'store'])->name('admin.store');

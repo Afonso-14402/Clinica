@@ -27,7 +27,7 @@ class SettingsController extends Controller
 public function changePassword(Request $request)
 {
     $request->validate([
-        'current_password' => ['required', 'current_password'], // Validação com a regra built-in
+        'current_password' => ['required', 'current_password'], // Validação 
         'new_password' => ['required', 'string', 'min:8', 'confirmed'],
     ]);
 

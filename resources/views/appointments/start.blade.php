@@ -46,11 +46,7 @@
                         <li>
                             <div class="dropdown-divider my-1"></div>
                         </li>
-                        <li>
-                            <a class="dropdown-item" href="#">
-                                <i class="bx bx-user bx-md me-3"></i><span>My Profile</span>
-                            </a>
-                        </li>
+                        
                         <li>
                             <a class="dropdown-item" href="{{ route('settings.index') }}">
                                 <i class="bx bx-cog bx-md me-3"></i><span>Settings</span>
@@ -108,7 +104,7 @@
                         <div class="col-md-4">
                             <div class="d-flex align-items-center">
                                 <i class="bx bx-badge-check text-primary me-2"></i>
-                                <span>{{ $appointment->specialty->name }}</span>
+                                <span>{{ $appointment->specialty ? $appointment->specialty->name : 'Especialidade não encontrada' }}</span>
                             </div>
                         </div>
                         @endif

@@ -24,8 +24,29 @@ class AppointmentHistoryController extends Controller
         $user = Auth::user();
         
         // Consulta base para obter consultas do paciente
-        $query = Appointment::where('patient_user_id', $user->id)
-            ->with(['doctor', 'specialty', 'status']);
+        $query = Appointment::with(['doctor', 'specialty', 'status']);
+
+        // Filtro de visualização (como médico ou paciente)
+        switch ($request->view_as) {
+            case 'doctor':
+                if ($user->role_id === 2) { // Se for médico
+                    $query->where('doctor_user_id', $user->id);
+                }
+                break;
+            case 'patient':
+                $query->where('patient_user_id', $user->id);
+                break;
+            default:
+                // Mostrar todas as consultas relacionadas ao usuário
+                $query->where(function($q) use ($user) {
+                    $q->where('patient_user_id', $user->id)
+                      ->orWhere(function($q) use ($user) {
+                          if ($user->role_id === 2) { // Se for médico
+                              $q->where('doctor_user_id', $user->id);
+                          }
+                      });
+                });
+        }
 
         // Aplicar filtro por período
         if ($request->date_filter) {

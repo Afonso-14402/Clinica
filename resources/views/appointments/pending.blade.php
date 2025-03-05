@@ -47,11 +47,7 @@
                     <li>
                         <div class="dropdown-divider my-1"></div>
                     </li>
-                    <li>
-                        <a class="dropdown-item" href="#">
-                            <i class="bx bx-user bx-md me-3"></i><span>My Profile</span>
-                        </a>
-                    </li>
+                    
                     <li>
                         <a class="dropdown-item" href="{{ route('settings.index') }}">
                             <i class="bx bx-cog bx-md me-3"></i><span>Settings</span>
@@ -253,6 +249,7 @@
     </div>
 </div>
 
+<script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
 <script>
     // Buscar e exibir horários do médico
     document.querySelectorAll('[data-bs-target="#scheduleModal"]').forEach(button => {
@@ -549,6 +546,80 @@
                     console.error('Erro ao carregar horários:', error);
                     newTimeSelect.innerHTML = '<option value="">Erro ao carregar horários</option>';
                 });
+        }
+    });
+
+    // Adicionar o código para exportação Excel
+    document.getElementById('exportButton').addEventListener('click', function () {
+        // Localiza a tabela no DOM
+        var table = document.querySelector('#doctorTable table');
+        if (!table) {
+            console.error('Tabela não encontrada!');
+            return;
+        }
+
+        // Extrai os dados da tabela
+        var rows = Array.from(table.rows).map(row =>
+            Array.from(row.cells).map(cell => {
+                // Remove os botões e ícones do conteúdo exportado
+                let clone = cell.cloneNode(true);
+                let buttons = clone.querySelectorAll('button, .bx, .dropdown');
+                buttons.forEach(btn => btn.remove());
+                return clone.innerText.trim();
+            })
+        );
+
+        // Cria uma nova planilha e adiciona os dados
+        var wb = XLSX.utils.book_new();
+        var ws = XLSX.utils.aoa_to_sheet(rows);
+
+        // Adiciona a planilha ao workbook
+        XLSX.utils.book_append_sheet(wb, ws, 'Consultas_Pendentes');
+
+        // Gera nome do arquivo com data atual
+        var date = new Date();
+        var fileName = `consultas_pendentes_${date.getFullYear()}-${(date.getMonth()+1).toString().padStart(2, '0')}-${date.getDate().toString().padStart(2, '0')}.xlsx`;
+
+        // Exporta o arquivo para o Excel
+        XLSX.writeFile(wb, fileName);
+    });
+
+    // Adicionar pesquisa em tempo real
+    document.addEventListener('DOMContentLoaded', function() {
+        const doctorSearch = document.getElementById('doctorSearch');
+        if (doctorSearch) {
+            let searchTimeout;
+            
+            doctorSearch.addEventListener('input', function() {
+                clearTimeout(searchTimeout);
+                const searchQuery = this.value;
+                
+                searchTimeout = setTimeout(() => {
+                    fetch(`/appointments/pending/search?query=${encodeURIComponent(searchQuery)}`)
+                        .then(response => {
+                            if (!response.ok) {
+                                throw new Error('Erro na resposta do servidor');
+                            }
+                            return response.text();
+                        })
+                        .then(html => {
+                            const parser = new DOMParser();
+                            const doc = parser.parseFromString(html, 'text/html');
+                            const newTableBody = doc.querySelector('tbody');
+                            const newPagination = doc.querySelector('.pagination');
+                            
+                            if (newTableBody) {
+                                document.querySelector('#doctorTable tbody').innerHTML = newTableBody.innerHTML;
+                            }
+                            if (newPagination && document.querySelector('.pagination')) {
+                                document.querySelector('.pagination').innerHTML = newPagination.innerHTML;
+                            }
+                        })
+                        .catch(error => {
+                            console.error('Erro ao buscar consultas:', error);
+                        });
+                }, 300);
+            });
         }
     });
 </script>

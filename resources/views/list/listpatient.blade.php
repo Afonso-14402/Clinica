@@ -374,6 +374,9 @@ h6.fw-bold {
 
 @section('content')
 
+<!-- Adicionar a biblioteca XLSX.js -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+
 <!-- Navbar -->
 <nav class="layout-navbar container-xxl navbar navbar-expand-xl navbar-detached align-items-center bg-navbar-theme shadow-sm" id="layout-navbar">
     <!-- Navbar Content -->
@@ -384,13 +387,7 @@ h6.fw-bold {
     </div>
     <div class="navbar-nav-right d-flex align-items-center" id="navbar-collapse">
         <ul class="navbar-nav flex-row align-items-center ms-auto">
-            <!-- Notifications -->
-            <li class="nav-item dropdown-notifications navbar-dropdown dropdown">
-                <a class="nav-link dropdown-toggle hide-arrow" href="javascript:void(0);" data-bs-toggle="dropdown">
-                    <i class="bx bx-bell bx-sm"></i>
-                    <span class="badge rounded-pill bg-danger badge-notifications"></span>
-                </a>
-            </li>
+           
             <!-- User Profile -->
             <li class="nav-item dropdown-user navbar-dropdown dropdown">
                 <a class="nav-link dropdown-toggle hide-arrow p-0" href="javascript:void(0);" data-bs-toggle="dropdown">
@@ -488,13 +485,6 @@ h6.fw-bold {
                                     Ações
                                 </button>
                                 <ul class="dropdown-menu">
-                                    <!-- Editar Paciente -->
-                                    <li>
-                                        <a class="dropdown-item" href="#">
-                                            <i class="bx bx-edit-alt me-1"></i> Editar
-                                        </a>
-                                    </li>
-                                    
                                     <!-- Ver Prontuário -->
                                     <li>
                                         <a class="dropdown-item" data-bs-toggle="modal" data-bs-target="#addPacienteModal" data-patient-id="{{ $patient->id }}">
@@ -661,7 +651,7 @@ h6.fw-bold {
           <div class="card shadow-sm">
             <div class="card-header">
               <ul class="nav nav-tabs card-header-tabs" id="pacienteModalTab" role="tablist">
-                @foreach (['Dados Pessoais', 'Prontuário Médico'] as $index => $tab)
+                @foreach (['Dados Pessoais', 'Histórico de Prontuários'] as $index => $tab)
                 <li class="nav-item" role="presentation">
                   <button 
                     class="nav-link {{ $index === 0 ? 'active' : '' }}" 
@@ -767,8 +757,8 @@ h6.fw-bold {
                     </div>
                 </div>
                 </div>
-                <!-- Aba: Prontuário Médico -->
-                <div class="tab-pane fade" id="modal-prontuario-medico" role="tabpanel">
+                <!-- Aba: Histórico de Prontuários -->
+                <div class="tab-pane fade" id="modal-historico-de-prontuarios" role="tabpanel">
                     <div class="prontuario-container">
                         <!-- Cabeçalho do Prontuário -->
                         <div class="prontuario-header mb-4">
@@ -850,7 +840,7 @@ document.getElementById('closeModal')?.addEventListener('click', () => {
 $(document).ready(function() {
     $('#addPacienteModal').on('show.bs.modal', function(event) {
         const patientId = $(event.relatedTarget).data('patient-id');
-        const prontuarioTab = $('#modal-prontuario-medico');
+        const prontuarioTab = $('#modal-historico-de-prontuarios');
         const reportList = prontuarioTab.find('.report-list tbody');
         const reportDetails = prontuarioTab.find('.report-details');
 
@@ -1180,23 +1170,32 @@ document.addEventListener('DOMContentLoaded', function () {
         patientSearch.addEventListener('input', function () {
             const searchQuery = this.value;
 
-            fetch(`/list/patients?search=${encodeURIComponent(searchQuery)}`)
-                .then(response => response.text())
+            fetch(`/list-patients?search=${encodeURIComponent(searchQuery)}`)
+                .then(response => {
+                    if (!response.ok) {
+                        throw new Error('Erro na resposta do servidor');
+                    }
+                    return response.text();
+                })
                 .then(html => {
                     const parser = new DOMParser();
                     const doc = parser.parseFromString(html, 'text/html');
                     const newTableBody = doc.querySelector('#patientTableBody');
                     const newPagination = doc.querySelector('.pagination');
 
-                    document.querySelector('#patientTableBody').innerHTML = newTableBody.innerHTML;
-                    document.querySelector('.pagination').innerHTML = newPagination.innerHTML;
+                    if (newTableBody) {
+                        document.querySelector('#patientTableBody').innerHTML = newTableBody.innerHTML;
+                    }
+                    if (newPagination) {
+                        document.querySelector('.pagination').innerHTML = newPagination.innerHTML;
+                    }
                 })
                 .catch(error => {
-                    console.error('Erro ao buscar os utentes:', error);
+                    console.error('Erro ao buscar os pacientes:', error);
+                    // Opcional: mostrar mensagem de erro para o usuário
+                    alert('Ocorreu um erro ao buscar os pacientes. Por favor, tente novamente.');
                 });
         });
-    } else {
-        console.error('Elemento com ID "patientSearch" não encontrado!');
     }
 });
 
@@ -1234,9 +1233,41 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     });
 });
+
+// Adicionar o código para exportação Excel
+document.getElementById('exportButton').addEventListener('click', function () {
+    // Localiza a tabela no DOM
+    var table = document.querySelector('#doctorTable table');
+    if (!table) {
+        console.error('Tabela não encontrada!');
+        return;
+    }
+
+    // Extrai os dados da tabela
+    var rows = Array.from(table.rows).map(row =>
+        Array.from(row.cells).map(cell => {
+            // Remove os botões e ícones do conteúdo exportado
+            let clone = cell.cloneNode(true);
+            let buttons = clone.querySelectorAll('button, .bx');
+            buttons.forEach(btn => btn.remove());
+            return clone.innerText.trim();
+        })
+    );
+
+    // Cria uma nova planilha e adiciona os dados
+    var wb = XLSX.utils.book_new();
+    var ws = XLSX.utils.aoa_to_sheet(rows);
+
+    // Adiciona a planilha ao workbook
+    XLSX.utils.book_append_sheet(wb, ws, 'Pacientes');
+
+    // Exporta o arquivo para o Excel
+    XLSX.writeFile(wb, 'lista_pacientes.xlsx');
+});
 </script>
  
 
-@endsection<script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+@endsection
+<script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
 <script src="https://code.jquery.com/jquery-3.6.4.min.js"></script>
 <link href='https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css' rel='stylesheet'>

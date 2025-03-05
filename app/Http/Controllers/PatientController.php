@@ -117,4 +117,22 @@ class PatientController extends Controller
             ], 500);
         }
     }
+
+    public function search(Request $request)
+    {
+        // Obtém o usuário autenticado
+        $user = auth()->user();
+        
+        $query = $request->get('search');
+        
+        $patients = User::where('role_id', 3)
+            ->where('name', 'LIKE', "%{$query}%")
+            ->paginate(10);
+        
+        if ($request->ajax()) {
+            return view('list.listpatient', compact('patients', 'user'))->render();
+        }
+        
+        return view('list.listpatient', compact('patients', 'user'));
+    }
 } 
